@@ -27,7 +27,6 @@ module Gitlab
           common_commit = repo.merge_base_commit(head, base)
 
           options ||= {}
-          break_rewrites = options[:break_rewrites]
           actual_options = filter_diff_options(options)
           repo.diff(common_commit, head, actual_options, *paths)
         end
