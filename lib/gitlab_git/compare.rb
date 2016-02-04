@@ -31,7 +31,7 @@ module Gitlab
 
         # Try to collect diff only if diffs is empty
         # Otherwise return cached version
-        if @diffs.empty? && @timeout == false
+        if @diffs.first.nil? && @timeout == false
           begin
             @diffs = Gitlab::Git::Diff.between(@repository, @head.id, @base.id,
                                                options, *paths)
