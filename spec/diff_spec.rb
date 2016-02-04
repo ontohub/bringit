@@ -52,8 +52,8 @@ EOT
     let(:diffs) { Gitlab::Git::Diff.between(repository, 'feature', 'master') }
     subject { diffs }
 
-    it { should be_kind_of Array }
-    its(:size) { should eq(1) }
+    it { should be_kind_of Enumerator }
+    it { subject.to_a.size.should eq(1) }
 
     context :diff do
       subject { diffs.first }

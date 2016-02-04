@@ -320,8 +320,8 @@ describe Gitlab::Git::Commit do
   describe :diffs do
     subject { commit.diffs }
 
-    it { should be_kind_of Array }
-    its(:size) { should eq(2) }
+    it { should be_kind_of Enumerator }
+    it { subject.to_a.size.should eq(2) }
     its(:first) { should be_kind_of Gitlab::Git::Diff }
   end
 

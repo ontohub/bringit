@@ -47,7 +47,7 @@ module Gitlab
       # Check if diff is empty because it is actually empty
       # and not because its impossible to get it
       def empty_diff?
-        diffs.empty? && timeout == false
+        diffs.first.nil? && timeout == false
       end
     end
   end
