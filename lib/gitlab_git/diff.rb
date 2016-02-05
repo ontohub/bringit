@@ -187,6 +187,10 @@ module Gitlab
         a_mode == '160000' || b_mode == '160000'
       end
 
+      def size
+        @size ||= @diff.scan(/\n/).count
+      end
+
       private
 
       def init_from_rugged(rugged)
