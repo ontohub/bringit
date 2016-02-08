@@ -49,14 +49,14 @@ EOT
   end
 
   describe :between do
-    let(:diffs) { Gitlab::Git::Diff.between(repository, 'feature', 'master') }
+    let(:diffs) { Gitlab::Git::Diff.between(repository, 'feature', 'master', all_diffs: true) }
     subject { diffs }
 
-    it { should be_kind_of Enumerator }
+    it { should be_kind_of Gitlab::Git::DiffCollection }
     it { subject.to_a.size.should eq(1) }
 
     context :diff do
-      subject { diffs.first }
+      subject { diffs.to_a.first }
 
       it { should be_kind_of Gitlab::Git::Diff }
       its(:new_path) { should == 'files/ruby/feature.rb' }

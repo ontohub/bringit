@@ -315,11 +315,12 @@ module Gitlab
       # diff options.  The +options+ hash can also include :break_rewrites to
       # split larger rewrites into delete/add pairs.
       def diff(from, to, options = {}, *paths)
-        Enumerator.new do |y|
-          diff_patches(from, to, options, *paths).each do |p|
-            y << Gitlab::Git::Diff.new(p)
-          end
+        result = DiffCollection.new(options)
+        diff_patches(from, to, options, *paths).each do |p|
+          result.add(Gitlab::Git::Diff.new(p))
+          break if result.full?
         end
+        result
       end
 
       # Return the diff between +from+ and +to+ in a single patch string.  The

@@ -130,7 +130,8 @@ module Gitlab
                              :disable_pathspec_match, :deltas_are_icase,
                              :include_untracked_content, :skip_binary_check,
                              :include_typechange, :include_typechange_trees,
-                             :ignore_filemode, :recurse_ignored_dirs, :paths]
+                             :ignore_filemode, :recurse_ignored_dirs, :paths,
+                             :max_files, :max_lines, :all_diffs]
 
           if default_options
             actual_defaults = default_options.dup
@@ -188,7 +189,7 @@ module Gitlab
       end
 
       def size
-        @size ||= @diff.scan(/\n/).count
+        @size ||= Count.lines(@diff)
       end
 
       private

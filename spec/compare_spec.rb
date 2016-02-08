@@ -16,20 +16,19 @@ describe Gitlab::Git::Compare do
 
   describe :diffs do
     subject do
-      compare.diffs.map(&:new_path)
+      compare.diffs(all_diffs: true).map!(&:new_path)
     end
 
     it { should have(10).elements }
     it { should include('files/ruby/popen.rb') }
     it { should_not include('LICENSE') }
-    it { compare.timeout.should be_false }
-    it { compare.empty_diff?.should be_false }
+    it { subject; compare.empty_diff?.should be_false }
   end
 
   describe 'non-existing refs' do
     let(:compare) { Gitlab::Git::Compare.new(repository, 'no-such-branch', '1234567890') }
 
     it { compare.commits.should be_empty }
-    it { compare.diffs.should be_empty }
+    it { compare.diffs.to_a.should be_empty }
   end
 end

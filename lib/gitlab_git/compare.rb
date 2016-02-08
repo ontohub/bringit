@@ -1,13 +1,12 @@
 module Gitlab
   module Git
     class Compare
-      attr_reader :commits, :diffs, :same, :timeout, :head, :base
+      attr_reader :commits, :same, :head, :base
 
       def initialize(repository, base, head)
-        @commits, @diffs = [], []
+        @commits= []
         @same = false
         @repository = repository
-        @timeout = false
 
         return unless base && head
 
@@ -24,21 +23,17 @@ module Gitlab
         @commits = Gitlab::Git::Commit.between(repository, @base.id, @head.id)
       end
 
-      def diffs(paths = nil, options = {})
+      def diffs(options = {})
         unless @head && @base
-          return []
+          return Gitlab::Git::DiffCollection.empty
         end
 
         # Try to collect diff only if diffs is empty
         # Otherwise return cached version
-        if @diffs.first.nil? && @timeout == false
-          begin
+        if @diffs.nil?
+            paths = options.delete(:paths) || []
             @diffs = Gitlab::Git::Diff.between(@repository, @head.id, @base.id,
-                                               options, *paths)
-          rescue Gitlab::Git::Diff::TimeoutError => ex
-            @diffs = []
-            @timeout = true
-          end
+              options, *paths)
         end
 
         @diffs
@@ -47,7 +42,7 @@ module Gitlab
       # Check if diff is empty because it is actually empty
       # and not because its impossible to get it
       def empty_diff?
-        diffs.first.nil? && timeout == false
+        diffs.to_a.empty?
       end
     end
   end
