@@ -1126,9 +1126,9 @@ module Gitlab
 
           # Yield the actual file contents
           count = 0
-          file_contents.each_line.each_with_index do |line, i|
+          file_contents.each_line do |line|
             line.chomp!
-            yielder.yield [line, i]
+            yielder.yield [line, count]
             count += 1
           end
 
@@ -1143,7 +1143,7 @@ module Gitlab
         # Loop through consecutive blocks of lines with indexes
         lines_with_index.each_cons(2 * SEARCH_CONTEXT_LINES + 1) do |line_block|
           # Get the 'middle' line and index from the block
-          line, i = line_block[SEARCH_CONTEXT_LINES]
+          line = line_block[SEARCH_CONTEXT_LINES].first
 
           next unless line && line.match(/#{Regexp.escape(query)}/i)
 
