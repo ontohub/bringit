@@ -12,7 +12,7 @@ module Gitlab
         @max_lines = options.delete(:max_lines)
         @all_diffs = options.delete(:all_diffs)
         if !@all_diffs && !(@max_files && @max_lines)
-          raise 'You must pass both :max_files and :max_lines or set :all_files to true.'
+          raise 'You must pass both :max_files and :max_lines or set :all_diffs to true.'
         end
 
         @file_count, @line_count = 0, 0
