@@ -1143,7 +1143,7 @@ module Gitlab
         # Loop through consecutive blocks of lines with indexes
         lines_with_index.each_cons(2 * SEARCH_CONTEXT_LINES + 1) do |line_block|
           # Get the 'middle' line and index from the block
-          line = line_block[SEARCH_CONTEXT_LINES].first
+          line, i = line_block[SEARCH_CONTEXT_LINES]
 
           next unless line && line.match(/#{Regexp.escape(query)}/i)
 
