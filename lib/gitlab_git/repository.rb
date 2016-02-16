@@ -1126,9 +1126,9 @@ module Gitlab
 
           # Yield the actual file contents
           count = 0
-          file_contents.each_line.each_with_index do |line, i|
+          file_contents.each_line do |line|
             line.chomp!
-            yielder.yield [line, i]
+            yielder.yield [line, count]
             count += 1
           end
 
