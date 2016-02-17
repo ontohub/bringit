@@ -1,3 +1,6 @@
+v 8.2.0
+  - Upgrade Rugged to 0.24.0b13
+
 v 8.1.0
   - Added Gitlab::Git::Repository#count_commits_between
 
