@@ -31,9 +31,9 @@ module Gitlab
         # Try to collect diff only if diffs is empty
         # Otherwise return cached version
         if @diffs.nil?
-            paths = options.delete(:paths) || []
-            @diffs = Gitlab::Git::Diff.between(@repository, @head.id, @base.id,
-              options, *paths)
+          paths = options.delete(:paths) || []
+          @diffs = Gitlab::Git::Diff.between(@repository, @head.id, @base.id,
+            options, *paths)
         end
 
         @diffs
