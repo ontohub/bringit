@@ -1,13 +1,14 @@
 module Gitlab
   module Git
     class DiffCollection
-      class TooManyDiffs < ::StandardError ; end
+      include Enumerable
 
       def self.empty
-        new(all_diffs: true)
+        new([], all_diffs: true)
       end
 
-      def initialize(options)
+      def initialize(iterator, options)
+        @iterator = iterator
         @max_files = options.delete(:max_files)
         @max_lines = options.delete(:max_lines)
         @all_diffs = options.delete(:all_diffs)
@@ -19,17 +20,22 @@ module Gitlab
         @array = Array.new
       end
 
-      def add(diff)
-        raise TooManyDiffs, "Can only hold #@max_files files and #@max_lines lines." if full?
-        @file_count += 1
-        @line_count += diff.size
-        if !too_many_files? && !too_many_lines?
-          @array << diff
-        end
-      end
+      def each
+        @iterator.each_with_index do |raw, i|
+          if !@array[i].nil?
+            yield @array[i]
+            next
+          end
+          
+          @file_count += 1
+          break if too_many_files?
 
-      def full?
-        too_many_files?
+          diff = Gitlab::Git::Diff.new(raw)
+          @line_count += diff.size
+          break if too_many_lines?
+
+          yield @array[i] = diff
+        end
       end
 
       def too_many_files?
@@ -41,15 +47,15 @@ module Gitlab
       end
 
       def real_size
-        too_many_files? ? "#{@max_files}+" : @file_count.to_s
-      end
+        return @file_count.to_s if @all_diffs
 
-      def to_a
-        @array
+        result = [@max_files, @file_count].min.to_s
+        result << '+' if too_many_files? || too_many_lines?
+        result
       end
 
       def map!
-        @array.each_with_index do |elt, i|
+        each_with_index do |elt, i|
           @array[i] = yield(elt)
         end
       end

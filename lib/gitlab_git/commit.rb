@@ -205,12 +205,7 @@ module Gitlab
       end
 
       def diffs(options = {})
-        result = DiffCollection.new(options)
-        diff_from_parent(options).each do |diff|
-          result.add(Gitlab::Git::Diff.new(diff))
-          break if result.full?
-        end
-        result
+        DiffCollection.new(diff_from_parent(options), options)
       end
 
       def parents
