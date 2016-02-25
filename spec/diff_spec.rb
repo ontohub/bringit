@@ -107,9 +107,9 @@ EOT
     it { Gitlab::Git::Diff.new(@diffs[1]).submodule?.should == true }
   end
 
-  describe :size do
+  describe :line_count do
     subject { Gitlab::Git::Diff.new(@rugged_diff) }
     
-    its(:size) { should eq(9) }
+    its(:line_count) { should eq(9) }
   end
 end

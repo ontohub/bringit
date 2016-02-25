@@ -188,8 +188,8 @@ module Gitlab
         a_mode == '160000' || b_mode == '160000'
       end
 
-      def size
-        @size ||= Count.lines(@diff)
+      def line_count
+        @line_count ||= Count.lines(@diff)
       end
 
       private

@@ -31,7 +31,7 @@ module Gitlab
           break if too_many_files?
 
           diff = Gitlab::Git::Diff.new(raw)
-          @line_count += diff.size
+          @line_count += diff.line_count
           break if too_many_lines?
 
           yield @array[i] = diff
