@@ -321,8 +321,8 @@ describe Gitlab::Git::Commit do
     subject { commit.diffs(all_diffs: true) }
 
     it { should be_kind_of Gitlab::Git::DiffCollection }
-    it { subject.to_a.size.should eq(2) }
-    it { subject.to_a.first.should be_kind_of Gitlab::Git::Diff }
+    it { subject.count.should eq(2) }
+    it { subject.first.should be_kind_of Gitlab::Git::Diff }
   end
 
   describe :ref_names do

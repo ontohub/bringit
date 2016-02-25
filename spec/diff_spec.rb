@@ -53,10 +53,10 @@ EOT
     subject { diffs }
 
     it { should be_kind_of Gitlab::Git::DiffCollection }
-    it { subject.to_a.size.should eq(1) }
+    it { subject.count.should eq(1) }
 
     context :diff do
-      subject { diffs.to_a.first }
+      subject { diffs.first }
 
       it { should be_kind_of Gitlab::Git::Diff }
       its(:new_path) { should == 'files/ruby/feature.rb' }

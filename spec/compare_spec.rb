@@ -29,6 +29,6 @@ describe Gitlab::Git::Compare do
     let(:compare) { Gitlab::Git::Compare.new(repository, 'no-such-branch', '1234567890') }
 
     it { compare.commits.should be_empty }
-    it { compare.diffs.to_a.should be_empty }
+    it { compare.diffs(all_diffs: true).to_a.should be_empty }
   end
 end

@@ -542,7 +542,7 @@ describe Gitlab::Git::Repository do
     it "should contain the same diffs as #diff" do
       diff_text = repo.diff_text("master", "feature")
       diff_text = encode_utf8(diff_text)
-      repo.diff("master", "feature", all_diffs: true).to_a.each do |single_diff|
+      repo.diff("master", "feature", all_diffs: true).each do |single_diff|
         expect(diff_text.include?(single_diff.diff)).to be_true
       end
     end
