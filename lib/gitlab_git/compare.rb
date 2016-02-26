@@ -28,11 +28,8 @@ module Gitlab
           return Gitlab::Git::DiffCollection.empty
         end
 
-        @diffs ||= begin
-          paths = options.delete(:paths) || []
-          Gitlab::Git::Diff.between(@repository, @head.id, @base.id,
-            options, *paths)
-        end
+        paths = options.delete(:paths) || []
+        Gitlab::Git::Diff.between(@repository, @head.id, @base.id, options, *paths)
       end
 
       # Check if diff is empty because it is actually empty
