@@ -16,40 +16,50 @@ module Gitlab
           raise 'You must pass both :max_files and :max_lines or set :all_diffs to true.'
         end
 
-        @file_count, @line_count = 0, 0
+        @line_count = 0
+        @overflow = false
         @array = Array.new
       end
 
       def each
         @iterator.each_with_index do |raw, i|
+          # First yield cached Diff instances from @array
           if !@array[i].nil?
             yield @array[i]
             next
           end
           
-          @file_count += 1
-          break if _too_many_files?
+          # We have exhausted @array, time to create new Diff instances or stop.
+          break if @overflow
 
+          if !@all_diffs && i >= @max_files
+            @overflow = true
+            break
+          end
+          
+          # Going by the number of files alone it is OK to create a new Diff instance.
           diff = Gitlab::Git::Diff.new(raw)
+
           @line_count += diff.line_count
-          break if _too_many_lines?
+          if !@all_diffs && @line_count >= @max_lines
+            # This last Diff instance pushes us over the lines limit. We stop and
+            # discard it.
+            @overflow = true
+            break
+          end
 
           yield @array[i] = diff
         end
       end
 
       def too_many_files?
-        return @too_many_files unless @too_many_files.nil?
-        
         populate!
-        @too_many_files = _too_many_files?
+        !@all_diffs && @overflow && size >= @max_files
       end
 
       def too_many_lines?
-        return @too_many_lines unless @too_many_lines.nil?
-        
         populate!
-        @too_many_lines = _too_many_lines?
+        !@all_diffs && @overflow && @line_count >= @max_lines
       end
 
       def size
@@ -57,7 +67,12 @@ module Gitlab
       end
 
       def real_size
-        @real_size ||= @iterator.count
+        populate!
+        return size.to_s if @all_diffs
+
+        result = [@max_files, size].min.to_s
+        result << '+' if @overflow
+        result
       end
 
       def map!
@@ -74,14 +89,6 @@ module Gitlab
         each { nil } # force a loop through all diffs
         @populated = true
         nil
-      end
-
-      def _too_many_files?
-        !@all_diffs && (@file_count > @max_files)
-      end
-
-      def _too_many_lines?
-        !@all_diffs && (@line_count > @max_lines)
       end
     end
   end

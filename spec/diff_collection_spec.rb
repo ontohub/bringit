@@ -29,8 +29,6 @@ describe Gitlab::Git::DiffCollection do
   end
 
   context 'overflow handling' do
-    before { subject.to_a }
-
     context 'adding few enough files' do
       let(:file_count) { 3 }
 
@@ -39,7 +37,7 @@ describe Gitlab::Git::DiffCollection do
 
         its(:too_many_files?) { should be_false }
         its(:too_many_lines?) { should be_false }
-        its(:real_size) { should eq(3) }
+        its(:real_size) { should eq('3') }
         it { subject.size.should eq(3) }
 
         context 'when limiting is disabled' do
@@ -47,7 +45,7 @@ describe Gitlab::Git::DiffCollection do
 
           its(:too_many_files?) { should be_false }
           its(:too_many_lines?) { should be_false }
-          its(:real_size) { should eq(3) }
+          its(:real_size) { should eq('3') }
           it { subject.size.should eq(3) }
         end
       end
@@ -57,7 +55,7 @@ describe Gitlab::Git::DiffCollection do
 
         its(:too_many_files?) { should be_false }
         its(:too_many_lines?) { should be_true }
-        its(:real_size) { should eq(3) }
+        its(:real_size) { should eq('0+') }
         it { subject.size.should eq(0) }
 
         context 'when limiting is disabled' do
@@ -65,7 +63,7 @@ describe Gitlab::Git::DiffCollection do
 
           its(:too_many_files?) { should be_false }
           its(:too_many_lines?) { should be_false }
-          its(:real_size) { should eq(3) }
+          its(:real_size) { should eq('3') }
           it { subject.size.should eq(3) }
         end
       end
@@ -79,7 +77,7 @@ describe Gitlab::Git::DiffCollection do
 
         its(:too_many_files?) { should be_true }
         its(:too_many_lines?) { should be_false }
-        its(:real_size) { should eq(11) }
+        its(:real_size) { should eq('10+') }
         it { subject.size.should eq(10) }
 
         context 'when limiting is disabled' do
@@ -87,7 +85,7 @@ describe Gitlab::Git::DiffCollection do
 
           its(:too_many_files?) { should be_false }
           its(:too_many_lines?) { should be_false }
-          its(:real_size) { should eq(11) }
+          its(:real_size) { should eq('11') }
           it { subject.size.should eq(11) }
         end
       end
@@ -97,7 +95,7 @@ describe Gitlab::Git::DiffCollection do
 
         its(:too_many_files?) { should be_false }
         its(:too_many_lines?) { should be_true }
-        its(:real_size) { should eq(11) }
+        its(:real_size) { should eq('3+') }
         it { subject.size.should eq(3) }
 
         context 'when limiting is disabled' do
@@ -105,7 +103,7 @@ describe Gitlab::Git::DiffCollection do
 
           its(:too_many_files?) { should be_false }
           its(:too_many_lines?) { should be_false }
-          its(:real_size) { should eq(11) }
+          its(:real_size) { should eq('11') }
           it { subject.size.should eq(11) }
         end
       end
@@ -119,7 +117,7 @@ describe Gitlab::Git::DiffCollection do
 
         its(:too_many_files?) { should be_false }
         its(:too_many_lines?) { should be_false }
-        its(:real_size) { should eq(10) }
+        its(:real_size) { should eq('10') }
         it { subject.size.should eq(10) }
       end
     end
