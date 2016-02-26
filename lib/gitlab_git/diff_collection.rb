@@ -28,36 +28,60 @@ module Gitlab
           end
           
           @file_count += 1
-          break if too_many_files?
+          break if _too_many_files?
 
           diff = Gitlab::Git::Diff.new(raw)
           @line_count += diff.line_count
-          break if too_many_lines?
+          break if _too_many_lines?
 
           yield @array[i] = diff
         end
       end
 
       def too_many_files?
-        !@all_diffs && (@file_count > @max_files)
+        return @too_many_files unless @too_many_files.nil?
+        
+        populate!
+        @too_many_files = _too_many_files?
       end
 
       def too_many_lines?
-        !@all_diffs && (@line_count > @max_lines)
+        return @too_many_lines unless @too_many_lines.nil?
+        
+        populate!
+        @too_many_lines = _too_many_lines?
+      end
+
+      def size
+        @size ||= count # forces a loop through @iterator
       end
 
       def real_size
-        return @file_count.to_s if @all_diffs
-
-        result = [@max_files, @file_count].min.to_s
-        result << '+' if too_many_files? || too_many_lines?
-        result
+        @real_size ||= @iterator.count
       end
 
       def map!
         each_with_index do |elt, i|
           @array[i] = yield(elt)
         end
+      end
+
+      private
+
+      def populate!
+        return if @populated
+        
+        each { nil } # force a loop through all diffs
+        @populated = true
+        nil
+      end
+
+      def _too_many_files?
+        !@all_diffs && (@file_count > @max_files)
+      end
+
+      def _too_many_lines?
+        !@all_diffs && (@line_count > @max_lines)
       end
     end
   end
