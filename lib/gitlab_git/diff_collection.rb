@@ -70,9 +70,11 @@ module Gitlab
         populate!
         return size.to_s if @all_diffs
 
-        result = [@max_files, size].min.to_s
-        result << '+' if @overflow
-        result
+        if @overflow
+          "#{size}+"
+        else
+          size.to_s
+        end
       end
 
       def map!
