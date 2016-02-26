@@ -28,7 +28,7 @@ module Gitlab
             yield @array[i]
             next
           end
-          
+
           # We have exhausted @array, time to create new Diff instances or stop.
           break if @overflow
 
@@ -36,7 +36,7 @@ module Gitlab
             @overflow = true
             break
           end
-          
+
           # Going by the number of files alone it is OK to create a new Diff instance.
           diff = Gitlab::Git::Diff.new(raw)
 
@@ -87,7 +87,7 @@ module Gitlab
 
       def populate!
         return if @populated
-        
+
         each { nil } # force a loop through all diffs
         @populated = true
         nil
