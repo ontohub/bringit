@@ -318,7 +318,7 @@ describe Gitlab::Git::Commit do
   end
 
   describe :diffs do
-    subject { commit.diffs(all_diffs: true) }
+    subject { commit.diffs }
 
     it { should be_kind_of Gitlab::Git::DiffCollection }
     it { subject.count.should eq(2) }

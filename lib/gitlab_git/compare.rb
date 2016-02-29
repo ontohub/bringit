@@ -35,8 +35,7 @@ module Gitlab
       # Check if diff is empty because it is actually empty
       # and not because its impossible to get it
       def empty_diff?
-        # It is OK to use 'all_diffs: true' because "any?" stops once it finds one.
-        !diffs(all_diffs: true).any?
+        !diffs.any?
       end
     end
   end

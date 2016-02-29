@@ -49,7 +49,7 @@ EOT
   end
 
   describe :between do
-    let(:diffs) { Gitlab::Git::Diff.between(repository, 'feature', 'master', all_diffs: true) }
+    let(:diffs) { Gitlab::Git::Diff.between(repository, 'feature', 'master') }
     subject { diffs }
 
     it { should be_kind_of Gitlab::Git::DiffCollection }

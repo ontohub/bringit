@@ -3,18 +3,16 @@ module Gitlab
     class DiffCollection
       include Enumerable
 
+      DEFAULT_LIMITS = {max_files: 100, max_lines: 5000}.freeze
+
       def self.empty
         new([], all_diffs: true)
       end
 
       def initialize(iterator, options)
         @iterator = iterator
-        @max_files = options.delete(:max_files)
-        @max_lines = options.delete(:max_lines)
-        @all_diffs = options.delete(:all_diffs)
-        if !@all_diffs && !(@max_files && @max_lines)
-          raise 'You must pass both :max_files and :max_lines or set :all_diffs to true.'
-        end
+        @max_files = options.fetch(:max_files, DEFAULT_LIMITS[:max_files])
+        @max_lines = options.fetch(:max_lines, DEFAULT_LIMITS[:max_lines])
 
         @line_count = 0
         @overflow = false
@@ -32,7 +30,7 @@ module Gitlab
           # We have exhausted @array, time to create new Diff instances or stop.
           break if @overflow
 
-          if !@all_diffs && i >= @max_files
+          if i >= @max_files
             @overflow = true
             break
           end
@@ -41,7 +39,7 @@ module Gitlab
           diff = Gitlab::Git::Diff.new(raw)
 
           @line_count += diff.line_count
-          if !@all_diffs && @line_count >= @max_lines
+          if @line_count >= @max_lines
             # This last Diff instance pushes us over the lines limit. We stop and
             # discard it.
             @overflow = true
@@ -54,12 +52,12 @@ module Gitlab
 
       def too_many_files?
         populate!
-        !@all_diffs && @overflow && size >= @max_files
+        @overflow && size >= @max_files
       end
 
       def too_many_lines?
         populate!
-        !@all_diffs && @overflow && @line_count >= @max_lines
+        @overflow && @line_count >= @max_lines
       end
 
       def size
@@ -68,7 +66,6 @@ module Gitlab
 
       def real_size
         populate!
-        return size.to_s if @all_diffs
 
         if @overflow
           "#{size}+"
