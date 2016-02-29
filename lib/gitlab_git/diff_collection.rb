@@ -13,7 +13,7 @@ module Gitlab
         @iterator = iterator
         @max_files = options.fetch(:max_files, DEFAULT_LIMITS[:max_files])
         @max_lines = options.fetch(:max_lines, DEFAULT_LIMITS[:max_lines])
-        @all_diffs = !!options.fetch(:all_diffs)
+        @all_diffs = !!options.fetch(:all_diffs, false)
 
         @line_count = 0
         @overflow = false
