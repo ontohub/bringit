@@ -39,6 +39,15 @@ describe Gitlab::Git::DiffCollection do
         its(:too_many_lines?) { should be_false }
         its(:real_size) { should eq('3') }
         it { subject.size.should eq(3) }
+
+        context 'when limiting is disabled' do
+          let(:all_diffs) { true }
+
+          its(:too_many_files?) { should be_false }
+          its(:too_many_lines?) { should be_false }
+          its(:real_size) { should eq('3') }
+          it { subject.size.should eq(3) }
+        end
       end
 
       context 'and too many lines' do
@@ -48,6 +57,15 @@ describe Gitlab::Git::DiffCollection do
         its(:too_many_lines?) { should be_true }
         its(:real_size) { should eq('0+') }
         it { subject.size.should eq(0) }
+
+        context 'when limiting is disabled' do
+          let(:all_diffs) { true }
+
+          its(:too_many_files?) { should be_false }
+          its(:too_many_lines?) { should be_false }
+          its(:real_size) { should eq('3') }
+          it { subject.size.should eq(3) }
+        end
       end
     end
 
@@ -61,6 +79,15 @@ describe Gitlab::Git::DiffCollection do
         its(:too_many_lines?) { should be_false }
         its(:real_size) { should eq('10+') }
         it { subject.size.should eq(10) }
+
+        context 'when limiting is disabled' do
+          let(:all_diffs) { true }
+
+          its(:too_many_files?) { should be_false }
+          its(:too_many_lines?) { should be_false }
+          its(:real_size) { should eq('11') }
+          it { subject.size.should eq(11) }
+        end
       end
 
       context 'and too many lines' do
@@ -70,6 +97,15 @@ describe Gitlab::Git::DiffCollection do
         its(:too_many_lines?) { should be_true }
         its(:real_size) { should eq('3+') }
         it { subject.size.should eq(3) }
+
+        context 'when limiting is disabled' do
+          let(:all_diffs) { true }
+
+          its(:too_many_files?) { should be_false }
+          its(:too_many_lines?) { should be_false }
+          its(:real_size) { should eq('11') }
+          it { subject.size.should eq(11) }
+        end
       end
     end
 

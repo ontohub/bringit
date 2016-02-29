@@ -13,6 +13,7 @@ module Gitlab
         @iterator = iterator
         @max_files = options.fetch(:max_files, DEFAULT_LIMITS[:max_files])
         @max_lines = options.fetch(:max_lines, DEFAULT_LIMITS[:max_lines])
+        @all_diffs = !!options.fetch(:all_diffs)
 
         @line_count = 0
         @overflow = false
@@ -30,7 +31,7 @@ module Gitlab
           # We have exhausted @array, time to create new Diff instances or stop.
           break if @overflow
 
-          if i >= @max_files
+          if !@all_diffs && i >= @max_files
             @overflow = true
             break
           end
@@ -39,7 +40,7 @@ module Gitlab
           diff = Gitlab::Git::Diff.new(raw)
 
           @line_count += diff.line_count
-          if @line_count >= @max_lines
+          if !@all_diffs && @line_count >= @max_lines
             # This last Diff instance pushes us over the lines limit. We stop and
             # discard it.
             @overflow = true
@@ -52,12 +53,12 @@ module Gitlab
 
       def too_many_files?
         populate!
-        @overflow && size >= @max_files
+        !@all_diffs && @overflow && size >= @max_files
       end
 
       def too_many_lines?
         populate!
-        @overflow && @line_count >= @max_lines
+        !@all_diffs && @overflow && @line_count >= @max_lines
       end
 
       def size
