@@ -3,7 +3,7 @@ module Gitlab
     class DiffCollection
       include Enumerable
 
-      DEFAULT_LIMITS = {max_files: 100, max_lines: 5000}.freeze
+      DEFAULT_LIMITS = { max_files: 100, max_lines: 5000 }.freeze
 
       def self.empty
         new([], all_diffs: true)
