@@ -36,6 +36,7 @@ describe Gitlab::Git::DiffCollection do
         let(:line_count) { 10 }
 
         its(:overflow?) { should be_false }
+        its(:empty?) { should be_false }
         its(:too_many_files?) { should be_false }
         its(:too_many_lines?) { should be_false }
         its(:real_size) { should eq('3') }
@@ -44,6 +45,8 @@ describe Gitlab::Git::DiffCollection do
         context 'when limiting is disabled' do
           let(:all_diffs) { true }
 
+          its(:overflow?) { should be_false }
+          its(:empty?) { should be_false }
           its(:too_many_files?) { should be_false }
           its(:too_many_lines?) { should be_false }
           its(:real_size) { should eq('3') }
@@ -55,6 +58,7 @@ describe Gitlab::Git::DiffCollection do
         let(:line_count) { 1000 }
 
         its(:overflow?) { should be_true }
+        its(:empty?) { should be_false }
         its(:too_many_files?) { should be_false }
         its(:too_many_lines?) { should be_true }
         its(:real_size) { should eq('0+') }
@@ -63,6 +67,8 @@ describe Gitlab::Git::DiffCollection do
         context 'when limiting is disabled' do
           let(:all_diffs) { true }
 
+          its(:overflow?) { should be_false }
+          its(:empty?) { should be_false }
           its(:too_many_files?) { should be_false }
           its(:too_many_lines?) { should be_false }
           its(:real_size) { should eq('3') }
@@ -78,6 +84,7 @@ describe Gitlab::Git::DiffCollection do
         let(:line_count) { 1 }
 
         its(:overflow?) { should be_true }
+        its(:empty?) { should be_false }
         its(:too_many_files?) { should be_true }
         its(:too_many_lines?) { should be_false }
         its(:real_size) { should eq('10+') }
@@ -87,6 +94,7 @@ describe Gitlab::Git::DiffCollection do
           let(:all_diffs) { true }
 
           its(:overflow?) { should be_false }
+          its(:empty?) { should be_false }
           its(:too_many_files?) { should be_false }
           its(:too_many_lines?) { should be_false }
           its(:real_size) { should eq('11') }
@@ -98,6 +106,7 @@ describe Gitlab::Git::DiffCollection do
         let(:line_count) { 30 }
 
         its(:overflow?) { should be_true }
+        its(:empty?) { should be_false }
         its(:too_many_files?) { should be_false }
         its(:too_many_lines?) { should be_true }
         its(:real_size) { should eq('3+') }
@@ -107,6 +116,7 @@ describe Gitlab::Git::DiffCollection do
           let(:all_diffs) { true }
 
           its(:overflow?) { should be_false }
+          its(:empty?) { should be_false }
           its(:too_many_files?) { should be_false }
           its(:too_many_lines?) { should be_false }
           its(:real_size) { should eq('11') }
@@ -122,12 +132,22 @@ describe Gitlab::Git::DiffCollection do
         let(:line_count) { 1 }
 
         its(:overflow?) { should be_false }
+        its(:empty?) { should be_false }
         its(:too_many_files?) { should be_false }
         its(:too_many_lines?) { should be_false }
         its(:real_size) { should eq('10') }
         it { subject.size.should eq(10) }
       end
     end
+  end
+
+  describe '::empty' do
+    subject { Gitlab::Git::DiffCollection.empty }
+
+    its(:overflow?) { should be_false }
+    its(:empty?) { should be_true }
+    its(:size) { should eq(0) }
+    its(:real_size) { should eq('0')}
   end
 
   def fake_diff(line_count)

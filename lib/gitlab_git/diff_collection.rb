@@ -51,6 +51,10 @@ module Gitlab
         end
       end
 
+      def empty?
+        !@iterator.any?
+      end
+
       def overflow?
         populate!
         !!@overflow
