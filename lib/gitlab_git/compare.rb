@@ -4,7 +4,7 @@ module Gitlab
       attr_reader :commits, :same, :head, :base
 
       def initialize(repository, base, head)
-        @commits= []
+        @commits = []
         @same = false
         @repository = repository
 
