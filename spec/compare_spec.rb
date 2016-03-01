@@ -22,7 +22,6 @@ describe Gitlab::Git::Compare do
     it { should have(10).elements }
     it { should include('files/ruby/popen.rb') }
     it { should_not include('LICENSE') }
-    it { subject; compare.empty_diff?.should be_false }
   end
 
   describe 'non-existing refs' do

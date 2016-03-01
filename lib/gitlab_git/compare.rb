@@ -31,12 +31,6 @@ module Gitlab
         paths = options.delete(:paths) || []
         Gitlab::Git::Diff.between(@repository, @head.id, @base.id, options, *paths)
       end
-
-      # Check if diff is empty because it is actually empty
-      # and not because its impossible to get it
-      def empty_diff?
-        diffs.empty?
-      end
     end
   end
 end
