@@ -51,6 +51,11 @@ module Gitlab
         end
       end
 
+      def overflow?
+        populate!
+        !!@overflow
+      end
+
       def too_many_files?
         populate!
         !@all_diffs && @overflow && size >= @max_files

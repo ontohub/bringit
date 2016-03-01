@@ -35,6 +35,7 @@ describe Gitlab::Git::DiffCollection do
       context 'and few enough lines' do
         let(:line_count) { 10 }
 
+        its(:overflow?) { should be_false }
         its(:too_many_files?) { should be_false }
         its(:too_many_lines?) { should be_false }
         its(:real_size) { should eq('3') }
@@ -53,6 +54,7 @@ describe Gitlab::Git::DiffCollection do
       context 'and too many lines' do
         let(:line_count) { 1000 }
 
+        its(:overflow?) { should be_true }
         its(:too_many_files?) { should be_false }
         its(:too_many_lines?) { should be_true }
         its(:real_size) { should eq('0+') }
@@ -75,6 +77,7 @@ describe Gitlab::Git::DiffCollection do
       context 'and few enough lines' do
         let(:line_count) { 1 }
 
+        its(:overflow?) { should be_true }
         its(:too_many_files?) { should be_true }
         its(:too_many_lines?) { should be_false }
         its(:real_size) { should eq('10+') }
@@ -83,6 +86,7 @@ describe Gitlab::Git::DiffCollection do
         context 'when limiting is disabled' do
           let(:all_diffs) { true }
 
+          its(:overflow?) { should be_false }
           its(:too_many_files?) { should be_false }
           its(:too_many_lines?) { should be_false }
           its(:real_size) { should eq('11') }
@@ -93,6 +97,7 @@ describe Gitlab::Git::DiffCollection do
       context 'and too many lines' do
         let(:line_count) { 30 }
 
+        its(:overflow?) { should be_true }
         its(:too_many_files?) { should be_false }
         its(:too_many_lines?) { should be_true }
         its(:real_size) { should eq('3+') }
@@ -101,6 +106,7 @@ describe Gitlab::Git::DiffCollection do
         context 'when limiting is disabled' do
           let(:all_diffs) { true }
 
+          its(:overflow?) { should be_false }
           its(:too_many_files?) { should be_false }
           its(:too_many_lines?) { should be_false }
           its(:real_size) { should eq('11') }
@@ -115,6 +121,7 @@ describe Gitlab::Git::DiffCollection do
       context 'and few enough lines' do
         let(:line_count) { 1 }
 
+        its(:overflow?) { should be_false }
         its(:too_many_files?) { should be_false }
         its(:too_many_lines?) { should be_false }
         its(:real_size) { should eq('10') }
