@@ -141,8 +141,8 @@ describe Gitlab::Git::DiffCollection do
     end
   end
 
-  describe '::empty' do
-    subject { Gitlab::Git::DiffCollection.empty }
+  describe 'empty collection' do
+    subject { Gitlab::Git::DiffCollection.new([]) }
 
     its(:overflow?) { should be_false }
     its(:empty?) { should be_true }

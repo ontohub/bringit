@@ -25,7 +25,7 @@ module Gitlab
 
       def diffs(options = {})
         unless @head && @base
-          return Gitlab::Git::DiffCollection.empty
+          return Gitlab::Git::DiffCollection.new([])
         end
 
         paths = options.delete(:paths) || []
