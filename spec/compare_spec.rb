@@ -16,7 +16,7 @@ describe Gitlab::Git::Compare do
 
   describe :diffs do
     subject do
-      compare.diffs.map!(&:new_path)
+      compare.diffs.map(&:new_path)
     end
 
     it { should have(10).elements }

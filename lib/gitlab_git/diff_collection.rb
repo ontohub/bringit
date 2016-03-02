@@ -80,7 +80,7 @@ module Gitlab
         end
       end
 
-      def map!
+      def decorate!
         each_with_index do |element, i|
           @array[i] = yield(element)
         end

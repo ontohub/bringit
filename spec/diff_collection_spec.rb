@@ -18,12 +18,12 @@ describe Gitlab::Git::DiffCollection do
 
   its(:to_a) { should be_kind_of ::Array }
 
-  describe :map! do
+  describe :decorate! do
     let(:file_count) { 3}
 
     it 'modifies the array in place' do
       count = 0
-      subject.map! { |d| !d.nil? && count += 1 }
+      subject.decorate! { |d| !d.nil? && count += 1 }
       subject.to_a.should eq([1, 2, 3])
     end
   end
