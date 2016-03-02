@@ -56,16 +56,6 @@ module Gitlab
         !!@overflow
       end
 
-      def too_many_files?
-        populate!
-        !@all_diffs && @overflow && size >= @max_files
-      end
-
-      def too_many_lines?
-        populate!
-        !@all_diffs && @overflow && @line_count >= @max_lines
-      end
-
       def size
         @size ||= count # forces a loop through @iterator
       end
