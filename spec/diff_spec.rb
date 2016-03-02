@@ -53,7 +53,7 @@ EOT
     subject { diffs }
 
     it { should be_kind_of Gitlab::Git::DiffCollection }
-    its(:count) { should eq(1) }
+    its(:size) { should eq(1) }
 
     context :diff do
       subject { diffs.first }
