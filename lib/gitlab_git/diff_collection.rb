@@ -19,7 +19,7 @@ module Gitlab
       def each
         @iterator.each_with_index do |raw, i|
           # First yield cached Diff instances from @array
-          if !@array[i].nil?
+          if @array[i]
             yield @array[i]
             next
           end
@@ -81,8 +81,8 @@ module Gitlab
       end
 
       def map!
-        each_with_index do |elt, i|
-          @array[i] = yield(elt)
+        each_with_index do |element, i|
+          @array[i] = yield(element)
         end
       end
 
