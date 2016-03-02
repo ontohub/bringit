@@ -1,9 +1,9 @@
 module Gitlab
   module Git
-    module Count
+    module Util
       LINE_SEP = "\n"
 
-      def self.lines(string)
+      def self.count_lines(string)
         case string[-1]
         when nil
           0

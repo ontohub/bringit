@@ -189,7 +189,7 @@ module Gitlab
       end
 
       def line_count
-        @line_count ||= Count.lines(@diff)
+        @line_count ||= Util.count_lines(@diff)
       end
 
       private

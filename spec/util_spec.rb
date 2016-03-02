@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe Gitlab::Git::Count do
-  describe :lines do
+describe Gitlab::Git::Util do
+  describe :count_lines do
     [
       ["", 0],
       ["foo", 1],
@@ -9,7 +9,7 @@ describe Gitlab::Git::Count do
       ["foo\n\n", 2],
     ].each do |string, line_count|
       it "counts #{line_count} lines in #{string.inspect}" do
-        Gitlab::Git::Count.lines(string).should eq(line_count)
+        Gitlab::Git::Util.count_lines(string).should eq(line_count)
       end
     end
   end
