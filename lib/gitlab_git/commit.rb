@@ -205,7 +205,7 @@ module Gitlab
       end
 
       def diffs(options = {})
-        diff_from_parent(options).map { |diff| Gitlab::Git::Diff.new(diff) }
+        DiffCollection.new(diff_from_parent(options), options)
       end
 
       def parents
