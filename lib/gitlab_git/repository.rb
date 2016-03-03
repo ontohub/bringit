@@ -320,9 +320,7 @@ module Gitlab
       # diff options.  The +options+ hash can also include :break_rewrites to
       # split larger rewrites into delete/add pairs.
       def diff(from, to, options = {}, *paths)
-        diff_patches(from, to, options, *paths).map do |p|
-          Gitlab::Git::Diff.new(p)
-        end
+        DiffCollection.new(diff_patches(from, to, options, *paths), options)
       end
 
       # Return the diff between +from+ and +to+ in a single patch string.  The
