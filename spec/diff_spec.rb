@@ -52,7 +52,7 @@ EOT
     let(:diffs) { Gitlab::Git::Diff.between(repository, 'feature', 'master') }
     subject { diffs }
 
-    it { should be_kind_of Gitlab::Git::DiffCollection }
+    it { should be_kind_of Array }
     its(:size) { should eq(1) }
 
     context :diff do
@@ -105,11 +105,5 @@ EOT
 
     it { Gitlab::Git::Diff.new(@diffs[0]).submodule?.should == false }
     it { Gitlab::Git::Diff.new(@diffs[1]).submodule?.should == true }
-  end
-
-  describe :line_count do
-    subject { Gitlab::Git::Diff.new(@rugged_diff) }
-    
-    its(:line_count) { should eq(9) }
   end
 end

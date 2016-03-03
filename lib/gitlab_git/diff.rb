@@ -130,8 +130,7 @@ module Gitlab
                              :disable_pathspec_match, :deltas_are_icase,
                              :include_untracked_content, :skip_binary_check,
                              :include_typechange, :include_typechange_trees,
-                             :ignore_filemode, :recurse_ignored_dirs, :paths,
-                             :max_files, :max_lines, :all_diffs]
+                             :ignore_filemode, :recurse_ignored_dirs, :paths]
 
           if default_options
             actual_defaults = default_options.dup
@@ -186,10 +185,6 @@ module Gitlab
 
       def submodule?
         a_mode == '160000' || b_mode == '160000'
-      end
-
-      def line_count
-        @line_count ||= Util.count_lines(@diff)
       end
 
       private
