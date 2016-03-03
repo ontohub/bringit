@@ -240,7 +240,8 @@ module Gitlab
           path: nil,
           ref: root_ref,
           follow: false,
-          skip_merges: false
+          skip_merges: false,
+          disable_walk: false
         }
 
         options = default_options.merge(options)
@@ -254,8 +255,28 @@ module Gitlab
           return []
         end
 
-        repo = options[:repo]
+        if can_walk?(options)
+          log_by_walk(sha, options)
+        else
+          log_by_shell(sha, options)
+        end
+      end
 
+      def can_walk?(options)
+        options[:path].blank? && !options[:skip_merges] && !options[:disable_walk]
+      end
+
+      def log_by_walk(sha, options)
+        walk_options = {
+          show: sha,
+          sort: Rugged::SORT_DATE,
+          limit: options[:limit],
+          offset: options[:offset]
+        }
+        Rugged::Walker.walk(rugged, walk_options).to_a
+      end
+
+      def log_by_shell(sha, options)
         cmd = %W(git --git-dir=#{path} log)
         cmd += %W(-n #{options[:limit].to_i})
         cmd += %W(--format=%H)
