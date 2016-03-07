@@ -674,6 +674,44 @@ describe Gitlab::Git::Repository do
       end
     end
 
+    context "compare results between log_by_walk and log_by_shell" do
+      let(:options) { { ref: "master" } }
+      let(:commits_by_walk) { repository.log(options).map(&:oid) }
+      let(:commits_by_shell) { repository.log(options.merge({ disable_walk: true })).map(&:oid) }
+
+      it { expect(commits_by_walk).to eq(commits_by_shell) }
+
+      context "with limit" do
+        let(:options) { { ref: "master", limit: 1 } }
+
+        it { expect(commits_by_walk).to eq(commits_by_shell) }
+      end
+
+      context "with offset" do
+        let(:options) { { ref: "master", offset: 1 } }
+
+        it { expect(commits_by_walk).to eq(commits_by_shell) }
+      end
+
+      context "with skip_merges" do
+        let(:options) { { ref: "master", skip_merges: true } }
+
+        it { expect(commits_by_walk).to eq(commits_by_shell) }
+      end
+
+      context "with path" do
+        let(:options) { { ref: "master", path: "encoding" } }
+
+        it { expect(commits_by_walk).to eq(commits_by_shell) }
+
+        context "with follow" do
+          let(:options) { { ref: "master", path: "encoding", follow: true } }
+
+          it { expect(commits_by_walk).to eq(commits_by_shell) }
+        end
+      end
+    end
+
     after(:all) do
       # Erase our commits so other tests get the original repo
       repo = Gitlab::Git::Repository.new(TEST_REPO_PATH).rugged
