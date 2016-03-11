@@ -249,6 +249,27 @@ describe Gitlab::Git::DiffCollection do
     end
   end
 
+  describe :each do
+    let(:collection) do
+      Gitlab::Git::DiffCollection.new([{ diff: 'a' * 204800 }])
+    end
+
+    it 'yields Diff instances even when they are too large' do
+      expect { |b| collection.each(&b) }.
+        to yield_with_args(an_instance_of(Gitlab::Git::Diff))
+    end
+
+    it 'prunes diffs that are too large' do
+      diff = nil
+
+      collection.each do |d|
+        diff = d
+      end
+
+      expect(diff.diff).to eq('')
+    end
+  end
+
   def fake_diff(line_count)
     {'diff' => "DIFF\n" * line_count}
   end

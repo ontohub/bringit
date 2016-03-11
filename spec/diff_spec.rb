@@ -15,7 +15,7 @@ describe Gitlab::Git::Diff do
         +[submodule "gitlab-grack"]
         +	path = gitlab-grack
         +	url = https://gitlab.com/gitlab-org/gitlab-grack.git
-        
+
 EOT
       new_path: ".gitmodules",
       old_path: ".gitmodules",
@@ -24,6 +24,7 @@ EOT
       new_file: false,
       renamed_file: false,
       deleted_file: false,
+      too_large: nil
     }
 
     @rugged_diff = repository.rugged.diff("5937ac0a7beb003549fc5fd26fc247adbce4a52e^", "5937ac0a7beb003549fc5fd26fc247adbce4a52e", paths:
@@ -121,10 +122,45 @@ EOT
 
   describe :line_count do
     subject { Gitlab::Git::Diff.new(@rugged_diff) }
-    
+
     describe '#line_count' do
       subject { super().line_count }
       it { is_expected.to eq(9) }
+    end
+
+    its(:line_count) { should eq(9) }
+  end
+
+  describe :too_large? do
+    it 'returns true for a diff that is too large' do
+      diff = Gitlab::Git::Diff.new(diff: 'a' * 204800)
+
+      expect(diff.too_large?).to eq(true)
+    end
+
+    it 'returns false for a diff that is small enough' do
+      diff = Gitlab::Git::Diff.new(diff: 'a')
+
+      expect(diff.too_large?).to eq(false)
+    end
+
+    it 'returns true for a diff that was explicitly marked as being too large' do
+      diff = Gitlab::Git::Diff.new(diff: 'a')
+
+      diff.prune_large_diff!
+
+      expect(diff.too_large?).to eq(true)
+    end
+  end
+
+  describe :prune_large_diff! do
+    it 'prunes the diff' do
+      diff = Gitlab::Git::Diff.new(diff: "foo\nbar")
+
+      diff.prune_large_diff!
+
+      expect(diff.diff).to eq('')
+      expect(diff.line_count).to eq(0)
     end
   end
 end

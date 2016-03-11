@@ -11,6 +11,8 @@ module Gitlab
       # Stats properties
       attr_accessor :new_file, :renamed_file, :deleted_file
 
+      attr_accessor :too_large
+
       class << self
         def between(repo, head, base, options = {}, *paths)
           # Only show what is new in the source branch compared to the target branch, not the other way around.
@@ -169,7 +171,7 @@ module Gitlab
       end
 
       def serialize_keys
-        @serialize_keys ||= %i(diff new_path old_path a_mode b_mode new_file renamed_file deleted_file)
+        @serialize_keys ||= %i(diff new_path old_path a_mode b_mode new_file renamed_file deleted_file too_large)
       end
 
       def to_hash
@@ -190,6 +192,20 @@ module Gitlab
 
       def line_count
         @line_count ||= Util.count_lines(@diff)
+      end
+
+      def too_large?
+        if @too_large.nil?
+          @too_large = @diff.bytesize >= 102400 # 100 KB
+        else
+          @too_large
+        end
+      end
+
+      def prune_large_diff!
+        @diff = ''
+        @line_count = 0
+        @too_large = true
       end
 
       private
