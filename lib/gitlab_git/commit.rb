@@ -10,7 +10,8 @@ module Gitlab
         :id, :message, :parent_ids,
         :authored_date, :author_name, :author_email,
         :committed_date, :committer_name, :committer_email
-      ]
+      ].freeze
+
       attr_accessor *SERIALIZE_KEYS
 
       def ==(other)
@@ -119,11 +120,11 @@ module Gitlab
           break_rewrites = options[:break_rewrites]
           actual_options = Diff.filter_diff_options(options)
 
-          if rugged_commit.parents.empty?
-            diff = rugged_commit.diff(actual_options.merge(reverse: true))
-          else
-            diff = rugged_commit.parents[0].diff(rugged_commit, actual_options)
-          end
+          diff = if rugged_commit.parents.empty?
+                   rugged_commit.diff(actual_options.merge(reverse: true))
+                 else
+                   rugged_commit.parents[0].diff(rugged_commit, actual_options)
+                 end
 
           diff.find_similar!(break_rewrites: break_rewrites)
           diff

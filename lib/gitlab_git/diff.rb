@@ -9,7 +9,7 @@ module Gitlab
       attr_accessor :old_path, :new_path, :a_mode, :b_mode, :diff
 
       # Stats properties
-      attr_accessor  :new_file, :renamed_file, :deleted_file
+      attr_accessor :new_file, :renamed_file, :deleted_file
 
       class << self
         def between(repo, head, base, options = {}, *paths)
@@ -222,7 +222,7 @@ module Gitlab
         # 'Binary'
         diff_text.sub!(/\A.*?^(---|Binary)/m, '\1')
 
-        if diff_text.start_with?('---') or diff_text.start_with?('Binary')
+        if diff_text.start_with?('---', 'Binary')
           diff_text
         else
           # If the diff_text did not contain a line starting with '---' or

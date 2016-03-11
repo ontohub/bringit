@@ -947,7 +947,7 @@ module Gitlab
 
         current = ""
         content.split("\n").each do |txt|
-          if txt.match(/^\s*\[/)
+          if txt =~ /^\s*\[/
             current = txt.match(/(?<=").*(?=")/)[0]
             results[current] = {}
           else
