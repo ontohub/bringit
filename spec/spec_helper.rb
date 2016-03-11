@@ -8,6 +8,7 @@ end
 
 require 'gitlab_git'
 require 'pry'
+require 'rspec/its'
 
 require_relative 'support/seed_helper'
 require_relative 'support/commit'
