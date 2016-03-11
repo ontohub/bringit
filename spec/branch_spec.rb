@@ -5,22 +5,26 @@ describe Gitlab::Git::Branch do
 
   subject { repository.branches }
 
-  it { should be_kind_of Array }
-  its(:size) { should eq(SeedRepo::Repo::BRANCHES.size) }
+  it { is_expected.to be_kind_of Array }
+
+  describe '#size' do
+    subject { super().size }
+    it { is_expected.to eq(SeedRepo::Repo::BRANCHES.size) }
+  end
 
   describe 'first branch' do
     let(:branch) { repository.branches.first }
 
-    it { branch.name.should == SeedRepo::Repo::BRANCHES.first }
-    it { branch.target.should == "0b4bc9a49b562e85de7cc9e834518ea6828729b9" }
+    it { expect(branch.name).to eq(SeedRepo::Repo::BRANCHES.first) }
+    it { expect(branch.target).to eq("0b4bc9a49b562e85de7cc9e834518ea6828729b9") }
   end
 
   describe 'last branch' do
     let(:branch) { repository.branches.last }
 
-    it { branch.name.should == SeedRepo::Repo::BRANCHES.last }
-    it { branch.target.should == SeedRepo::LastCommit::ID }
+    it { expect(branch.name).to eq(SeedRepo::Repo::BRANCHES.last) }
+    it { expect(branch.target).to eq(SeedRepo::LastCommit::ID) }
   end
 
-  it { repository.branches.size.should == SeedRepo::Repo::BRANCHES.size }
+  it { expect(repository.branches.size).to eq(SeedRepo::Repo::BRANCHES.size) }
 end

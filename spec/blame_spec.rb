@@ -49,7 +49,7 @@ describe Gitlab::Git::Blame do
     end
 
     it 'converts to UTF-8' do
-      CharlockHolmes::EncodingDetector.should_receive(:detect).and_return(nil)
+      expect(CharlockHolmes::EncodingDetector).to receive(:detect).and_return(nil)
       data = []
       blame.each do |commit, line|
         data << {
