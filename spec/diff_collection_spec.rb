@@ -16,7 +16,10 @@ describe Gitlab::Git::DiffCollection do
   let(:max_lines) { 100 }
   let(:all_diffs) { false }
 
-  its(:to_a) { should be_kind_of ::Array }
+  describe '#to_a' do
+    subject { super().to_a }
+    it { is_expected.to be_kind_of ::Array }
+  end
 
   describe :decorate! do
     let(:file_count) { 3}
@@ -24,7 +27,7 @@ describe Gitlab::Git::DiffCollection do
     it 'modifies the array in place' do
       count = 0
       subject.decorate! { |d| !d.nil? && count += 1 }
-      subject.to_a.should eq([1, 2, 3])
+      expect(subject.to_a).to eq([1, 2, 3])
     end
   end
 
@@ -35,36 +38,80 @@ describe Gitlab::Git::DiffCollection do
       context 'and few enough lines' do
         let(:line_count) { 10 }
 
-        its(:overflow?) { should be_false }
-        its(:empty?) { should be_false }
-        its(:real_size) { should eq('3') }
-        it { subject.size.should eq(3) }
+        describe '#overflow?' do
+          subject { super().overflow? }
+          it { is_expected.to be_falsey }
+        end
+
+        describe '#empty?' do
+          subject { super().empty? }
+          it { is_expected.to be_falsey }
+        end
+
+        describe '#real_size' do
+          subject { super().real_size }
+          it { is_expected.to eq('3') }
+        end
+        it { expect(subject.size).to eq(3) }
 
         context 'when limiting is disabled' do
           let(:all_diffs) { true }
 
-          its(:overflow?) { should be_false }
-          its(:empty?) { should be_false }
-          its(:real_size) { should eq('3') }
-          it { subject.size.should eq(3) }
+          describe '#overflow?' do
+            subject { super().overflow? }
+            it { is_expected.to be_falsey }
+          end
+
+          describe '#empty?' do
+            subject { super().empty? }
+            it { is_expected.to be_falsey }
+          end
+
+          describe '#real_size' do
+            subject { super().real_size }
+            it { is_expected.to eq('3') }
+          end
+          it { expect(subject.size).to eq(3) }
         end
       end
 
       context 'and too many lines' do
         let(:line_count) { 1000 }
 
-        its(:overflow?) { should be_true }
-        its(:empty?) { should be_false }
-        its(:real_size) { should eq('0+') }
-        it { subject.size.should eq(0) }
+        describe '#overflow?' do
+          subject { super().overflow? }
+          it { is_expected.to be_truthy }
+        end
+
+        describe '#empty?' do
+          subject { super().empty? }
+          it { is_expected.to be_falsey }
+        end
+
+        describe '#real_size' do
+          subject { super().real_size }
+          it { is_expected.to eq('0+') }
+        end
+        it { expect(subject.size).to eq(0) }
 
         context 'when limiting is disabled' do
           let(:all_diffs) { true }
 
-          its(:overflow?) { should be_false }
-          its(:empty?) { should be_false }
-          its(:real_size) { should eq('3') }
-          it { subject.size.should eq(3) }
+          describe '#overflow?' do
+            subject { super().overflow? }
+            it { is_expected.to be_falsey }
+          end
+
+          describe '#empty?' do
+            subject { super().empty? }
+            it { is_expected.to be_falsey }
+          end
+
+          describe '#real_size' do
+            subject { super().real_size }
+            it { is_expected.to eq('3') }
+          end
+          it { expect(subject.size).to eq(3) }
         end
       end
     end
@@ -75,36 +122,80 @@ describe Gitlab::Git::DiffCollection do
       context 'and few enough lines' do
         let(:line_count) { 1 }
 
-        its(:overflow?) { should be_true }
-        its(:empty?) { should be_false }
-        its(:real_size) { should eq('10+') }
-        it { subject.size.should eq(10) }
+        describe '#overflow?' do
+          subject { super().overflow? }
+          it { is_expected.to be_truthy }
+        end
+
+        describe '#empty?' do
+          subject { super().empty? }
+          it { is_expected.to be_falsey }
+        end
+
+        describe '#real_size' do
+          subject { super().real_size }
+          it { is_expected.to eq('10+') }
+        end
+        it { expect(subject.size).to eq(10) }
 
         context 'when limiting is disabled' do
           let(:all_diffs) { true }
 
-          its(:overflow?) { should be_false }
-          its(:empty?) { should be_false }
-          its(:real_size) { should eq('11') }
-          it { subject.size.should eq(11) }
+          describe '#overflow?' do
+            subject { super().overflow? }
+            it { is_expected.to be_falsey }
+          end
+
+          describe '#empty?' do
+            subject { super().empty? }
+            it { is_expected.to be_falsey }
+          end
+
+          describe '#real_size' do
+            subject { super().real_size }
+            it { is_expected.to eq('11') }
+          end
+          it { expect(subject.size).to eq(11) }
         end
       end
 
       context 'and too many lines' do
         let(:line_count) { 30 }
 
-        its(:overflow?) { should be_true }
-        its(:empty?) { should be_false }
-        its(:real_size) { should eq('3+') }
-        it { subject.size.should eq(3) }
+        describe '#overflow?' do
+          subject { super().overflow? }
+          it { is_expected.to be_truthy }
+        end
+
+        describe '#empty?' do
+          subject { super().empty? }
+          it { is_expected.to be_falsey }
+        end
+
+        describe '#real_size' do
+          subject { super().real_size }
+          it { is_expected.to eq('3+') }
+        end
+        it { expect(subject.size).to eq(3) }
 
         context 'when limiting is disabled' do
           let(:all_diffs) { true }
 
-          its(:overflow?) { should be_false }
-          its(:empty?) { should be_false }
-          its(:real_size) { should eq('11') }
-          it { subject.size.should eq(11) }
+          describe '#overflow?' do
+            subject { super().overflow? }
+            it { is_expected.to be_falsey }
+          end
+
+          describe '#empty?' do
+            subject { super().empty? }
+            it { is_expected.to be_falsey }
+          end
+
+          describe '#real_size' do
+            subject { super().real_size }
+            it { is_expected.to eq('11') }
+          end
+          it { expect(subject.size).to eq(11) }
         end
       end
     end
@@ -115,10 +206,21 @@ describe Gitlab::Git::DiffCollection do
       context 'and few enough lines' do
         let(:line_count) { 1 }
 
-        its(:overflow?) { should be_false }
-        its(:empty?) { should be_false }
-        its(:real_size) { should eq('10') }
-        it { subject.size.should eq(10) }
+        describe '#overflow?' do
+          subject { super().overflow? }
+          it { is_expected.to be_falsey }
+        end
+
+        describe '#empty?' do
+          subject { super().empty? }
+          it { is_expected.to be_falsey }
+        end
+
+        describe '#real_size' do
+          subject { super().real_size }
+          it { is_expected.to eq('10') }
+        end
+        it { expect(subject.size).to eq(10) }
       end
     end
   end
@@ -126,10 +228,25 @@ describe Gitlab::Git::DiffCollection do
   describe 'empty collection' do
     subject { Gitlab::Git::DiffCollection.new([]) }
 
-    its(:overflow?) { should be_false }
-    its(:empty?) { should be_true }
-    its(:size) { should eq(0) }
-    its(:real_size) { should eq('0')}
+    describe '#overflow?' do
+      subject { super().overflow? }
+      it { is_expected.to be_falsey }
+    end
+
+    describe '#empty?' do
+      subject { super().empty? }
+      it { is_expected.to be_truthy }
+    end
+
+    describe '#size' do
+      subject { super().size }
+      it { is_expected.to eq(0) }
+    end
+
+    describe '#real_size' do
+      subject { super().real_size }
+      it { is_expected.to eq('0')}
+    end
   end
 
   def fake_diff(line_count)

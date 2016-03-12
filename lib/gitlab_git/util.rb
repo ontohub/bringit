@@ -1,7 +1,7 @@
 module Gitlab
   module Git
     module Util
-      LINE_SEP = "\n"
+      LINE_SEP = "\n".freeze
 
       def self.count_lines(string)
         case string[-1]

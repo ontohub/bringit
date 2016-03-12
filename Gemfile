@@ -5,8 +5,9 @@ gemspec
 group :development do
   gem 'rubocop'
   gem 'coveralls', require: false
-  gem 'rspec'
+  gem 'rspec', '~> 3.0'
   gem 'rspec-mocks'
+  gem 'rspec-its'
   gem 'webmock'
   gem 'guard'
   gem 'guard-rspec'

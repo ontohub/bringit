@@ -8,10 +8,10 @@ describe Gitlab::Git::Repository do
   describe "Respond to" do
     subject { repository }
 
-    it { should respond_to(:raw) }
-    it { should respond_to(:rugged) }
-    it { should respond_to(:root_ref) }
-    it { should respond_to(:tags) }
+    it { is_expected.to respond_to(:raw) }
+    it { is_expected.to respond_to(:rugged) }
+    it { is_expected.to respond_to(:root_ref) }
+    it { is_expected.to respond_to(:tags) }
   end
 
   describe "#discover_default_branch" do
@@ -20,54 +20,62 @@ describe Gitlab::Git::Repository do
     let(:feature2) { 'feature2' }
 
     it "returns 'master' when master exists" do
-      repository.should_receive(:branch_names).at_least(:once).and_return([feature, master])
-      repository.discover_default_branch.should == 'master'
+      expect(repository).to receive(:branch_names).at_least(:once).and_return([feature, master])
+      expect(repository.discover_default_branch).to eq('master')
     end
 
     it "returns non-master when master exists but default branch is set to something else" do
       File.write(File.join(repository.path, 'HEAD'), 'ref: refs/heads/feature')
-      repository.should_receive(:branch_names).at_least(:once).and_return([feature, master])
-      repository.discover_default_branch.should == 'feature'
+      expect(repository).to receive(:branch_names).at_least(:once).and_return([feature, master])
+      expect(repository.discover_default_branch).to eq('feature')
       File.write(File.join(repository.path, 'HEAD'), 'ref: refs/heads/master')
     end
 
     it "returns a non-master branch when only one exists" do
-      repository.should_receive(:branch_names).at_least(:once).and_return([feature])
-      repository.discover_default_branch.should == 'feature'
+      expect(repository).to receive(:branch_names).at_least(:once).and_return([feature])
+      expect(repository.discover_default_branch).to eq('feature')
     end
 
     it "returns a non-master branch when more than one exists and master does not" do
-      repository.should_receive(:branch_names).at_least(:once).and_return([feature, feature2])
-      repository.discover_default_branch.should == 'feature'
+      expect(repository).to receive(:branch_names).at_least(:once).and_return([feature, feature2])
+      expect(repository.discover_default_branch).to eq('feature')
     end
 
     it "returns nil when no branch exists" do
-      repository.should_receive(:branch_names).at_least(:once).and_return([])
-      repository.discover_default_branch.should be_nil
+      expect(repository).to receive(:branch_names).at_least(:once).and_return([])
+      expect(repository.discover_default_branch).to be_nil
     end
   end
 
   describe :branch_names do
     subject { repository.branch_names }
 
-    it { should have(SeedRepo::Repo::BRANCHES.size).elements }
-    it { should include("master") }
-    it { should_not include("branch-from-space") }
+    it 'has SeedRepo::Repo::BRANCHES.size elements' do
+      expect(subject.size).to eq(SeedRepo::Repo::BRANCHES.size)
+    end
+    it { is_expected.to include("master") }
+    it { is_expected.not_to include("branch-from-space") }
   end
 
   describe :tag_names do
     subject { repository.tag_names }
 
-    it { should be_kind_of Array }
-    it { should have(SeedRepo::Repo::TAGS.size).elements }
-    its(:last) { should == "v1.2.1" }
-    it { should include("v1.0.0") }
-    it { should_not include("v5.0.0") }
+    it { is_expected.to be_kind_of Array }
+    it 'has SeedRepo::Repo::TAGS.size elements' do
+      expect(subject.size).to eq(SeedRepo::Repo::TAGS.size)
+    end
+
+    describe '#last' do
+      subject { super().last }
+      it { is_expected.to eq("v1.2.1") }
+    end
+    it { is_expected.to include("v1.0.0") }
+    it { is_expected.not_to include("v5.0.0") }
   end
 
   shared_examples 'archive check' do |extenstion|
-    it { metadata['ArchivePath'].should match(/tmp\/gitlab-git-test.git\/gitlab-git-test-master-#{SeedRepo::LastCommit::ID}/) }
-    it { metadata['ArchivePath'].should end_with extenstion }
+    it { expect(metadata['ArchivePath']).to match(/tmp\/gitlab-git-test.git\/gitlab-git-test-master-#{SeedRepo::LastCommit::ID}/) }
+    it { expect(metadata['ArchivePath']).to end_with extenstion }
   end
 
   describe :archive do
@@ -97,37 +105,44 @@ describe Gitlab::Git::Repository do
   describe :size do
     subject { repository.size }
 
-    it { should < 2 }
+    it { is_expected.to be < 2 }
   end
 
   describe :has_commits? do
-    it { repository.has_commits?.should be_true }
+    it { expect(repository.has_commits?).to be_truthy }
   end
 
   describe :empty? do
-    it { repository.empty?.should be_false }
+    it { expect(repository.empty?).to be_falsey }
   end
 
   describe :bare? do
-    it { repository.bare?.should be_true }
+    it { expect(repository.bare?).to be_truthy }
   end
 
   describe :heads do
     let(:heads) { repository.heads }
     subject { heads }
 
-    it { should be_kind_of Array }
-    its(:size) { should eq(SeedRepo::Repo::BRANCHES.size) }
+    it { is_expected.to be_kind_of Array }
+
+    describe '#size' do
+      subject { super().size }
+      it { is_expected.to eq(SeedRepo::Repo::BRANCHES.size) }
+    end
 
     context :head do
       subject { heads.first }
 
-      its(:name) { should == "feature" }
+      describe '#name' do
+        subject { super().name }
+        it { is_expected.to eq("feature") }
+      end
 
       context :commit do
         subject { heads.first.target }
 
-        it { should == "0b4bc9a49b562e85de7cc9e834518ea6828729b9" }
+        it { is_expected.to eq("0b4bc9a49b562e85de7cc9e834518ea6828729b9") }
       end
     end
   end
@@ -136,25 +151,52 @@ describe Gitlab::Git::Repository do
     let(:ref_names) { repository.ref_names }
     subject { ref_names }
 
-    it { should be_kind_of Array }
-    its(:first) { should == 'feature' }
-    its(:last) { should == 'v1.2.1' }
+    it { is_expected.to be_kind_of Array }
+
+    describe '#first' do
+      subject { super().first }
+      it { is_expected.to eq('feature') }
+    end
+
+    describe '#last' do
+      subject { super().last }
+      it { is_expected.to eq('v1.2.1') }
+    end
   end
 
   describe :search_files do
     let(:results) { repository.search_files('rails', 'master') }
     subject { results }
 
-    it { should be_kind_of Array }
-    its(:first) { should be_kind_of Gitlab::Git::BlobSnippet }
+    it { is_expected.to be_kind_of Array }
+
+    describe '#first' do
+      subject { super().first }
+      it { is_expected.to be_kind_of Gitlab::Git::BlobSnippet }
+    end
 
     context 'blob result' do
       subject { results.first }
 
-      its(:ref) { should == 'master' }
-      its(:filename) { should == 'CHANGELOG' }
-      its(:startline) { should == 35 }
-      its(:data) { should include "Ability to filter by multiple labels" }
+      describe '#ref' do
+        subject { super().ref }
+        it { is_expected.to eq('master') }
+      end
+
+      describe '#filename' do
+        subject { super().filename }
+        it { is_expected.to eq('CHANGELOG') }
+      end
+
+      describe '#startline' do
+        subject { super().startline }
+        it { is_expected.to eq(35) }
+      end
+
+      describe '#data' do
+        subject { super().data }
+        it { is_expected.to include "Ability to filter by multiple labels" }
+      end
     end
   end
 
@@ -165,17 +207,17 @@ describe Gitlab::Git::Repository do
       let(:submodules) { repository.submodules('master') }
       let(:submodule) { submodules.first }
 
-      it { submodules.should be_kind_of Hash }
-      it { submodules.empty?.should be_false }
+      it { expect(submodules).to be_kind_of Hash }
+      it { expect(submodules.empty?).to be_falsey }
 
       it 'should have valid data' do
-        submodule.should == [
+        expect(submodule).to eq([
           "six", {
             "id"=>"409f37c4f05865e4fb208c771485f211a22c4c2d",
             "path"=>"six",
             "url"=>"git://github.com/randx/six.git"
           }
-        ]
+        ])
       end
 
       it 'should handle nested submodules correctly' do
@@ -203,13 +245,13 @@ describe Gitlab::Git::Repository do
 
       it 'should handle tags correctly' do
         submodules = repository.submodules('v1.2.1')
-        submodule.should == [
+        expect(submodule).to eq([
           "six", {
             "id"=>"409f37c4f05865e4fb208c771485f211a22c4c2d",
             "path"=>"six",
             "url"=>"git://github.com/randx/six.git"
           }
-        ]
+        ])
       end
     end
 
@@ -222,8 +264,8 @@ describe Gitlab::Git::Repository do
   end
 
   describe :commit_count do
-    it { repository.commit_count("master").should == 23 }
-    it { repository.commit_count("feature").should == 9 }
+    it { expect(repository.commit_count("master")).to eq(23) }
+    it { expect(repository.commit_count("feature")).to eq(9) }
   end
 
   describe "#reset" do
@@ -263,7 +305,7 @@ describe Gitlab::Git::Repository do
       end
 
       it "should not touch untracked files" do
-        expect(File.exist?(untracked_path)).to be_true
+        expect(File.exist?(untracked_path)).to be_truthy
       end
 
       it "should move the HEAD to the correct commit" do
@@ -321,7 +363,7 @@ describe Gitlab::Git::Repository do
         it "should not do anything" do
           normal_repo = Gitlab::Git::Repository.new(TEST_NORMAL_REPO_PATH)
 
-          expect { normal_repo.checkout(new_branch) }.to raise_error
+          expect { normal_repo.checkout(new_branch) }.to raise_error(Rugged::ReferenceError)
           expect(normal_repo.rugged.branches[new_branch]).to be_nil
           expect(normal_repo.rugged.head.target.oid).to(
             eq(normal_repo.rugged.branches["master"].target.oid)
@@ -472,7 +514,7 @@ describe Gitlab::Git::Repository do
     let(:remotes) { repository.remote_names }
 
     it "should have one entry: 'origin'" do
-      expect(remotes).to have(1).items
+      expect(remotes.size).to eq(1)
       expect(remotes.first).to eq("origin")
     end
   end
@@ -482,7 +524,7 @@ describe Gitlab::Git::Repository do
 
     it "should have as many entries as branches and tags" do
       expected_refs = SeedRepo::Repo::BRANCHES + SeedRepo::Repo::TAGS
-      expect(refs).to have(expected_refs.size).items
+      expect(refs.size).to eq(expected_refs.size)
     end
   end
 
@@ -543,7 +585,7 @@ describe Gitlab::Git::Repository do
       diff_text = repo.diff_text("master", "feature")
       diff_text = encode_utf8(diff_text)
       repo.diff("master", "feature").each do |single_diff|
-        expect(diff_text.include?(single_diff.diff)).to be_true
+        expect(diff_text.include?(single_diff.diff)).to be_truthy
       end
     end
 
@@ -755,15 +797,15 @@ describe Gitlab::Git::Repository do
   describe '#count_commits_between' do
     subject { repository.count_commits_between('feature', 'master') }
 
-    it { should eq(15) }
+    it { is_expected.to eq(15) }
   end
 
   describe "branch_names_contains" do
     subject { repository.branch_names_contains(SeedRepo::LastCommit::ID) }
 
-    it { should include('master') }
-    it { should_not include('feature') }
-    it { should_not include('fix') }
+    it { is_expected.to include('master') }
+    it { is_expected.not_to include('feature') }
+    it { is_expected.not_to include('fix') }
   end
 
   describe '#autocrlf' do
@@ -803,9 +845,9 @@ describe Gitlab::Git::Repository do
   describe '#branches with deleted branch' do
     before(:each) do
       ref = double()
-      ref.stub(:name) { 'bad-branch' }
-      ref.stub(:target) { raise Rugged::ReferenceError }
-      repository.rugged.stub(:branches) { [ref] }
+      allow(ref).to receive(:name) { 'bad-branch' }
+      allow(ref).to receive(:target) { raise Rugged::ReferenceError }
+      allow(repository.rugged).to receive(:branches) { [ref] }
     end
 
     it 'should return empty branches' do
@@ -818,12 +860,12 @@ describe Gitlab::Git::Repository do
       valid_ref   = double(:ref)
       invalid_ref = double(:ref)
 
-      valid_ref.stub(name: 'master', target: double(:target))
+      allow(valid_ref).to receive_messages(name: 'master', target: double(:target))
 
-      invalid_ref.stub(name: 'bad-branch')
-      invalid_ref.stub(:target) { raise Rugged::ReferenceError }
+      allow(invalid_ref).to receive_messages(name: 'bad-branch')
+      allow(invalid_ref).to receive(:target) { raise Rugged::ReferenceError }
 
-      repository.rugged.stub(branches: [valid_ref, invalid_ref])
+      allow(repository.rugged).to receive_messages(branches: [valid_ref, invalid_ref])
     end
 
     it 'returns the number of branches' do

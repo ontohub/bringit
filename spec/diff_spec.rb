@@ -36,7 +36,7 @@ EOT
         @diff = Gitlab::Git::Diff.new(@raw_diff_hash)
       end
 
-      it { @diff.to_hash.should == @raw_diff_hash }
+      it { expect(@diff.to_hash).to eq(@raw_diff_hash) }
     end
 
     context "init from rugged" do
@@ -44,7 +44,7 @@ EOT
         @diff = Gitlab::Git::Diff.new(@rugged_diff)
       end
 
-      it { @diff.to_hash.should == @raw_diff_hash }
+      it { expect(@diff.to_hash).to eq(@raw_diff_hash) }
     end
   end
 
@@ -52,15 +52,27 @@ EOT
     let(:diffs) { Gitlab::Git::Diff.between(repository, 'feature', 'master') }
     subject { diffs }
 
-    it { should be_kind_of Gitlab::Git::DiffCollection }
-    its(:size) { should eq(1) }
+    it { is_expected.to be_kind_of Gitlab::Git::DiffCollection }
+
+    describe '#size' do
+      subject { super().size }
+      it { is_expected.to eq(1) }
+    end
 
     context :diff do
       subject { diffs.first }
 
-      it { should be_kind_of Gitlab::Git::Diff }
-      its(:new_path) { should == 'files/ruby/feature.rb' }
-      its(:diff) { should include '+class Feature' }
+      it { is_expected.to be_kind_of Gitlab::Git::Diff }
+
+      describe '#new_path' do
+        subject { super().new_path }
+        it { is_expected.to eq('files/ruby/feature.rb') }
+      end
+
+      describe '#diff' do
+        subject { super().diff }
+        it { is_expected.to include '+class Feature' }
+      end
     end
   end
 
@@ -103,13 +115,16 @@ EOT
       @diffs = commit.parents[0].diff(commit).patches
     end
 
-    it { Gitlab::Git::Diff.new(@diffs[0]).submodule?.should == false }
-    it { Gitlab::Git::Diff.new(@diffs[1]).submodule?.should == true }
+    it { expect(Gitlab::Git::Diff.new(@diffs[0]).submodule?).to eq(false) }
+    it { expect(Gitlab::Git::Diff.new(@diffs[1]).submodule?).to eq(true) }
   end
 
   describe :line_count do
     subject { Gitlab::Git::Diff.new(@rugged_diff) }
     
-    its(:line_count) { should eq(9) }
+    describe '#line_count' do
+      subject { super().line_count }
+      it { is_expected.to eq(9) }
+    end
   end
 end
