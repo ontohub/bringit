@@ -169,7 +169,7 @@ module Gitlab
       end
 
       def serialize_keys
-        @serialize_keys ||= %w(diff new_path old_path a_mode b_mode new_file renamed_file deleted_file).map(&:to_sym)
+        @serialize_keys ||= %i(diff new_path old_path a_mode b_mode new_file renamed_file deleted_file)
       end
 
       def to_hash
