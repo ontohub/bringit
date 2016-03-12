@@ -921,6 +921,33 @@ module Gitlab
         raw_output.compact
       end
 
+      def copy_gitattributes(ref)
+        begin
+          commit = lookup(ref)
+        rescue Rugged::ReferenceError
+          raise InvalidRef.new("Ref #{ref} is invalid")
+        end
+
+        # Create the paths
+        info_dir_path = File.join(path, 'info')
+        info_attributes_path = File.join(info_dir_path, 'attributes')
+
+        begin
+          # Retrieve the contents of the blob
+          gitattributes_content = blob_content(commit, '.gitattributes')
+        rescue InvalidBlobName
+          # No .gitattributes found. Should now remove any info/attributes and return
+          File.delete(info_attributes_path) if File.exists?(info_attributes_path)
+          return
+        end
+
+        # Create the info directory if needed
+        Dir.mkdir(info_dir_path) unless File.directory?(info_dir_path)
+
+        # Write the contents of the .gitattributes file to info/attributes
+        File.write(info_attributes_path, gitattributes_content)
+      end
+
       private
 
       # Get the content of a blob for a given commit.  If the blob is a commit

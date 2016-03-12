@@ -999,4 +999,80 @@ index 0000000..e69de29
       end
     end
   end
+
+  describe "#copy_gitattributes" do
+    let(:attributes_path) { File.join(TEST_REPO_PATH, 'info/attributes') }
+
+    it "raises an error with invalid ref" do
+      expect { repository.copy_gitattributes("invalid") }.to raise_error(Gitlab::Git::Repository::InvalidRef)
+    end
+
+    context "with no .gitattrbutes" do
+      before(:each) do
+        repository.copy_gitattributes("master")
+      end
+
+      it "does not have an info/attributes" do
+        expect(File.exist?(attributes_path)).to be_falsey
+      end
+
+      after(:each) do
+        FileUtils.rm_rf(attributes_path)
+      end
+    end
+
+    context "with .gitattrbutes" do
+      before(:each) do
+        repository.copy_gitattributes("gitattributes")
+      end
+
+      it "has an info/attributes" do
+        expect(File.exist?(attributes_path)).to be_truthy
+      end
+
+      it "has the same content in info/attributes as .gitattributes" do
+        contents = File.open(attributes_path, "rb") { |f| f.read }
+        expect(contents).to eq("*.md binary\n")
+      end
+
+      after(:each) do
+        FileUtils.rm_rf(attributes_path)
+      end
+    end
+
+    context "with updated .gitattrbutes" do
+      before(:each) do
+        repository.copy_gitattributes("gitattributes")
+        repository.copy_gitattributes("gitattributes-updated")
+      end
+
+      it "has an info/attributes" do
+        expect(File.exist?(attributes_path)).to be_truthy
+      end
+
+      it "has the updated content in info/attributes" do
+        contents = File.read(attributes_path)
+        expect(contents).to eq("*.txt binary\n")
+      end
+
+      after(:each) do
+        FileUtils.rm_rf(attributes_path)
+      end
+    end
+
+    context "with no .gitattrbutes in HEAD but with previous info/attributes" do
+      before(:each) do
+        repository.copy_gitattributes("gitattributes")
+        repository.copy_gitattributes("master")
+      end
+
+      it "does not have an info/attributes" do
+        expect(File.exist?(attributes_path)).to be_falsey
+      end
+
+      after(:each) do
+        FileUtils.rm_rf(attributes_path)
+      end
+    end
+  end
 end
