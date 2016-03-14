@@ -1,3 +1,9 @@
+v 9.0.2
+  - Exclude merge commits in format_patch method (Stan Hu)
+
+v 9.0.1
+  - Speed up `git log`
+
 v 9.0.0
   - BREAKING: return DiffCollections from #diffs methods
 
