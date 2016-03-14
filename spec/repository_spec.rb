@@ -976,4 +976,14 @@ index 0000000..e69de29
       expect(not_existed_branch.length).to equal(0)
     end
   end
+
+  describe "#format_patch" do
+    let(:to_sha) { '0e50ec4d3c7ce42ab74dda1d422cb2cbffe1e326' }
+    let(:from_sha) { '732401c65e924df81435deb12891ef570167d2e2' }
+
+    it 'generates patch excluding merge commit' do
+      patch = repository.format_patch(from_sha, to_sha)
+      expect(patch).to include('Subject: [PATCH] Add valid and invalid lfs pointers')
+    end
+  end
 end
