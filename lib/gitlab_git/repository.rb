@@ -787,7 +787,7 @@ module Gitlab
         commits_between(from_sha, to_sha).map do |commit|
           # Ignore merge commits, which have more than one parent,
           # in creation of patch to mimic the behavior of `git format-patch`
-          commit.to_mbox(actual_options) if commit.parents.length == 1
+          commit.to_mbox(actual_options) if commit.parents.length <= 1
         end.join("\n")
       end
 
