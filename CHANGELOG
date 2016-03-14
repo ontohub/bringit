@@ -1,3 +1,6 @@
+v 9.0.3
+  - Add a method to copy the .gitattributes into the bare repository
+
 v 9.0.2
   - Exclude merge commits in format_patch method (Stan Hu)
 
