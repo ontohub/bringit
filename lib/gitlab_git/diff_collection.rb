@@ -35,7 +35,18 @@ module Gitlab
           # Going by the number of files alone it is OK to create a new Diff instance.
           diff = Gitlab::Git::Diff.new(raw)
 
+          # If a diff is too large we still want to display some information
+          # about it (e.g. the file path) without keeping the raw data around
+          # (as this would be a waste of memory usage).
+          #
+          # This also removes the line count (from the diff itself) so it
+          # doesn't add up to the total amount of lines.
+          if diff.too_large?
+            diff.prune_large_diff!
+          end
+
           @line_count += diff.line_count
+
           if !@all_diffs && @line_count >= @max_lines
             # This last Diff instance pushes us over the lines limit. We stop and
             # discard it.
