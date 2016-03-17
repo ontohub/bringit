@@ -13,6 +13,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency("github-linguist", "~> 4.7.0")
   s.add_dependency("activesupport", "~> 4.0")
-  s.add_dependency("rugged", "~> 0.24.0b13")
+  s.add_dependency("rugged", "~> 0.24.0")
   s.add_dependency("charlock_holmes", "~> 0.7.3")
 end
