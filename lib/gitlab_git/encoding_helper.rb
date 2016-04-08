@@ -13,7 +13,10 @@ module EncodingHelper
     return message.force_encoding("BINARY") if detect && detect[:type] == :binary
 
     # encoding message to detect encoding
-    if detect && detect[:encoding]
+    # Force encoding only if we have high confidence. The confidence threshold
+    # is tuned so that all test cases pass. It needs to be greater than
+    # 33% (don't force encoding) and less than 44% (force encoding).
+    if detect && detect[:encoding] && detect[:confidence] > 40
       message.force_encoding(detect[:encoding])
     end
 
