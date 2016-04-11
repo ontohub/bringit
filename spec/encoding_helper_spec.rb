@@ -36,7 +36,34 @@ describe EncodingHelper do
   end
 
   describe '#encode_utf8' do
-    # Pending
+    [
+      [
+        "encodes valid utf8 encoded string to utf8",
+        "λ, λ, λ".encode("UTF-8"),
+        "λ, λ, λ".encode("UTF-8"),
+      ],
+      [
+        "encodes valid ASCII-8BIT encoded string to utf8",
+        "ascii only".encode("ASCII-8BIT"),
+        "ascii only".encode("UTF-8"),
+      ],
+      [
+        "encodes valid ISO-8859-1 encoded string to utf8",
+        "Rüby ist eine Programmiersprache. Wir verlängern den text damit ICU die Sprache erkennen kann.".encode("ISO-8859-1", "UTF-8"),
+        "Rüby ist eine Programmiersprache. Wir verlängern den text damit ICU die Sprache erkennen kann.".encode("UTF-8"),
+      ],
+      [
+        "encodes invalid utf8 encoded string to utf8",
+        "mu ns\xC3\n Lorem ipsum dolor sit amet, consectetur adipisicing ut\xC3\xA0y\xC3\xB9a".force_encoding("UTF-8"),
+        "mu ns\n Lorem ipsum dolor sit amet, consectetur adipisicing utàyùa".encode("UTF-8"),
+      ],
+    ].each do |description, test_string, xpect|
+      it description do
+        r = ext_class.encode_utf8(test_string.force_encoding('UTF-8'))
+        expect(r).to eq(xpect)
+        expect(r.encoding.name).to eq('UTF-8')
+      end
+    end
   end
 
   describe '#clean' do
