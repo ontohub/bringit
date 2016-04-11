@@ -2,14 +2,12 @@ require "spec_helper"
 require_relative '../lib/gitlab_git/encoding_helper'
 
 describe EncodingHelper do
-
   let(:ext_class){ Class.new { extend EncodingHelper } }
   let(:binary_string){
     File.read(File.expand_path('../support/gitlab_logo.png', __FILE__))
   }
 
   describe '#encode!' do
-
     [
       [
         'leaves ascii only string as is',
@@ -35,7 +33,6 @@ describe EncodingHelper do
     it 'leaves binary string as is' do
       expect(ext_class.encode!(binary_string)).to eq(binary_string)
     end
-
   end
 
   describe '#encode_utf8' do
@@ -43,7 +40,6 @@ describe EncodingHelper do
   end
 
   describe '#clean' do
-
     [
       [
         'leaves ascii only string as is',
@@ -65,7 +61,5 @@ describe EncodingHelper do
         expect(ext_class.encode!(test_string)).to eq(xpect)
       end
     end
-
   end
-
 end
