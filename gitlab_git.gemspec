@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.license     = 'MIT'
   s.files       = `git ls-files lib/`.split("\n") << 'VERSION'
   s.homepage    =
-    'http://rubygems.org/gems/gitlab_git'
+    'https://gitlab.com/gitlab-org/gitlab_git'
 
   s.add_dependency("github-linguist", "~> 4.7.0")
   s.add_dependency("activesupport", "~> 4.0")
