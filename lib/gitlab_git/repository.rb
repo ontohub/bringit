@@ -7,6 +7,7 @@ require "rubygems/package"
 module Gitlab
   module Git
     class Repository
+      extend Forwardable
       include Gitlab::Git::Popen
 
       SEARCH_CONTEXT_LINES = 3
@@ -23,6 +24,9 @@ module Gitlab
 
       # Rugged repo object
       attr_reader :rugged
+
+      # Define a delegator for the rugged attributes
+      def_delegator :rugged, :attributes
 
       # 'path' must be the path to a _bare_ git repository, e.g.
       # /path/to/my-repo.git
@@ -946,6 +950,12 @@ module Gitlab
 
         # Write the contents of the .gitattributes file to info/attributes
         File.write(info_attributes_path, gitattributes_content)
+      end
+
+      # Checks if the blob should be diffable according to its attributes
+      def diffable?(blob)
+        blob_attributes = attributes(blob.path).to_h
+        blob_attributes.fetch('diff', blob.text?)
       end
 
       private
