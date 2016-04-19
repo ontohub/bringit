@@ -1,3 +1,6 @@
+v 10.0.1
+  - Only force_encode strings to detected encoding if confidence is above threshold.
+
 v 9.0.3
   - Add a method to copy the .gitattributes into the bare repository
 

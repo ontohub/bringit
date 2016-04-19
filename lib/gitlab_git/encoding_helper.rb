@@ -1,6 +1,17 @@
 module EncodingHelper
   extend self
 
+  # This threshold is carefully tweaked to prevent usage of encodings detected
+  # by CharlockHolmes with low confidence. If CharlockHolmes confidence is low,
+  # we're better off sticking with utf8 encoding.
+  # Reason: git diff can return strings with invalid utf8 byte sequences if it
+  # truncates a diff in the middle of a multibyte character. In this case
+  # CharlockHolmes will try to guess the encoding and will likely suggest an
+  # obscure encoding with low confidence.
+  # There is a lot more info with this merge request:
+  # https://gitlab.com/gitlab-org/gitlab_git/merge_requests/77#note_4754193
+  ENCODING_CONFIDENCE_THRESHOLD = 40
+
   def encode!(message)
     return nil unless message.respond_to? :force_encoding
 
@@ -12,8 +23,8 @@ module EncodingHelper
     detect = CharlockHolmes::EncodingDetector.detect(message)
     return message.force_encoding("BINARY") if detect && detect[:type] == :binary
 
-    # encoding message to detect encoding
-    if detect && detect[:encoding]
+    # force detected encoding if we have sufficient confidence.
+    if detect && detect[:encoding] && detect[:confidence] > ENCODING_CONFIDENCE_THRESHOLD
       message.force_encoding(detect[:encoding])
     end
 
