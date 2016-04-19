@@ -2,10 +2,8 @@ require "spec_helper"
 require_relative '../lib/gitlab_git/encoding_helper'
 
 describe EncodingHelper do
-  let(:ext_class){ Class.new { extend EncodingHelper } }
-  let(:binary_string){
-    File.read(File.expand_path('../support/gitlab_logo.png', __FILE__))
-  }
+  let(:ext_class) { Class.new { extend EncodingHelper } }
+  let(:binary_string) { File.join(SUPPORT_PATH, 'gitlab_logo.png') }
 
   describe '#encode!' do
     [
