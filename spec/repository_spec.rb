@@ -1075,4 +1075,45 @@ index 0000000..e69de29
       end
     end
   end
+
+  describe '#diffable' do
+    info_dir_path = attributes_path = File.join(TEST_REPO_PATH, 'info')
+    attributes_path = File.join(info_dir_path, 'attributes')
+
+    before(:all) do
+      FileUtils.mkdir(info_dir_path) unless File.exist?(info_dir_path)
+      File.write(attributes_path, "*.md -diff\n")
+    end
+
+    it "should return true for files which are text and do not have attributes" do
+      blob = Gitlab::Git::Blob.find(
+        repository,
+        '33bcff41c232a11727ac6d660bd4b0c2ba86d63d',
+        'LICENSE'
+      )
+      expect(repository.diffable?(blob)).to be_truthy
+    end
+
+    it "should return false for binary files which do not have attributes" do
+      blob = Gitlab::Git::Blob.find(
+        repository,
+        '33bcff41c232a11727ac6d660bd4b0c2ba86d63d',
+        'files/images/logo-white.png'
+      )
+      expect(repository.diffable?(blob)).to be_falsey
+    end
+
+    it "should return false for text files which have been marked as not being diffable in attributes" do
+      blob = Gitlab::Git::Blob.find(
+        repository,
+        '33bcff41c232a11727ac6d660bd4b0c2ba86d63d',
+        'README.md'
+      )
+      expect(repository.diffable?(blob)).to be_falsey
+    end
+
+    after(:all) do
+      FileUtils.rm_rf(info_dir_path)
+    end
+  end
 end
