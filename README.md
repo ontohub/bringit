@@ -2,9 +2,8 @@
 
 GitLab wrapper around git objects.
 
-[![build status](https://ci.gitlab.org/projects/6/status.png?ref=master)](https://ci.gitlab.org/projects/6?ref=master)
+[![build status](https://gitlab.com/gitlab-org/gitlab_git/badges/master/build.svg)](https://gitlab.com/gitlab-org/gitlab_git/commits/master)
 [![Gem Version](https://badge.fury.io/rb/gitlab_git.svg)](http://badge.fury.io/rb/gitlab_git)
-[![Code Climate](https://codeclimate.com/github/gitlabhq/gitlab_git.png)](https://codeclimate.com/github/gitlabhq/gitlab_git)
 
 ## Moved from Grit to Rugged
 
