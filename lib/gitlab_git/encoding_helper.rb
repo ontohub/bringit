@@ -39,7 +39,7 @@ module EncodingHelper
   def encode_utf8(message)
     detect = CharlockHolmes::EncodingDetector.detect(message)
     detect_all = CharlockHolmes::EncodingDetector.detect_all(message)
-    if detect # TODO: && detect[:confidence] > ENCODING_CONFIDENCE_THRESHOLD
+    if detect
       CharlockHolmes::Converter.convert(message, detect[:encoding], 'UTF-8')
     else
       clean(message)
