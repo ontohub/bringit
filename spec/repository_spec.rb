@@ -754,6 +754,32 @@ describe Gitlab::Git::Repository do
       end
     end
 
+    context "where provides 'after' timestamp" do
+      options = { after: Time.iso8601('2014-03-03T20:15:01+00:00') }
+
+      it "should returns commits on or after that timestamp" do
+        commits = repository.log(options)
+
+        expect(commits.size).to be > 0
+        satisfy do
+          commits.all? { |commit| commit.created_at >= options[:after] }
+        end
+      end
+    end
+
+    context "where provides 'before' timestamp" do
+      options = { before: Time.iso8601('2014-03-03T20:15:01+00:00') }
+
+      it "should returns commits on or before that timestamp" do
+        commits = repository.log(options)
+
+        expect(commits.size).to be > 0
+        satisfy do
+          commits.all? { |commit| commit.created_at <= options[:before] }
+        end
+      end
+    end
+
     after(:all) do
       # Erase our commits so other tests get the original repo
       repo = Gitlab::Git::Repository.new(TEST_REPO_PATH).rugged

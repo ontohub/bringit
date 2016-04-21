@@ -235,6 +235,7 @@ module Gitlab
       #     path: 'app/models',
       #     limit: 10,
       #     offset: 5,
+      #     after: Time.new(2016, 4, 21, 14, 32, 10)
       #   )
       #
       def log(options)
@@ -245,7 +246,9 @@ module Gitlab
           ref: root_ref,
           follow: false,
           skip_merges: false,
-          disable_walk: false
+          disable_walk: false,
+          after: nil,
+          before: nil
         }
 
         options = default_options.merge(options)
@@ -259,15 +262,19 @@ module Gitlab
           return []
         end
 
-        if can_walk?(options)
-          log_by_walk(sha, options)
-        else
+        if log_using_shell?(options)
           log_by_shell(sha, options)
+        else
+          log_by_walk(sha, options)
         end
       end
 
-      def can_walk?(options)
-        options[:path].blank? && !options[:skip_merges] && !options[:disable_walk]
+      def log_using_shell?(options)
+        options[:path].present? ||
+          options[:disable_walk] ||
+          options[:skip_merges] ||
+          options[:after] ||
+          options[:before]
       end
 
       def log_by_walk(sha, options)
@@ -287,6 +294,8 @@ module Gitlab
         cmd += %W(--skip=#{options[:offset].to_i})
         cmd += %W(--follow) if options[:follow]
         cmd += %W(--no-merges) if options[:skip_merges]
+        cmd += %W(--after=#{options[:after].iso8601}) if options[:after]
+        cmd += %W(--before=#{options[:before].iso8601}) if options[:before]
         cmd += [sha]
         cmd += %W(-- #{options[:path]}) if options[:path].present?
 
