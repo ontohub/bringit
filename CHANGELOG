@@ -1,3 +1,6 @@
+v 10.0.2
+  - Allow get commits before or after a specific date
+
 v 10.0.1
   - Only force_encode strings to detected encoding if confidence is above threshold.
 
