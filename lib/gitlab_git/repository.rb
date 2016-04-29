@@ -103,6 +103,13 @@ module Gitlab
         end.sort_by(&:name)
       end
 
+      # Returns true if the given tag exists
+      #
+      # name - The name of the tag as a String.
+      def tag_exists?(name)
+        !!rugged.tags[name]
+      end
+
       # Returns an Array of branch and tag names
       def ref_names
         branch_names + tag_names
