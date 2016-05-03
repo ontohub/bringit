@@ -1,3 +1,6 @@
+v 10.1.0
+  - Added Repository#tag_exists?
+
 v 10.0.2
   - Allow get commits before or after a specific date
 

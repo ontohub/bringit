@@ -1142,4 +1142,16 @@ index 0000000..e69de29
       FileUtils.rm_rf(info_dir_path)
     end
   end
+
+  describe '#tag_exists?' do
+    it 'returns true for an existing tag' do
+      tag = repository.tag_names.first
+
+      expect(repository.tag_exists?(tag)).to eq(true)
+    end
+
+    it 'returns false for a non-existing tag' do
+      expect(repository.tag_exists?('v9000')).to eq(false)
+    end
+  end
 end
