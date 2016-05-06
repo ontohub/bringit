@@ -1,3 +1,6 @@
+v 10.1.1
+  - load_all_data! only does one lookup per blob
+
 v 10.1.0
   - Added Repository#tag_exists?
 
