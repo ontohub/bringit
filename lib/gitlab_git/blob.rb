@@ -212,6 +212,8 @@ module Gitlab
         %w(id name path size data mode commit_id).each do |key|
           self.send("#{key}=", options[key.to_sym])
         end
+
+        @loaded_all_data = false
       end
 
       def empty?
@@ -226,7 +228,9 @@ module Gitlab
       # memory as a Ruby string.
       def load_all_data!(repository)
         return if @data == '' # don't mess with submodule blobs
+        return @data if @loaded_all_data
 
+        @loaded_all_data = true
         @data = repository.lookup(id).content
       end
 
