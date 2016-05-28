@@ -524,32 +524,6 @@ describe Gitlab::Git::Repository do
     end
   end
 
-  describe "#diff_text" do
-    let(:repo) { Gitlab::Git::Repository.new(TEST_MUTABLE_REPO_PATH) }
-
-    it "should contain the same diffs as #diff" do
-      diff_text = repo.diff_text("master", "feature")
-      diff_text = encode_utf8(diff_text)
-      repo.diff("master", "feature").each do |single_diff|
-        expect(diff_text.include?(single_diff.diff)).to be_truthy
-      end
-    end
-
-    it "should restrict its output to +paths+" do
-      diff_text = repo.diff_text("master", "feature", nil, "files")
-      repo.rugged.diff("master", "feature").each_delta do |delta|
-        path = delta.old_file[:path]
-        match_text = "diff --git a/#{path}"
-
-        if path.match(/^files/)
-          expect(diff_text).to include(match_text)
-        else
-          expect(diff_text).not_to include(match_text)
-        end
-      end
-    end
-  end
-
   describe "#log" do
     commit_with_old_name = nil
     commit_with_new_name = nil
@@ -902,10 +876,6 @@ index 0000000..e69de29
       it 'creates a directory' do
         result = repository.mkdir(path, commit_options)
         expect(result).not_to eq(nil)
-
-        diff_text = repository.diff_text("#{result}~1", result)
-        expected = generate_diff_for_path(expected_path)
-        expect(diff_text).to eq(expected)
 
         # Verify another mkdir doesn't create a directory that already exists
         expect{ repository.mkdir(path, commit_options) }.to raise_error('Directory already exists')
