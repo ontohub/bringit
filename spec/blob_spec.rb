@@ -65,10 +65,10 @@ describe Gitlab::Git::Blob do
       let(:blob_size) { 111803 }
 
       it { expect(blob.size).to eq(blob_size) }
-      it { expect(blob.data.length).to eq(Gitlab::Git::Blob::DATA_FRAGMENT_SIZE) }
+      it { expect(blob.data.length).to eq(Gitlab::Git::Blob::MAX_DATA_DISPLAY_SIZE) }
 
       it 'check that this test is sane' do
-        expect(blob.size).to be > Gitlab::Git::Blob::DATA_FRAGMENT_SIZE
+        expect(blob.size).to be > Gitlab::Git::Blob::MAX_DATA_DISPLAY_SIZE
       end
 
       it 'can load all data' do
@@ -89,10 +89,10 @@ describe Gitlab::Git::Blob do
       let(:blob_size) { 111803 }
 
       it { expect(blob.size).to eq(blob_size) }
-      it { expect(blob.data.length).to eq(Gitlab::Git::Blob::DATA_FRAGMENT_SIZE) }
+      it { expect(blob.data.length).to eq(Gitlab::Git::Blob::MAX_DATA_DISPLAY_SIZE) }
       
       it 'check that this test is sane' do
-        expect(blob.size).to be > Gitlab::Git::Blob::DATA_FRAGMENT_SIZE
+        expect(blob.size).to be > Gitlab::Git::Blob::MAX_DATA_DISPLAY_SIZE
       end
     end
   end

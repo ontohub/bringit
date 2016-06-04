@@ -7,10 +7,11 @@ module Gitlab
       include Linguist::BlobHelper
       include EncodingHelper
 
-      # This number needs to be large enough to allow reliable content /
-      # encoding detection (Linguist) and LFS pointer parsing. All other cases
-      # where we need full blob data should use load_all_data!.
-      DATA_FRAGMENT_SIZE = 1024
+      # This number is the maximum amount of data that we want to display to
+      # the user. We load as much as we can for encoding detection
+      # (Linguist) and LFS pointer parsing. All other cases where we need full
+      # blob data should use load_all_data!.
+      MAX_DATA_DISPLAY_SIZE = 10485760
 
       attr_accessor :name, :path, :size, :data, :mode, :id, :commit_id
 
@@ -33,7 +34,7 @@ module Gitlab
                 id: blob.oid,
                 name: blob_entry[:name],
                 size: blob.size,
-                data: blob.content(DATA_FRAGMENT_SIZE),
+                data: blob.content(MAX_DATA_DISPLAY_SIZE),
                 mode: blob_entry[:filemode].to_s(8),
                 path: path,
                 commit_id: sha,
@@ -48,7 +49,7 @@ module Gitlab
           Blob.new(
             id: blob.oid,
             size: blob.size,
-            data: blob.content(DATA_FRAGMENT_SIZE),
+            data: blob.content(MAX_DATA_DISPLAY_SIZE),
           )
         end
 
@@ -224,7 +225,7 @@ module Gitlab
         encode! @data
       end
 
-      # Load all blob data (not just the first DATA_FRAGMENT_SIZE bytes) into
+      # Load all blob data (not just the first MAX_DATA_DISPLAY_SIZE bytes) into
       # memory as a Ruby string.
       def load_all_data!(repository)
         return if @data == '' # don't mess with submodule blobs
