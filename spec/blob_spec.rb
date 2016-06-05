@@ -65,10 +65,10 @@ describe Gitlab::Git::Blob do
       let(:blob_size) { 111803 }
 
       it { expect(blob.size).to eq(blob_size) }
-      it { expect(blob.data.length).to eq(Gitlab::Git::Blob::MAX_DATA_DISPLAY_SIZE) }
+      it { expect(blob.data.length).to eq(blob_size) }
 
       it 'check that this test is sane' do
-        expect(blob.size).to be > Gitlab::Git::Blob::MAX_DATA_DISPLAY_SIZE
+        expect(blob.size).to be <= Gitlab::Git::Blob::MAX_DATA_DISPLAY_SIZE
       end
 
       it 'can load all data' do
@@ -85,14 +85,14 @@ describe Gitlab::Git::Blob do
     it { expect(raw_blob.size).to eq(669) }
 
     context 'large file' do
-      let(:blob) { Gitlab::Git::Blob.raw(repository, '08cf843fd8fe1c50757df0a13fcc44661996b4df') }
-      let(:blob_size) { 111803 }
+      it 'limits the size of a large file' do
+        blob_size = Gitlab::Git::Blob::MAX_DATA_DISPLAY_SIZE + 1
+        buffer = Array.new(blob_size, 0)
+        rugged_blob = Rugged::Blob.from_buffer(repository.rugged, buffer.join(''))
+        blob = Gitlab::Git::Blob.raw(repository, rugged_blob)
 
-      it { expect(blob.size).to eq(blob_size) }
-      it { expect(blob.data.length).to eq(Gitlab::Git::Blob::MAX_DATA_DISPLAY_SIZE) }
-      
-      it 'check that this test is sane' do
-        expect(blob.size).to be > Gitlab::Git::Blob::MAX_DATA_DISPLAY_SIZE
+        expect(blob.size).to eq(blob_size)
+        expect(blob.data.length).to eq(Gitlab::Git::Blob::MAX_DATA_DISPLAY_SIZE)
       end
     end
   end
