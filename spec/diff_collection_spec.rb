@@ -9,8 +9,9 @@ describe Gitlab::Git::DiffCollection do
       all_diffs: all_diffs,
     )
   end
-  let(:iterator) { Array.new(file_count, fake_diff(line_count)) }
+  let(:iterator) { Array.new(file_count, fake_diff(line_length, line_count)) }
   let(:file_count) { 0 }
+  let(:line_length) { 1 }
   let(:line_count) { 1 }
   let(:max_files) { 10 }
   let(:max_lines) { 100 }
@@ -223,6 +224,47 @@ describe Gitlab::Git::DiffCollection do
         it { expect(subject.size).to eq(10) }
       end
     end
+
+    context 'adding too many bytes' do
+      let(:file_count) { 10 }
+      let(:line_length) { 5200 }
+
+      describe '#overflow?' do
+        subject { super().overflow? }
+        it { is_expected.to be_truthy }
+      end
+
+      describe '#empty?' do
+        subject { super().empty? }
+        it { is_expected.to be_falsey }
+      end
+
+      describe '#real_size' do
+        subject { super().real_size }
+        it { is_expected.to eq('9+') }
+      end
+      it { expect(subject.size).to eq(9) }
+
+      context 'when limiting is disabled' do
+        let(:all_diffs) { true }
+
+        describe '#overflow?' do
+          subject { super().overflow? }
+          it { is_expected.to be_falsey }
+        end
+
+        describe '#empty?' do
+          subject { super().empty? }
+          it { is_expected.to be_falsey }
+        end
+
+        describe '#real_size' do
+          subject { super().real_size }
+          it { is_expected.to eq('10') }
+        end
+        it { expect(subject.size).to eq(10) }
+      end
+    end
   end
 
   describe 'empty collection' do
@@ -270,7 +312,7 @@ describe Gitlab::Git::DiffCollection do
     end
   end
 
-  def fake_diff(line_count)
-    {'diff' => "DIFF\n" * line_count}
+  def fake_diff(line_length, line_count)
+    {'diff' => "#{'a' * line_length}\n" * line_count}
   end
 end

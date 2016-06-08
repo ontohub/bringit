@@ -1,3 +1,6 @@
+v 10.1.2
+  - DiffCollections now enforce a total byte limit of 5 KB * max_files
+
 v 10.1.1
   - load_all_data! only does one lookup per blob
 

@@ -9,9 +9,11 @@ module Gitlab
         @iterator = iterator
         @max_files = options.fetch(:max_files, DEFAULT_LIMITS[:max_files])
         @max_lines = options.fetch(:max_lines, DEFAULT_LIMITS[:max_lines])
+        @max_bytes = @max_files * 5120 # Average 5 KB per file
         @all_diffs = !!options.fetch(:all_diffs, false)
 
         @line_count = 0
+        @byte_count = 0
         @overflow = false
         @array = Array.new
       end
@@ -46,8 +48,9 @@ module Gitlab
           end
 
           @line_count += diff.line_count
+          @byte_count += diff.diff.bytesize
 
-          if !@all_diffs && @line_count >= @max_lines
+          if !@all_diffs && (@line_count >= @max_lines || @byte_count >= @max_bytes)
             # This last Diff instance pushes us over the lines limit. We stop and
             # discard it.
             @overflow = true
