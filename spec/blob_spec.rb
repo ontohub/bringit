@@ -83,6 +83,7 @@ describe Gitlab::Git::Blob do
     it { expect(raw_blob.id).to eq(SeedRepo::RubyBlob::ID) }
     it { expect(raw_blob.data[0..10]).to eq("require \'fi") }
     it { expect(raw_blob.size).to eq(669) }
+    it { expect(raw_blob.truncated?).to be_falsey }
 
     context 'large file' do
       it 'limits the size of a large file' do
@@ -93,6 +94,7 @@ describe Gitlab::Git::Blob do
 
         expect(blob.size).to eq(blob_size)
         expect(blob.data.length).to eq(Gitlab::Git::Blob::MAX_DATA_DISPLAY_SIZE)
+        expect(blob.truncated?).to be_truthy
       end
     end
   end

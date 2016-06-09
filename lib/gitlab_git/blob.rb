@@ -266,6 +266,10 @@ module Gitlab
         nil
       end
 
+      def truncated?
+        size > data.size
+      end
+
       private
 
       def has_lfs_version_key?
