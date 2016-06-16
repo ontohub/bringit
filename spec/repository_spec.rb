@@ -1154,4 +1154,18 @@ index 0000000..e69de29
       expect(repository.tag_exists?('v9000')).to eq(false)
     end
   end
+
+  describe '#branch_exists?' do
+    it 'returns true for an existing branch' do
+      expect(repository.branch_exists?('master')).to eq(true)
+    end
+
+    it 'returns false for a non-existing branch' do
+      expect(repository.branch_exists?('kittens')).to eq(false)
+    end
+
+    it 'returns false when using an invalid branch name' do
+      expect(repository.branch_exists?('.bla')).to eq(false)
+    end
+  end
 end
