@@ -106,6 +106,7 @@ describe Gitlab::Git::Blob do
       it { expect(blob.name).to eq("russian.rb") }
       it { expect(blob.data.lines.first).to eq("Хороший файл") }
       it { expect(blob.size).to eq(23) }
+      it { expect(blob.truncated?).to be_falsey }
       it { expect(blob.mode).to eq("100755") }
     end
 
@@ -116,6 +117,7 @@ describe Gitlab::Git::Blob do
       it { expect(blob.data).to include("これはテスト") }
       it { expect(blob.size).to eq(340) }
       it { expect(blob.mode).to eq("100755") }
+      it { expect(blob.truncated?).to be_falsey }
     end
   end
 
