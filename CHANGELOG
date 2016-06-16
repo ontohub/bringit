@@ -1,5 +1,6 @@
 v 10.2.0
   - Add Repository#branch_exists? to check if a branch exists
+  - Fix bug where truncated? would erroneously change after the first iteration
 
 v 10.1.4
   - Fix truncated? for Unicode-encoded blobs

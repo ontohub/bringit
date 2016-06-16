@@ -267,7 +267,7 @@ module Gitlab
       end
 
       def truncated?
-        size > @data.size
+        size > data.bytes.size
       end
 
       private

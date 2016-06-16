@@ -107,6 +107,8 @@ describe Gitlab::Git::Blob do
       it { expect(blob.data.lines.first).to eq("Хороший файл") }
       it { expect(blob.size).to eq(23) }
       it { expect(blob.truncated?).to be_falsey }
+      # Run it twice since data is encoded after the first run
+      it { expect(blob.truncated?).to be_falsey }
       it { expect(blob.mode).to eq("100755") }
     end
 
