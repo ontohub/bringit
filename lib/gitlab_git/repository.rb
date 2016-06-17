@@ -809,22 +809,6 @@ module Gitlab
         rugged.remotes[remote_name].push(refspecs)
       end
 
-      # Return a String containing the mbox-formatted diff between +from+ and
-      # +to+.  See #diff for the allowed keys in the +options+ hash.
-      def format_patch(from, to, options = {})
-        options ||= {}
-        break_rewrites = options[:break_rewrites]
-        actual_options = Diff.filter_diff_options(options)
-
-        from_sha = rugged.rev_parse_oid(from)
-        to_sha = rugged.rev_parse_oid(to)
-        commits_between(from_sha, to_sha).map do |commit|
-          # Ignore merge commits, which have more than one parent,
-          # in creation of patch to mimic the behavior of `git format-patch`
-          commit.to_mbox(actual_options) if commit.parents.length <= 1
-        end.flatten.join("\n")
-      end
-
       # Merge the +source_name+ branch into the +target_name+ branch. This is
       # equivalent to `git merge --no_ff +source_name+`, since a merge commit
       # is always created.
