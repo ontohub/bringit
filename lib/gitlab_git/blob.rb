@@ -13,7 +13,7 @@ module Gitlab
       # blob data should use load_all_data!.
       MAX_DATA_DISPLAY_SIZE = 10485760
 
-      attr_accessor :name, :path, :size, :data, :mode, :id, :commit_id
+      attr_accessor :name, :path, :size, :data, :mode, :id, :commit_id, :loaded_size
 
       class << self
         def find(repository, sha, path)
@@ -215,6 +215,8 @@ module Gitlab
         end
 
         @loaded_all_data = false
+        # Retain the actual size before it is encoded
+        @loaded_size = @data.bytes.size
       end
 
       def empty?
@@ -233,6 +235,7 @@ module Gitlab
 
         @loaded_all_data = true
         @data = repository.lookup(id).content
+        @loaded_size = @data.size
       end
 
       def name
@@ -267,7 +270,7 @@ module Gitlab
       end
 
       def truncated?
-        size > data.bytes.size
+        size && (size > loaded_size)
       end
 
       private
