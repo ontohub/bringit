@@ -1,3 +1,6 @@
+v 10.2.2
+  - Revert Repository#format_patch removal
+
 v 10.2.1
   - Fix bug where truncated? would always be true for ISO-8859 files
 
