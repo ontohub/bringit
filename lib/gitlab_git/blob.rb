@@ -216,7 +216,7 @@ module Gitlab
 
         @loaded_all_data = false
         # Retain the actual size before it is encoded
-        @loaded_size = @data.bytes.size
+        @loaded_size = @data.bytesize
       end
 
       def empty?
@@ -235,7 +235,7 @@ module Gitlab
 
         @loaded_all_data = true
         @data = repository.lookup(id).content
-        @loaded_size = @data.size
+        @loaded_size = @data.bytesize
       end
 
       def name
