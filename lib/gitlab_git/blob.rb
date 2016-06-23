@@ -216,7 +216,7 @@ module Gitlab
 
         @loaded_all_data = false
         # Retain the actual size before it is encoded
-        @loaded_size = @data.bytesize
+        @loaded_size = @data.bytesize if @data
       end
 
       def empty?

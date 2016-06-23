@@ -1,5 +1,8 @@
 v 10.3.0 (unreleased)
-  - Removal Repository#format_patch
+  - Remove Repository#format_patch
+
+v 10.2.3
+  - Handle nil blob data
 
 v 10.2.2
   - Revert Repository#format_patch removal

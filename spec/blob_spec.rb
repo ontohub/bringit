@@ -5,6 +5,16 @@ require "spec_helper"
 describe Gitlab::Git::Blob do
   let(:repository) { Gitlab::Git::Repository.new(TEST_REPO_PATH) }
 
+  describe :initialize do
+    let(:blob) { Gitlab::Git::Blob.new(name: 'test') }
+
+    it 'handles nil data' do
+      expect(blob.name).to eq('test')
+      expect(blob.size).to eq(nil)
+      expect(blob.loaded_size).to eq(nil)
+    end
+  end
+
   describe :find do
     context 'file in subdir' do
       let(:blob) { Gitlab::Git::Blob.find(repository, SeedRepo::Commit::ID, "files/ruby/popen.rb") }
