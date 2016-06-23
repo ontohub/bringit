@@ -93,8 +93,12 @@ describe Gitlab::Git::Blob do
         blob = Gitlab::Git::Blob.raw(repository, rugged_blob)
 
         expect(blob.size).to eq(blob_size)
+        expect(blob.loaded_size).to eq(Gitlab::Git::Blob::MAX_DATA_DISPLAY_SIZE)
         expect(blob.data.length).to eq(Gitlab::Git::Blob::MAX_DATA_DISPLAY_SIZE)
         expect(blob.truncated?).to be_truthy
+
+        blob.load_all_data!(repository)
+        expect(blob.loaded_size).to eq(blob_size)
       end
     end
   end
@@ -119,6 +123,16 @@ describe Gitlab::Git::Blob do
       it { expect(blob.data).to include("これはテスト") }
       it { expect(blob.size).to eq(340) }
       it { expect(blob.mode).to eq("100755") }
+      it { expect(blob.truncated?).to be_falsey }
+    end
+
+    context 'file with ISO-8859 text' do
+      let(:blob) { Gitlab::Git::Blob.find(repository, SeedRepo::LastCommit::ID, "encoding/iso8859.txt") }
+
+      it { expect(blob.name).to eq("iso8859.txt") }
+      it { expect(blob.loaded_size).to eq(4) }
+      it { expect(blob.size).to eq(4) }
+      it { expect(blob.mode).to eq("100644") }
       it { expect(blob.truncated?).to be_falsey }
     end
   end
