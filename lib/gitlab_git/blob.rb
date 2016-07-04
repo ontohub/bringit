@@ -223,6 +223,8 @@ module Gitlab
         #   file: {
         #     previous_path: 'documents/old_story.txt'
         #     path: 'documents/story.txt'
+        #     content: 'Lorem ipsum...',
+        #     update: true
         #   },
         #   author: {
         #     email: 'user@example.com',
