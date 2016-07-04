@@ -221,8 +221,11 @@ module Gitlab
         #   file: {
         #     previous_path: 'documents/old_story.txt'
         #     path: 'documents/story.txt'
+<<<<<<< 7022a6d0d019114abec393f434256548a01a529e
         #     content: 'Lorem ipsum...',
         #     update: true
+=======
+>>>>>>> adds rename action to blob.rb
         #   },
         #   author: {
         #     email: 'user@example.com',
