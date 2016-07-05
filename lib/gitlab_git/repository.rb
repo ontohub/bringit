@@ -1155,7 +1155,7 @@ module Gitlab
       end
 
       def unsupported_platform?
-        %w( darwin freebsd solaris ).map{ |platform| RUBY_PLATFORM.include?(platform) }.any?
+        %w[darwin freebsd solaris].map { |platform| RUBY_PLATFORM.include?(platform) }.any?
       end
 
       # Returns true if the index entry has the special file mode that denotes
