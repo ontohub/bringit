@@ -314,7 +314,6 @@ describe Gitlab::Git::Blob do
       expect(commit.tree.to_a.any? do |tree|
         tree[:name] == 'NEWREADME.md'
       end).to be_truthy
-
     end
   end
 
