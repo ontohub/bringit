@@ -152,7 +152,6 @@ module Gitlab
           else
             if action == :rename
               old_path_name = PathHelper.normalize_path(file[:previous_path])
-
               old_filename = old_path_name.to_s
               index.remove(old_filename)
             end
