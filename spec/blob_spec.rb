@@ -270,6 +270,54 @@ describe Gitlab::Git::Blob do
     end
   end
 
+  describe :rename do
+    let(:repository) { Gitlab::Git::Repository.new(TEST_NORMAL_REPO_PATH) }
+
+    let(:commit_options) do
+      options = {
+        file: {
+          path: 'NEWREADME.md',
+          previous_path: 'README.md',
+          content: 'Lorem ipsum...',
+          update: true
+        },
+        author: {
+          email: 'user@example.com',
+          name: 'Test User',
+          time: Time.now
+        },
+        committer: {
+          email: 'user@example.com',
+          name: 'Test User',
+          time: Time.now
+        },
+        commit: {
+          message: 'Rename readme',
+          branch: 'master'
+        }
+      }
+    end
+
+    let!(:commit_sha) { Gitlab::Git::Blob.rename(repository, commit_options) }
+    let!(:commit) { repository.lookup(commit_sha) }
+
+    it 'should rename the file with commit' do
+      # Commit message valid
+      expect(commit.message).to eq('Rename readme')
+
+      # Previous file was removed
+      expect(commit.tree.to_a.any? do |tree|
+        tree[:name] == 'README.md'
+      end).to be_falsey
+
+      # File was renamed
+      expect(commit.tree.to_a.any? do |tree|
+        tree[:name] == 'NEWREADME.md'
+      end).to be_truthy
+
+    end
+  end
+
   describe :remove do
     let(:repository) { Gitlab::Git::Repository.new(TEST_REPO_PATH) }
 
