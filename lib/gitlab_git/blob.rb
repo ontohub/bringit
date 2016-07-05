@@ -150,7 +150,7 @@ module Gitlab
           if action == :remove
             index.remove(filename)
           else
-            mode = 0100644
+            mode = 0o100644
             file_entry = index.get(filename)
 
             if file_entry
