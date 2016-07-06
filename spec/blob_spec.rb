@@ -300,33 +300,24 @@ describe Gitlab::Git::Blob do
 
     let!(:ref) { commit_options[:commit][:branch] }
     let!(:prev_commit_count) { repository.commit_count(ref) }
-    let!(:commit_sha) { Gitlab::Git::Blob.rename(repository, commit_options) }
-    let!(:commit) { repository.lookup(commit_sha) }
-    let!(:commit_count) { repository.commit_count(ref) }
-    let!(:blob) {
-      commit.tree.to_a.any? do |tree|
-        tree[:name] == 'NEWREADME.md'
-      end
-    }
-
-    let!(:previous_blob) {
-      commit.tree.to_a.any? do |tree|
-        tree[:name] == 'README.md'
-      end
-    }
+    let(:commit_sha) { Gitlab::Git::Blob.rename(repository, commit_options) }
+    let(:commit_count) { repository.commit_count(ref) }
+    let(:commit) { repository.lookup(commit_sha) }
+    let(:blob) { Gitlab::Git::Blob.find(repository, commit_sha, "NEWREADME.md") }
+    let(:removed_blob) { Gitlab::Git::Blob.find(repository, commit_sha, "README.md") }
 
     it 'should rename the file with commit' do
       # Commit message valid
       expect(commit.message).to eq('Rename readme')
 
-      #Only one commit was made
+      # Only one commit was made
       expect(commit_count).to eq(prev_commit_count + 1)
 
       # Previous file was removed
-      expect(previous_blob).to be_falsey
+      expect(removed_blob).to be_nil
 
       # File was renamed
-      expect(blob).to be_truthy
+      expect(blob).not_to be_nil
     end
   end
 
@@ -357,11 +348,11 @@ describe Gitlab::Git::Blob do
 
     let!(:commit_sha) { Gitlab::Git::Blob.remove(repository, commit_options) }
     let!(:commit) { repository.lookup(commit_sha) }
-    let!(:blob) {
+    let!(:blob) do
       commit.tree.to_a.any? do |tree|
         tree[:name] == "README.md"
       end
-    }
+    end
 
     it 'should remove file with commit' do
       # Commit message valid
