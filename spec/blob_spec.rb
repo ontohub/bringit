@@ -270,6 +270,57 @@ describe Gitlab::Git::Blob do
     end
   end
 
+  describe :rename do
+    let(:repository) { Gitlab::Git::Repository.new(TEST_NORMAL_REPO_PATH) }
+
+    let(:commit_options) do
+      options = {
+        file: {
+          path: 'NEWREADME.md',
+          previous_path: 'README.md',
+          content: 'Lorem ipsum...',
+          update: true
+        },
+        author: {
+          email: 'user@example.com',
+          name: 'Test User',
+          time: Time.now
+        },
+        committer: {
+          email: 'user@example.com',
+          name: 'Test User',
+          time: Time.now
+        },
+        commit: {
+          message: 'Rename readme',
+          branch: 'master'
+        }
+      }
+    end
+
+    let!(:ref) { commit_options[:commit][:branch] }
+    let!(:prev_commit_count) { repository.commit_count(ref) }
+    let(:commit_sha) { Gitlab::Git::Blob.rename(repository, commit_options) }
+    let(:commit_count) { repository.commit_count(ref) }
+    let(:commit) { repository.lookup(commit_sha) }
+    let(:blob) { Gitlab::Git::Blob.find(repository, commit_sha, "NEWREADME.md") }
+    let(:removed_blob) { Gitlab::Git::Blob.find(repository, commit_sha, "README.md") }
+
+    it 'should rename the file with commit' do
+      # Commit message valid
+      expect(commit.message).to eq('Rename readme')
+
+      # Only one commit was made
+      expect(commit_count).to eq(prev_commit_count + 1)
+
+      # Previous file was removed
+      expect(removed_blob).to be_nil
+
+      # File was renamed
+      expect(blob).not_to be_nil
+    end
+  end
+
   describe :remove do
     let(:repository) { Gitlab::Git::Repository.new(TEST_REPO_PATH) }
 
@@ -295,17 +346,16 @@ describe Gitlab::Git::Blob do
       }
     end
 
-    let!(:commit_sha) { Gitlab::Git::Blob.remove(repository, commit_options) }
-    let!(:commit) { repository.lookup(commit_sha) }
+    let(:commit_sha) { Gitlab::Git::Blob.remove(repository, commit_options) }
+    let(:commit) { repository.lookup(commit_sha) }
+    let(:blob) { Gitlab::Git::Blob.find(repository, commit_sha, "README.md") }
 
     it 'should remove file with commit' do
       # Commit message valid
       expect(commit.message).to eq('Remove readme')
 
       # File was removed
-      expect(commit.tree.to_a.any? do |tree|
-        tree[:name] == 'README.md'
-      end).to be_falsey
+      expect(blob).to be_nil
     end
   end
 

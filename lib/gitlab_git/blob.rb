@@ -150,6 +150,12 @@ module Gitlab
           if action == :remove
             index.remove(filename)
           else
+            if action == :rename
+              old_path_name = PathHelper.normalize_path(file[:previous_path])
+              old_filename = old_path_name.to_s
+              index.remove(old_filename)
+            end
+
             mode = 0o100644
             file_entry = index.get(filename)
 
@@ -206,6 +212,35 @@ module Gitlab
         #
         def remove(repository, options)
           commit(repository, options, :remove)
+        end
+
+
+        # Rename file from repository and return commit sha
+        #
+        # options should contain next structure:
+        #   file: {
+        #     previous_path: 'documents/old_story.txt'
+        #     path: 'documents/story.txt'
+        #     content: 'Lorem ipsum...',
+        #     update: true
+        #   },
+        #   author: {
+        #     email: 'user@example.com',
+        #     name: 'Test User',
+        #     time: Time.now
+        #   },
+        #   committer: {
+        #     email: 'user@example.com',
+        #     name: 'Test User',
+        #     time: Time.now
+        #   },
+        #   commit: {
+        #     message: 'Rename FILENAME',
+        #     branch: 'master'
+        #   }
+        #
+        def rename(repository, options)
+          commit(repository, options, :rename)
         end
       end
 
