@@ -299,10 +299,8 @@ describe Gitlab::Git::Blob do
     end
 
     let!(:ref) { commit_options[:commit][:branch] }
-    let!(:prev_commit_count) { repository.commit_count(ref) }
     let!(:commit_sha) { Gitlab::Git::Blob.rename(repository, commit_options) }
     let!(:commit) { repository.lookup(commit_sha) }
-    let!(:commit_count) { repository.commit_count(ref) }
     let!(:blob) {
       commit.tree.to_a.any? do |tree|
         tree[:name] == 'NEWREADME.md'
@@ -319,8 +317,8 @@ describe Gitlab::Git::Blob do
       # Commit message valid
       expect(commit.message).to eq('Rename readme')
 
-      #Only one commit was made
-      expect(commit_count).to eq(prev_commit_count + 1)
+      # Only one commit was made
+      expect(commit_sha).to change { repository.commit_count(ref) }.by(1)
 
       # Previous file was removed
       expect(previous_blob).to be_falsey
