@@ -346,20 +346,16 @@ describe Gitlab::Git::Blob do
       }
     end
 
-    let!(:commit_sha) { Gitlab::Git::Blob.remove(repository, commit_options) }
-    let!(:commit) { repository.lookup(commit_sha) }
-    let!(:blob) do
-      commit.tree.to_a.any? do |tree|
-        tree[:name] == "README.md"
-      end
-    end
+    let(:commit_sha) { Gitlab::Git::Blob.remove(repository, commit_options) }
+    let(:commit) { repository.lookup(commit_sha) }
+    let(:blob) { Gitlab::Git::Blob.find(repository, commit_sha, "README.md") }
 
     it 'should remove file with commit' do
       # Commit message valid
       expect(commit.message).to eq('Remove readme')
 
       # File was removed
-      expect(blob).to be_falsey
+      expect(blob).to be_nil
     end
   end
 
