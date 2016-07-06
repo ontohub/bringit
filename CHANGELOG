@@ -1,5 +1,6 @@
 v 10.3.0 (unreleased)
   - Remove Repository#format_patch
+  - Remove Repository#add_tag
 
 v 10.2.3
   - Handle nil blob data
