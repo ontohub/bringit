@@ -1,3 +1,6 @@
+v 10.3.1
+  - Optional ref update on commit create
+
 v 10.3.0
   - Remove Repository#format_patch
   - Remove Repository#add_tag
