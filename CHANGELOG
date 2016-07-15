@@ -1,3 +1,6 @@
+v 10.3.2
+  - Handle collapsable DiffCollection
+
 v 10.3.1
   - Optional ref update on commit create
 
