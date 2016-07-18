@@ -7,6 +7,7 @@ describe Gitlab::Git::DiffCollection do
       max_files: max_files,
       max_lines: max_lines,
       all_diffs: all_diffs,
+      no_collapse: no_collapse
     )
   end
   let(:iterator) { Array.new(file_count, fake_diff(line_length, line_count)) }
@@ -16,6 +17,7 @@ describe Gitlab::Git::DiffCollection do
   let(:max_files) { 10 }
   let(:max_lines) { 100 }
   let(:all_diffs) { false }
+  let(:no_collapse) { true }
 
   describe '#to_a' do
     subject { super().to_a }
@@ -292,23 +294,154 @@ describe Gitlab::Git::DiffCollection do
   end
 
   describe :each do
-    let(:collection) do
-      Gitlab::Git::DiffCollection.new([{ diff: 'a' * 204800 }])
-    end
-
-    it 'yields Diff instances even when they are too large' do
-      expect { |b| collection.each(&b) }.
-        to yield_with_args(an_instance_of(Gitlab::Git::Diff))
-    end
-
-    it 'prunes diffs that are too large' do
-      diff = nil
-
-      collection.each do |d|
-        diff = d
+    context 'when diff are too large' do
+      let(:collection) do
+        Gitlab::Git::DiffCollection.new([{ diff: 'a' * 204800 }])
       end
 
-      expect(diff.diff).to eq('')
+      it 'yields Diff instances even when they are too large' do
+        expect { |b| collection.each(&b) }.
+          to yield_with_args(an_instance_of(Gitlab::Git::Diff))
+      end
+
+      it 'prunes diffs that are too large' do
+        diff = nil
+
+        collection.each do |d|
+          diff = d
+        end
+
+        expect(diff.diff).to eq('')
+      end
+    end
+
+    context 'when diff is quite large will collapse by default' do
+      let(:iterator) { [{ diff: 'a' * 20480 }] }
+
+      context 'when no collapse is set' do
+        let(:no_collapse) { true }
+
+        it 'yields Diff instances even when they are quite big' do
+          expect { |b| subject.each(&b) }.
+            to yield_with_args(an_instance_of(Gitlab::Git::Diff))
+        end
+
+        it 'does not prune diffs' do
+          diff = nil
+
+          subject.each do |d|
+            diff = d
+          end
+
+          expect(diff.diff).not_to eq('')
+        end
+      end
+
+      context 'when no collapse is unset' do
+        let(:no_collapse) { false }
+
+        it 'yields Diff instances even when they are quite big' do
+          expect { |b| subject.each(&b) }.
+            to yield_with_args(an_instance_of(Gitlab::Git::Diff))
+        end
+
+        it 'prunes diffs that are quite big' do
+          diff = nil
+
+          subject.each do |d|
+            diff = d
+          end
+
+          expect(diff.diff).to eq('')
+        end
+
+        context 'when go over safe limits on files' do
+          let(:iterator) { [ fake_diff(1,1) ] * 4 }
+
+          before(:each) do
+            stub_const('Gitlab::Git::DiffCollection::DEFAULT_LIMITS', { max_files: 2, max_lines: max_lines })
+          end
+
+          it 'prunes diffs by default even little ones' do
+            subject.each_with_index do |d, i|
+              if i < 2
+                expect(d.diff).not_to eq('')
+              else # 90 lines
+                expect(d.diff).to eq('')
+              end
+            end
+          end
+        end
+
+        context 'when go over safe limits on lines' do
+          let(:iterator) do
+            [
+              fake_diff(1, 45),
+              fake_diff(1, 45),
+              fake_diff(1, 20480),
+              fake_diff(1, 1)
+            ]
+          end
+
+          before(:each) do
+            stub_const('Gitlab::Git::DiffCollection::DEFAULT_LIMITS', { max_files: max_files, max_lines: 80 })
+          end
+
+          it 'prunes diffs by default even little ones' do
+            subject.each_with_index do |d, i|
+              if i < 2
+                expect(d.diff).not_to eq('')
+              else # 90 lines
+                expect(d.diff).to eq('')
+              end
+            end
+          end
+        end
+
+        context 'when go over safe limits on bytes' do
+          let(:iterator) do
+            [
+              fake_diff(1, 45),
+              fake_diff(1, 45),
+              fake_diff(1, 20480),
+              fake_diff(1, 1)
+            ]
+          end
+
+          before(:each) do
+            stub_const('Gitlab::Git::DiffCollection::DEFAULT_LIMITS', { max_files: max_files, max_lines: 80 })
+          end
+
+          it 'prunes diffs by default even little ones' do
+            subject.each_with_index do |d, i|
+              if i < 2
+                expect(d.diff).not_to eq('')
+              else # > 80 bytes
+                expect(d.diff).to eq('')
+              end
+            end
+          end
+        end
+      end
+
+      context 'when limiting is disabled' do
+        let(:all_diffs) { true }
+
+        it 'yields Diff instances even when they are quite big' do
+          expect { |b| subject.each(&b) }.
+            to yield_with_args(an_instance_of(Gitlab::Git::Diff))
+        end
+
+        it 'does not prune diffs' do
+          diff = nil
+
+          subject.each do |d|
+            diff = d
+          end
+
+          expect(diff.diff).not_to eq('')
+        end
+      end
     end
   end
 

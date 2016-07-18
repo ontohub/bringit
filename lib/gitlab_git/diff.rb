@@ -133,7 +133,7 @@ module Gitlab
                              :include_untracked_content, :skip_binary_check,
                              :include_typechange, :include_typechange_trees,
                              :ignore_filemode, :recurse_ignored_dirs, :paths,
-                             :max_files, :max_lines, :all_diffs]
+                             :max_files, :max_lines, :all_diffs, :no_collapse]
 
           if default_options
             actual_defaults = default_options.dup
@@ -206,6 +206,21 @@ module Gitlab
         @diff = ''
         @line_count = 0
         @too_large = true
+      end
+
+      def collapsed?
+        return @collapsed if defined?(@collapsed)
+        false
+      end
+
+      def collapsible?
+        @diff.bytesize >= 10240 # 10 KB
+      end
+
+      def prune_collapsed_diff!
+        @diff = ''
+        @line_count = 0
+        @collapsed = true
       end
 
       private

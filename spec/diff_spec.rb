@@ -153,11 +153,47 @@ EOT
     end
   end
 
-  describe :prune_large_diff! do
+  describe :collapsed? do
+    it 'returns false by default even on quite big diff' do
+      diff = Gitlab::Git::Diff.new(diff: 'a' * 20480)
+
+      expect(diff.collapsed?).to eq(false)
+    end
+
+    it 'returns false by default for a diff that is small enough' do
+      diff = Gitlab::Git::Diff.new(diff: 'a')
+
+      expect(diff.collapsed?).to eq(false)
+    end
+
+    it 'returns true for a diff that was explicitly marked as being collapsed' do
+      diff = Gitlab::Git::Diff.new(diff: 'a')
+
+      diff.prune_collapsed_diff!
+
+      expect(diff.collapsed?).to eq(true)
+    end
+  end
+
+  describe :collapsible? do
+    it 'returns true for a diff that is quite large' do
+      diff = Gitlab::Git::Diff.new(diff: 'a' * 20480)
+
+      expect(diff.collapsible?).to eq(true)
+    end
+
+    it 'returns false for a diff that is small enough' do
+      diff = Gitlab::Git::Diff.new(diff: 'a')
+
+      expect(diff.collapsible?).to eq(false)
+    end
+  end
+
+  describe :prune_collapsed_diff! do
     it 'prunes the diff' do
       diff = Gitlab::Git::Diff.new(diff: "foo\nbar")
 
-      diff.prune_large_diff!
+      diff.prune_collapsed_diff!
 
       expect(diff.diff).to eq('')
       expect(diff.line_count).to eq(0)
