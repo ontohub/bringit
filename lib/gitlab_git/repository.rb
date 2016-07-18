@@ -853,7 +853,8 @@ module Gitlab
       #   },
       #   commit: {
       #     message: 'Wow such commit',
-      #     branch: 'master'
+      #     branch: 'master',
+      #     update_ref: false
       #   }
       def mkdir(path, options = {})
         # Check if this directory exists; if it does, then don't bother
@@ -863,10 +864,13 @@ module Gitlab
         rugged_ref = rugged.ref(ref)
 
         raise InvalidRef.new("Invalid ref") if rugged_ref.nil?
+
         target_commit = rugged_ref.target
+
         raise InvalidRef.new("Invalid target commit") if target_commit.nil?
 
         entry = tree_entry(target_commit, path)
+
         if entry
           if entry[:type] == :blob
             raise InvalidBlobName.new("Directory already exists as a file")

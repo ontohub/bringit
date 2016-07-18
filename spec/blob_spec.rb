@@ -209,7 +209,7 @@ describe Gitlab::Git::Blob do
     end
   end
 
-  describe :create do
+  describe :commit do
     let(:repository) { Gitlab::Git::Repository.new(TEST_REPO_PATH) }
 
     let(:commit_options) do
@@ -249,6 +249,21 @@ describe Gitlab::Git::Blob do
 
       # File was created
       expect(repository.lookup(tree[:oid]).first[:name]).to eq('story.txt')
+    end
+
+    describe "ref updating" do
+      it 'creates a commit but does not udate a ref' do
+        commit_opts = commit_options.tap{ |opts| opts[:commit][:update_ref] = false}
+        commit_sha = Gitlab::Git::Blob.commit(repository, commit_opts)
+        commit = repository.lookup(commit_sha)
+
+        # Commit message valid
+        expect(commit.message).to eq('Wow such commit')
+
+        # Does not update any related ref
+        expect(repository.lookup("fix-mode").oid).to_not eq(commit.oid)
+        expect(repository.lookup("HEAD").oid).to_not eq(commit.oid)
+      end
     end
 
     describe 'reject updates' do

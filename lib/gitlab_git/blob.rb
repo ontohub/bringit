@@ -115,7 +115,8 @@ module Gitlab
         #   },
         #   commit: {
         #     message: 'Wow such commit',
-        #     branch: 'master'
+        #     branch: 'master',
+        #     update_ref: false
         #   }
         #
         def commit(repository, options, action = :add)
@@ -126,6 +127,7 @@ module Gitlab
           commit = options[:commit]
           repo = repository.rugged
           ref = commit[:branch]
+          update_ref = commit[:update_ref].nil? ? true : commit[:update_ref]
           parents = []
 
           unless ref.start_with?('refs/')
@@ -184,7 +186,7 @@ module Gitlab
           opts[:committer] = committer
           opts[:message] = commit[:message]
           opts[:parents] = parents
-          opts[:update_ref] = ref
+          opts[:update_ref] = ref if update_ref
 
           Rugged::Commit.create(repo, opts)
         end
