@@ -140,7 +140,7 @@ describe Gitlab::Git::Repository do
       end
 
       context :commit do
-        subject { heads.first.target }
+        subject { heads.first.target.sha }
 
         it { is_expected.to eq("0b4bc9a49b562e85de7cc9e834518ea6828729b9") }
       end

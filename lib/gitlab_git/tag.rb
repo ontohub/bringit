@@ -1,8 +1,8 @@
 module Gitlab
   module Git
     class Tag < Ref
-      def initialize(name, target, message = nil)
-        super(name, target)
+      def initialize(repository, name, target, message = nil)
+        super(repository, name, target)
         @message = message
       end
 
