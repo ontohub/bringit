@@ -1,4 +1,4 @@
-v 10.4
+v 10.4.0
   - Move implementation of `local_branches` to `Gitlab::Git::Repository` from gitlab-ce
   - Refactor Refs to preserve their target objects instead of just a string representation
 
