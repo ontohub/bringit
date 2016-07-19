@@ -68,6 +68,12 @@ module Gitlab
         end.compact.sort_by(&:name)
       end
 
+      def local_branches
+        rugged.branches.each(:local).map do |branch|
+          Branch.new(self, branch.name, branch.target)
+        end
+      end
+
       # Returns the number of valid branches
       def branch_count
         rugged.branches.count do |ref|
