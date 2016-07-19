@@ -55,7 +55,12 @@ module Gitlab
         def find(repo, commit_id = "HEAD")
           return decorate(commit_id) if commit_id.is_a?(Rugged::Commit)
 
-          obj = repo.rev_parse_target(commit_id)
+          obj = if commit_id.is_a?(String)
+                  repo.rev_parse_target(commit_id)
+                else
+                  Ref.dereference_object(commit_id)
+                end
+
           return nil unless obj.is_a?(Rugged::Commit)
 
           decorate(obj)

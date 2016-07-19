@@ -2,7 +2,7 @@ module Gitlab
   module Git
     class Ref
       include EncodingHelper
-      
+
       # Branch or tag name
       # without "refs/tags|heads" prefix
       attr_reader :name
@@ -20,18 +20,17 @@ module Gitlab
         str.gsub(/\Arefs\/heads\//, '')
       end
 
-      def initialize(name, target)
+      def self.dereference_object(object)
+        object = object.target while object.is_a?(Rugged::Tag::Annotation)
+
+        object
+      end
+
+      def initialize(repository, name, target)
         encode! name
         @name = name.gsub(/\Arefs\/(tags|heads)\//, '')
-        @target = if target.respond_to?(:oid)
-                    target.oid
-                  elsif target.respond_to?(:name)
-                    target.name
-                  elsif target.is_a? String
-                    target
-                  else
-                    nil
-                  end
+
+        @target = Commit.find(repository, target)
       end
     end
   end

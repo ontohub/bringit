@@ -1,3 +1,7 @@
+v 10.4
+  - Move implementation of `local_branches` to `Gitlab::Git::Repository` from gitlab-ce
+  - Refactor Refs to preserve their target objects instead of just a string representation
+
 v 10.3.2
   - Handle collapsable DiffCollection
 

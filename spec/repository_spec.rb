@@ -140,7 +140,7 @@ describe Gitlab::Git::Repository do
       end
 
       context :commit do
-        subject { heads.first.target }
+        subject { heads.first.target.sha }
 
         it { is_expected.to eq("0b4bc9a49b562e85de7cc9e834518ea6828729b9") }
       end
@@ -1089,5 +1089,21 @@ index 0000000..e69de29
     it 'returns false when using an invalid branch name' do
       expect(repository.branch_exists?('.bla')).to eq(false)
     end
+  end
+
+  describe '#local_branches' do
+    it 'returns the local branches' do
+      create_remote_branch('joe', 'remote_branch', 'master')
+      repository.create_branch('local_branch', 'master')
+
+      expect(repository.local_branches.any? { |branch| branch.name == 'remote_branch' }).to eq(false)
+      expect(repository.local_branches.any? { |branch| branch.name == 'local_branch' }).to eq(true)
+    end
+  end
+
+  def create_remote_branch(remote_name, branch_name, source_branch_name)
+    source_branch = repository.branches.find { |branch| branch.name == source_branch_name }
+    rugged = repository.rugged
+    rugged.references.create("refs/remotes/#{remote_name}/#{branch_name}", source_branch.target.sha)
   end
 end

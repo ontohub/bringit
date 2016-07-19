@@ -61,11 +61,17 @@ module Gitlab
       def branches
         rugged.branches.map do |rugged_ref|
           begin
-            Branch.new(rugged_ref.name, rugged_ref.target)
+            Branch.new(self, rugged_ref.name, rugged_ref.target)
           rescue Rugged::ReferenceError
             # Omit invalid branch
           end
         end.compact.sort_by(&:name)
+      end
+
+      def local_branches
+        rugged.branches.each(:local).map do |branch|
+          Branch.new(self, branch.name, branch.target)
+        end
       end
 
       # Returns the number of valid branches
@@ -99,7 +105,7 @@ module Gitlab
             end
           end
 
-          Tag.new(ref.name, ref.target, message)
+          Tag.new(self, ref.name, ref.target, message)
         end.sort_by(&:name)
       end
 
@@ -132,7 +138,7 @@ module Gitlab
       # Deprecated. Will be removed in 5.2
       def heads
         rugged.references.each("refs/heads/*").map do |head|
-          Gitlab::Git::Ref.new(head.name, head.target)
+          Gitlab::Git::Ref.new(self, head.name, head.target)
         end.sort_by(&:name)
       end
 
@@ -337,8 +343,7 @@ module Gitlab
       # annotated tag, then return the tag's target instead.
       def rev_parse_target(revspec)
         obj = rugged.rev_parse(revspec)
-        obj = obj.target while obj.is_a?(Rugged::Tag::Annotation)
-        obj
+        Ref.dereference_object(obj)
       end
 
       # Return a collection of Rugged::Commits between the two revspec arguments.
@@ -745,7 +750,7 @@ module Gitlab
       #   create_branch("other-feature", "master")
       def create_branch(ref, start_point = "HEAD")
         rugged_ref = rugged.branches.create(ref, start_point)
-        Branch.new(rugged_ref.name, rugged_ref.target)
+        Branch.new(self, rugged_ref.name, rugged_ref.target)
       rescue Rugged::ReferenceError => e
         raise InvalidRef.new("Branch #{ref} already exists") if e.to_s =~ /'refs\/heads\/#{ref}'/
         raise InvalidRef.new("Invalid reference #{start_point}")
