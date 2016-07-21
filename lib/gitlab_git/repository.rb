@@ -98,14 +98,17 @@ module Gitlab
           message = nil
 
           if ref.target.is_a?(Rugged::Tag::Annotation)
+            object = ref.target
             tag_message = ref.target.message
 
             if tag_message.respond_to?(:chomp)
               message = tag_message.chomp
             end
+          else
+            object = nil # Lightweight tags aren't git objects
           end
 
-          Tag.new(self, ref.name, ref.target, message)
+          Tag.new(self, object, ref.name, ref.target, message)
         end.sort_by(&:name)
       end
 
