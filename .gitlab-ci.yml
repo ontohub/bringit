@@ -1,19 +1,24 @@
+image: ruby:2.1
+
 before_script:
   - ./scripts/prepare_build.sh
-  - git submodule update --init
   - ruby -v
-  - which ruby
   - gem install bundler --no-ri --no-rdoc
-  - bundle install
+  - bundle install -j $(nproc) --path vendor
+
+cache:
+  paths:
+    - vendor/ruby
 
 rspec:
   script:
   - bundle exec rspec spec
-  tags:
-    - ruby
+
+rspec2.3:
+  image: ruby:2.3.1
+  script:
+  - bundle exec rspec spec
 
 rubocop:
   script:
     - bundle exec rubocop
-  tags:
-    - ruby
