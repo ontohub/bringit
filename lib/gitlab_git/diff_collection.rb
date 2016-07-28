@@ -23,51 +23,58 @@ module Gitlab
       end
 
       def each
-        @iterator.each_with_index do |raw, i|
-          # First yield cached Diff instances from @array
-          if @array[i]
-            yield @array[i]
-            next
+        if @populated
+          # @iterator.each is slower than just iterating the array in place
+          @array.each do |item|
+            yield item
           end
-
-          # We have exhausted @array, time to create new Diff instances or stop.
-          break if @overflow
-
-          if !@all_diffs && i >= @max_files
-            @overflow = true
-            break
-          end
-
-          # Going by the number of files alone it is OK to create a new Diff instance.
-          diff = Gitlab::Git::Diff.new(raw)
-
-          # If a diff is too large we still want to display some information
-          # about it (e.g. the file path) without keeping the raw data around
-          # (as this would be a waste of memory usage).
-          #
-          # This also removes the line count (from the diff itself) so it
-          # doesn't add up to the total amount of lines.
-          if diff.too_large?
-            diff.prune_large_diff!
-          end
-
-          if !@all_diffs && !@no_collapse
-            if diff.collapsible? || over_safe_limits?(i)
-              diff.prune_collapsed_diff!
+        else
+          @iterator.each_with_index do |raw, i|
+            # First yield cached Diff instances from @array
+            if @array[i]
+              yield @array[i]
+              next
             end
+
+            # We have exhausted @array, time to create new Diff instances or stop.
+            break if @overflow
+
+            if !@all_diffs && i >= @max_files
+              @overflow = true
+              break
+            end
+
+            # Going by the number of files alone it is OK to create a new Diff instance.
+            diff = Gitlab::Git::Diff.new(raw)
+
+            # If a diff is too large we still want to display some information
+            # about it (e.g. the file path) without keeping the raw data around
+            # (as this would be a waste of memory usage).
+            #
+            # This also removes the line count (from the diff itself) so it
+            # doesn't add up to the total amount of lines.
+            if diff.too_large?
+              diff.prune_large_diff!
+            end
+
+            if !@all_diffs && !@no_collapse
+              if diff.collapsible? || over_safe_limits?(i)
+                diff.prune_collapsed_diff!
+              end
+            end
+
+            @line_count += diff.line_count
+            @byte_count += diff.diff.bytesize
+
+            if !@all_diffs && (@line_count >= @max_lines || @byte_count >= @max_bytes)
+              # This last Diff instance pushes us over the lines limit. We stop and
+              # discard it.
+              @overflow = true
+              break
+            end
+
+            yield @array[i] = diff
           end
-
-          @line_count += diff.line_count
-          @byte_count += diff.diff.bytesize
-
-          if !@all_diffs && (@line_count >= @max_lines || @byte_count >= @max_bytes)
-            # This last Diff instance pushes us over the lines limit. We stop and
-            # discard it.
-            @overflow = true
-            break
-          end
-
-          yield @array[i] = diff
         end
       end
 
@@ -81,7 +88,7 @@ module Gitlab
       end
 
       def size
-        @size ||= count # forces a loop through @iterator
+        @size ||= count # forces a loop using each method
       end
 
       def real_size
@@ -95,9 +102,11 @@ module Gitlab
       end
 
       def decorate!
-        each_with_index do |element, i|
+        collection = each_with_index do |element, i|
           @array[i] = yield(element)
         end
+        @populated = true
+        collection
       end
 
       private
