@@ -25,12 +25,21 @@ describe Gitlab::Git::DiffCollection do
   end
 
   describe :decorate! do
-    let(:file_count) { 3}
+    let(:file_count) { 3 }
 
     it 'modifies the array in place' do
       count = 0
       subject.decorate! { |d| !d.nil? && count += 1 }
       expect(subject.to_a).to eq([1, 2, 3])
+      expect(count).to eq(3)
+    end
+
+    it 'avoids future iterator iterations' do
+      subject.decorate! { |d| d if !d.nil? }
+
+      expect(iterator).not_to receive(:each)
+
+      subject.overflow?
     end
   end
 
