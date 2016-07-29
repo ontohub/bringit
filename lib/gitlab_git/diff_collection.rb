@@ -15,6 +15,7 @@ module Gitlab
         @safe_max_bytes = @safe_max_files * 5120 # Average 5 KB per file
         @all_diffs = !!options.fetch(:all_diffs, false)
         @no_collapse = !!options.fetch(:no_collapse, true)
+        @deltas_only = !!options.fetch(:deltas_only, false)
 
         @line_count = 0
         @byte_count = 0
@@ -22,59 +23,14 @@ module Gitlab
         @array = Array.new
       end
 
-      def each
+      def each(&block)
         if @populated
           # @iterator.each is slower than just iterating the array in place
-          @array.each do |item|
-            yield item
-          end
+          @array.each(&block)
+        elsif @deltas_only
+          each_delta(&block)
         else
-          @iterator.each_with_index do |raw, i|
-            # First yield cached Diff instances from @array
-            if @array[i]
-              yield @array[i]
-              next
-            end
-
-            # We have exhausted @array, time to create new Diff instances or stop.
-            break if @overflow
-
-            if !@all_diffs && i >= @max_files
-              @overflow = true
-              break
-            end
-
-            # Going by the number of files alone it is OK to create a new Diff instance.
-            diff = Gitlab::Git::Diff.new(raw)
-
-            # If a diff is too large we still want to display some information
-            # about it (e.g. the file path) without keeping the raw data around
-            # (as this would be a waste of memory usage).
-            #
-            # This also removes the line count (from the diff itself) so it
-            # doesn't add up to the total amount of lines.
-            if diff.too_large?
-              diff.prune_large_diff!
-            end
-
-            if !@all_diffs && !@no_collapse
-              if diff.collapsible? || over_safe_limits?(i)
-                diff.prune_collapsed_diff!
-              end
-            end
-
-            @line_count += diff.line_count
-            @byte_count += diff.diff.bytesize
-
-            if !@all_diffs && (@line_count >= @max_lines || @byte_count >= @max_bytes)
-              # This last Diff instance pushes us over the lines limit. We stop and
-              # discard it.
-              @overflow = true
-              break
-            end
-
-            yield @array[i] = diff
-          end
+          each_patch(&block)
         end
       end
 
@@ -121,6 +77,63 @@ module Gitlab
 
       def over_safe_limits?(files)
         files >= @safe_max_files || @line_count > @safe_max_lines || @byte_count >= @safe_max_bytes
+      end
+
+      def each_delta
+        @iterator.each_delta.with_index do |delta, i|
+          diff = Gitlab::Git::Diff.new(delta)
+
+          yield @array[i] = diff
+        end
+      end
+
+      def each_patch
+        @iterator.each_with_index do |raw, i|
+          # First yield cached Diff instances from @array
+          if @array[i]
+            yield @array[i]
+            next
+          end
+
+          # We have exhausted @array, time to create new Diff instances or stop.
+          break if @overflow
+
+          if !@all_diffs && i >= @max_files
+            @overflow = true
+            break
+          end
+
+          # Going by the number of files alone it is OK to create a new Diff instance.
+          diff = Gitlab::Git::Diff.new(raw)
+
+          # If a diff is too large we still want to display some information
+          # about it (e.g. the file path) without keeping the raw data around
+          # (as this would be a waste of memory usage).
+          #
+          # This also removes the line count (from the diff itself) so it
+          # doesn't add up to the total amount of lines.
+          if diff.too_large?
+            diff.prune_large_diff!
+          end
+
+          if !@all_diffs && !@no_collapse
+            if diff.collapsible? || over_safe_limits?(i)
+              diff.prune_collapsed_diff!
+            end
+          end
+
+          @line_count += diff.line_count
+          @byte_count += diff.diff.bytesize
+
+          if !@all_diffs && (@line_count >= @max_lines || @byte_count >= @max_bytes)
+            # This last Diff instance pushes us over the lines limit. We stop and
+            # discard it.
+            @overflow = true
+            break
+          end
+
+          yield @array[i] = diff
+        end
       end
     end
   end
