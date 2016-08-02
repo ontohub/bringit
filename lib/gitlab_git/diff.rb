@@ -159,12 +159,13 @@ module Gitlab
       end
 
       def initialize(raw_diff)
-        raise "Nil as raw diff passed" unless raw_diff
-
-        if raw_diff.is_a?(Hash)
+        case raw_diff
+        when Hash
           init_from_hash(raw_diff)
-        elsif raw_diff.is_a?(Rugged::Patch)
+        when Rugged::Patch, Rugged::Diff::Delta
           init_from_rugged(raw_diff)
+        when nil
+          raise "Nil as raw diff passed"
         else
           raise "Invalid raw diff type: #{raw_diff.class}"
         end
@@ -226,9 +227,13 @@ module Gitlab
       private
 
       def init_from_rugged(rugged)
-        @diff = encode!(strip_diff_headers(rugged.to_s))
+        if rugged.is_a?(Rugged::Patch)
+          @diff = encode!(strip_diff_headers(rugged.to_s))
+          d = rugged.delta
+        else
+          d = rugged
+        end
 
-        d = rugged.delta
         @new_path = encode!(d.new_file[:path])
         @old_path = encode!(d.old_file[:path])
         @a_mode = d.old_file[:mode].to_s(8)
