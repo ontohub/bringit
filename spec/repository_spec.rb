@@ -1092,18 +1092,27 @@ index 0000000..e69de29
   end
 
   describe '#local_branches' do
+    before(:all) do
+      @repo = Gitlab::Git::Repository.new(TEST_MUTABLE_REPO_PATH)
+    end
+
+    after(:all) do
+      FileUtils.rm_rf(TEST_MUTABLE_REPO_PATH)
+      ensure_seeds
+    end
+
     it 'returns the local branches' do
       create_remote_branch('joe', 'remote_branch', 'master')
-      repository.create_branch('local_branch', 'master')
+      @repo.create_branch('local_branch', 'master')
 
-      expect(repository.local_branches.any? { |branch| branch.name == 'remote_branch' }).to eq(false)
-      expect(repository.local_branches.any? { |branch| branch.name == 'local_branch' }).to eq(true)
+      expect(@repo.local_branches.any? { |branch| branch.name == 'remote_branch' }).to eq(false)
+      expect(@repo.local_branches.any? { |branch| branch.name == 'local_branch' }).to eq(true)
     end
   end
 
   def create_remote_branch(remote_name, branch_name, source_branch_name)
-    source_branch = repository.branches.find { |branch| branch.name == source_branch_name }
-    rugged = repository.rugged
+    source_branch = @repo.branches.find { |branch| branch.name == source_branch_name }
+    rugged = @repo.rugged
     rugged.references.create("refs/remotes/#{remote_name}/#{branch_name}", source_branch.target.sha)
   end
 end
