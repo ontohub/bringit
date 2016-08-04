@@ -32,6 +32,12 @@ describe Gitlab::Git::Compare do
 
       it { is_expected.to be_empty }
     end
+
+    context 'providing nil as base ref or head ref' do
+      let(:compare) { Gitlab::Git::Compare.new(repository, nil, nil) }
+
+      it { is_expected.to be_empty }
+    end
   end
 
   describe :diffs do

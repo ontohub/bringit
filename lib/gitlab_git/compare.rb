@@ -6,7 +6,10 @@ module Gitlab
       def initialize(repository, base, head)
         @repository = repository
 
-        return unless base && head
+        unless base && head
+          @commits = []
+          return
+        end
 
         @base = Gitlab::Git::Commit.find(repository, base.try(:strip))
         @head = Gitlab::Git::Commit.find(repository, head.try(:strip))
