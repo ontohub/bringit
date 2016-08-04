@@ -1,11 +1,9 @@
 module Gitlab
   module Git
     class Compare
-      attr_reader :commits, :same, :head, :base
+      attr_reader :head, :base
 
       def initialize(repository, base, head)
-        @commits = []
-        @same = false
         @repository = repository
 
         return unless base && head
@@ -13,14 +11,18 @@ module Gitlab
         @base = Gitlab::Git::Commit.find(repository, base.try(:strip))
         @head = Gitlab::Git::Commit.find(repository, head.try(:strip))
 
-        return unless @base && @head
+        @commits = [] unless @base && @head
+        @commits = [] if same
+      end
 
-        if @base.id == @head.id
-          @same = true
-          return
-        end
+      def same
+        @base && @head && @base.id == @head.id
+      end
 
-        @commits = Gitlab::Git::Commit.between(repository, @base.id, @head.id)
+      def commits
+        return @commits if defined?(@commits)
+
+        @commits = Gitlab::Git::Commit.between(@repository, @base.id, @head.id)
       end
 
       def diffs(options = {})

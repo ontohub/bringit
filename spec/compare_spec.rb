@@ -14,6 +14,24 @@ describe Gitlab::Git::Compare do
     end
     it { is_expected.to include(SeedRepo::Commit::PARENT_ID) }
     it { is_expected.not_to include(SeedRepo::BigCommit::PARENT_ID) }
+
+    context 'non-existing base ref' do
+      let(:compare) { Gitlab::Git::Compare.new(repository, 'no-such-branch', SeedRepo::Commit::ID) }
+
+      it { is_expected.to be_empty }
+    end
+
+    context 'non-existing head ref' do
+      let(:compare) { Gitlab::Git::Compare.new(repository, SeedRepo::BigCommit::ID, '1234567890') }
+
+      it { is_expected.to be_empty }
+    end
+
+    context 'base ref is equal to head ref' do
+      let(:compare) { Gitlab::Git::Compare.new(repository, SeedRepo::BigCommit::ID, SeedRepo::BigCommit::ID) }
+
+      it { is_expected.to be_empty }
+    end
   end
 
   describe :diffs do
@@ -26,12 +44,31 @@ describe Gitlab::Git::Compare do
     end
     it { is_expected.to include('files/ruby/popen.rb') }
     it { is_expected.not_to include('LICENSE') }
+
+    context 'non-existing base ref' do
+      let(:compare) { Gitlab::Git::Compare.new(repository, 'no-such-branch', SeedRepo::Commit::ID) }
+
+      it { is_expected.to be_empty }
+    end
+
+    context 'non-existing head ref' do
+      let(:compare) { Gitlab::Git::Compare.new(repository, SeedRepo::BigCommit::ID, '1234567890') }
+
+      it { is_expected.to be_empty }
+    end
   end
 
-  describe 'non-existing refs' do
-    let(:compare) { Gitlab::Git::Compare.new(repository, 'no-such-branch', '1234567890') }
+  describe :same  do
+    subject do
+      compare.same
+    end
 
-    it { expect(compare.commits).to be_empty }
-    it { expect(compare.diffs).to be_empty }
+    it { is_expected.to eq(false) }
+
+    context 'base ref is equal to head ref' do
+      let(:compare) { Gitlab::Git::Compare.new(repository, SeedRepo::BigCommit::ID, SeedRepo::BigCommit::ID) }
+
+      it { is_expected.to eq(true) }
+    end
   end
 end
