@@ -952,7 +952,10 @@ module Gitlab
         Dir.mkdir(info_dir_path) unless File.directory?(info_dir_path)
 
         # Write the contents of the .gitattributes file to info/attributes
-        File.write(info_attributes_path, gitattributes_content)
+        # Use binary mode to prevent Rails from converting ASCII-8BIT to UTF-8
+        File.open(info_attributes_path, "wb") do |file|
+          file.write(gitattributes_content)
+        end
       end
 
       # Checks if the blob should be diffable according to its attributes

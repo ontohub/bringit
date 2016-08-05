@@ -1,3 +1,6 @@
+v 10.4.5
+  - Write .gitattributes in binary mode to prevent Rails from converting ASCII-8BIT to UTF-8
+
 v 10.4.4
   - Lazy load compare commits
 
