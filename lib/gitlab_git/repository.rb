@@ -3,6 +3,7 @@ require_relative 'encoding_helper'
 require_relative 'path_helper'
 require 'forwardable'
 require 'tempfile'
+require 'forwardable'
 require "rubygems/package"
 
 module Gitlab
