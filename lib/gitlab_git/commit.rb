@@ -287,15 +287,18 @@ module Gitlab
       end
 
       def init_from_rugged(commit)
+        author = commit.author
+        committer = commit.committer
+
         @raw_commit = commit
         @id = commit.oid
         @message = commit.message
-        @authored_date = commit.author[:time]
-        @committed_date = commit.committer[:time]
-        @author_name = commit.author[:name]
-        @author_email = commit.author[:email]
-        @committer_name = commit.committer[:name]
-        @committer_email = commit.committer[:email]
+        @authored_date = author[:time]
+        @committed_date = committer[:time]
+        @author_name = author[:name]
+        @author_email = author[:email]
+        @committer_name = committer[:name]
+        @committer_email = committer[:email]
         @parent_ids = commit.parents.map(&:oid)
       end
 

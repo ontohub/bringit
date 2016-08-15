@@ -1,3 +1,6 @@
+v 10.4.6
+  - Optimize fetch of the author and committer of a Rugged commit
+
 v 10.4.5
   - Write .gitattributes in binary mode to prevent Rails from converting ASCII-8BIT to UTF-8
   - Compare returns an empty collection of commits on nil refs
