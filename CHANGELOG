@@ -1,3 +1,6 @@
+v 10.4.7
+  - Remove unneeded call to Repository#root_ref
+
 v 10.4.6
   - Optimize fetch of the author and committer of a Rugged commit
 
