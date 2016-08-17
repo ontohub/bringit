@@ -275,7 +275,6 @@ module Gitlab
           limit: 10,
           offset: 0,
           path: nil,
-          ref: root_ref,
           follow: false,
           skip_merges: false,
           disable_walk: false,
