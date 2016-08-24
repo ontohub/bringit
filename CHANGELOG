@@ -1,3 +1,6 @@
+v 10.6.5
+  - Retain file mode whenever file is renamed
+
 v 10.6.4
   - Diff sizes are now checked before loading any extra data into memory
 
