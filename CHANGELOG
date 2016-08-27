@@ -1,4 +1,4 @@
-v 10.5.1
+v 10.5.0
   - Add Repository#find_branch to speed up branch lookups
 
 v 10.4.7

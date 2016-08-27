@@ -70,6 +70,10 @@ module Gitlab
         end.compact.sort_by(&:name)
       end
 
+      def reload_rugged
+        @rugged = nil
+      end
+
       # Directly find a branch with a simple name (e.g. master)
       #
       # force_reload causes a new Rugged repository to be instantiated
@@ -78,7 +82,7 @@ module Gitlab
       # be stale/invalid when packed-refs is changed.
       # See https://gitlab.com/gitlab-org/gitlab-ce/issues/15392#note_14538333
       def find_branch(name, force_reload = false)
-        @rugged = nil if force_reload
+        reload_rugged if force_reload
 
         rugged_ref = rugged.branches[name]
         Branch.new(self, rugged_ref.name, rugged_ref.target) if rugged_ref
