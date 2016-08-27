@@ -264,7 +264,7 @@ describe Gitlab::Git::Repository do
   end
 
   describe :commit_count do
-    it { expect(repository.commit_count("master")).to eq(23) }
+    it { expect(repository.commit_count("master")).to eq(25) }
     it { expect(repository.commit_count("feature")).to eq(9) }
   end
 
@@ -747,7 +747,7 @@ describe Gitlab::Git::Repository do
       let(:branch) { 'master' }
 
       it 'returns the number of commits between a sha and a branch' do
-        expect(repository.commits_between(sha, branch).count).to eq(3)
+        expect(repository.commits_between(sha, branch).count).to eq(5)
       end
 
       it 'returns the number of commits between a branch and a sha' do
@@ -760,7 +760,7 @@ describe Gitlab::Git::Repository do
       let(:second_branch) { 'master' }
 
       it 'returns the number of commits between' do
-        expect(repository.commits_between(first_branch, second_branch).count).to eq(15)
+        expect(repository.commits_between(first_branch, second_branch).count).to eq(17)
       end
     end
   end
@@ -768,7 +768,7 @@ describe Gitlab::Git::Repository do
   describe '#count_commits_between' do
     subject { repository.count_commits_between('feature', 'master') }
 
-    it { is_expected.to eq(15) }
+    it { is_expected.to eq(17) }
   end
 
   describe "branch_names_contains" do
@@ -928,7 +928,7 @@ index 0000000..e69de29
     let(:not_existed_branch) { repository.ls_files("not_existed_branch") }
 
     it "read every file paths of master branch" do
-      expect(master_file_paths.length).to equal(39)
+      expect(master_file_paths.length).to equal(40)
     end
 
     it "reads full file paths of master branch" do

@@ -248,7 +248,7 @@ describe Gitlab::Git::Commit do
         end
 
         it 'has 31 elements' do
-          expect(subject.size).to eq(31)
+          expect(subject.size).to eq(33)
         end
         it { is_expected.to include(SeedRepo::Commit::ID) }
         it { is_expected.to include(SeedRepo::Commit::PARENT_ID) }
@@ -267,8 +267,8 @@ describe Gitlab::Git::Commit do
           commits.map { |c| c.id }
         end
 
-        it 'has 22 elements' do
-          expect(subject.size).to eq(22)
+        it 'has 23 elements' do
+          expect(subject.size).to eq(24)
         end
         it { is_expected.to include(SeedRepo::Commit::ID) }
         it { is_expected.to include(SeedRepo::FirstCommit::ID) }
