@@ -1,4 +1,6 @@
 # Seed repo:
+# 4b4918a572fa86f9771e5ba40fbd48e1eb03e2c6 Merge branch 'master' into 'master'
+# 0e1b353b348f8477bdbec1ef47087171c5032cd9 adds an executable with different permissions
 # 0e50ec4d3c7ce42ab74dda1d422cb2cbffe1e326 Merge branch 'lfs_pointers' into 'master'
 # 33bcff41c232a11727ac6d660bd4b0c2ba86d63d Add valid and invalid lfs pointers
 # 732401c65e924df81435deb12891ef570167d2e2 Update year in license file
@@ -25,11 +27,11 @@
 #
 module SeedRepo
   module LastCommit
-    ID = "0e50ec4d3c7ce42ab74dda1d422cb2cbffe1e326"
-    PARENT_ID = "732401c65e924df81435deb12891ef570167d2e2"
-    MESSAGE = "Merge branch 'lfs_pointers' into 'master'"
-    AUTHOR_FULL_NAME = "Marin Jankovski"
-    FILES = ["files/lfs/archive-invalid.tar", "files/lfs/archive.rar", "files/lfs/file-invalid.zip", "files/lfs/image.jpg", "files/lfs/picture-invalid.png"]
+    ID = "4b4918a572fa86f9771e5ba40fbd48e1eb03e2c6"
+    PARENT_ID = "0e1b353b348f8477bdbec1ef47087171c5032cd9"
+    MESSAGE = "Merge branch 'master' into 'master'"
+    AUTHOR_FULL_NAME = "Stan Hu"
+    FILES = ["bin/executable"]
     FILES_COUNT = FILES.count
   end
 end
