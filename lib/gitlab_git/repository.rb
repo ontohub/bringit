@@ -70,6 +70,12 @@ module Gitlab
         end.compact.sort_by(&:name)
       end
 
+      # Directly find a branch with a simple name (e.g. master)
+      def find_branch(name)
+        rugged_ref = rugged.branches[name]
+        Branch.new(self, rugged_ref.name, rugged_ref.target) if rugged_ref
+      end
+
       def local_branches
         rugged.branches.each(:local).map do |branch|
           Branch.new(self, branch.name, branch.target)

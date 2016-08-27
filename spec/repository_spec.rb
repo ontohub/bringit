@@ -813,6 +813,21 @@ describe Gitlab::Git::Repository do
     end
   end
 
+  describe '#find_branch' do
+    it 'should return a Branch for master' do
+      branch = repository.find_branch('master')
+
+      expect(branch).to be_a_kind_of(Gitlab::Git::Branch)
+      expect(branch.name).to eq('master')
+    end
+
+    it 'should handle non-existent branch' do
+      branch = repository.find_branch('this-is-garbage')
+
+      expect(branch).to eq(nil)
+    end
+  end
+
   describe '#branches with deleted branch' do
     before(:each) do
       ref = double()
