@@ -1,3 +1,7 @@
+v 10.5.0
+  - Add Repository#find_branch to speed up branch lookups
+  - Add Repository#reload_rugged to force a refresh of the Rugged repository
+
 v 10.4.7
   - Remove unneeded call to Repository#root_ref
 

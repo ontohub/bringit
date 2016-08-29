@@ -813,6 +813,31 @@ describe Gitlab::Git::Repository do
     end
   end
 
+  describe '#find_branch' do
+    it 'should return a Branch for master' do
+      branch = repository.find_branch('master')
+
+      expect(branch).to be_a_kind_of(Gitlab::Git::Branch)
+      expect(branch.name).to eq('master')
+    end
+
+    it 'should handle non-existent branch' do
+      branch = repository.find_branch('this-is-garbage')
+
+      expect(branch).to eq(nil)
+    end
+
+    it 'should reload Rugged::Repository and return master' do
+      expect(Rugged::Repository).to receive(:new).twice.and_call_original
+
+      branch = repository.find_branch('master')
+      branch = repository.find_branch('master', force_reload: true)
+
+      expect(branch).to be_a_kind_of(Gitlab::Git::Branch)
+      expect(branch.name).to eq('master')
+    end
+  end
+
   describe '#branches with deleted branch' do
     before(:each) do
       ref = double()

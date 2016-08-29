@@ -70,6 +70,24 @@ module Gitlab
         end.compact.sort_by(&:name)
       end
 
+      def reload_rugged
+        @rugged = nil
+      end
+
+      # Directly find a branch with a simple name (e.g. master)
+      #
+      # force_reload causes a new Rugged repository to be instantiated
+      #
+      # This is to work around a bug in libgit2 that causes in-memory refs to
+      # be stale/invalid when packed-refs is changed.
+      # See https://gitlab.com/gitlab-org/gitlab-ce/issues/15392#note_14538333
+      def find_branch(name, force_reload = false)
+        reload_rugged if force_reload
+
+        rugged_ref = rugged.branches[name]
+        Branch.new(self, rugged_ref.name, rugged_ref.target) if rugged_ref
+      end
+
       def local_branches
         rugged.branches.each(:local).map do |branch|
           Branch.new(self, branch.name, branch.target)
