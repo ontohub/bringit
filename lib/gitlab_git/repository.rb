@@ -27,14 +27,12 @@ module Gitlab
       # Rugged repo object
       attr_reader :rugged
 
-      # Define a delegator for the rugged attributes
-      def_delegator :rugged, :attributes
-
       # 'path' must be the path to a _bare_ git repository, e.g.
       # /path/to/my-repo.git
       def initialize(path)
         @path = path
         @name = path.split("/").last
+        @attributes = Attributes.new(path)
       end
 
       # Default branch in the repository
@@ -978,8 +976,14 @@ module Gitlab
 
       # Checks if the blob should be diffable according to its attributes
       def diffable?(blob)
-        blob_attributes = attributes(blob.path).to_h
-        blob_attributes.fetch('diff', blob.text?)
+        attributes(blob.path).fetch('diff') { blob.text? }
+      end
+
+      # Returns the Git attributes for the given file path.
+      #
+      # See `Gitlab::Git::Attributes` for more information.
+      def attributes(path)
+        @attributes.attributes(path)
       end
 
       private
