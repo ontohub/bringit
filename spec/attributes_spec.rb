@@ -1,0 +1,97 @@
+require 'spec_helper'
+
+describe Gitlab::Git::Attributes do
+  let(:path) { File.join(SUPPORT_PATH, 'with-git-attributes.git') }
+
+  subject { described_class.new(path) }
+
+  describe '#attributes' do
+    context 'using a path with attributes' do
+      it 'returns the attributes as a Hash' do
+        expect(subject.attributes('test.txt')).to eq({ 'text' => true })
+      end
+
+      it 'returns a Hash containing multiple attributes' do
+        expect(subject.attributes('test.sh')).
+          to eq({ 'eol' => 'lf', 'gitlab-language' => 'shell' })
+      end
+
+      it 'returns a Hash containing attributes for a file with multiple extensions' do
+        expect(subject.attributes('test.haml.html')).
+          to eq({ 'gitlab-language' => 'haml' })
+      end
+
+      it 'returns a Hash containing attributes for a file in a directory' do
+        expect(subject.attributes('foo/bar.txt')).to eq({ 'foo' => true })
+      end
+
+      it 'returns a Hash containing attributes with query string parameters' do
+        expect(subject.attributes('foo.cgi')).
+          to eq({ 'key' => 'value?p1=v1&p2=v2' })
+      end
+    end
+
+    context 'using a path without any attributes' do
+      it 'returns an empty Hash' do
+        expect(subject.attributes('test.foo')).to eq({})
+      end
+    end
+  end
+
+  describe '#patterns' do
+    it 'parses a file with entries' do
+      expect(subject.patterns).to be_an_instance_of(Hash)
+    end
+
+    it 'parses an entry that uses a tab to separate the pattern and attributes' do
+      expect(subject.patterns['*.md']).
+        to eq({ 'gitlab-language' => 'markdown' })
+    end
+
+    it 'stores patterns in reverse order' do
+      first = subject.patterns.to_a[0]
+
+      expect(first[0]).to eq('*.md')
+    end
+
+    # It's a bit hard to test for something _not_ being processed. As such we'll
+    # just test the number of entries.
+    it 'ignores any comments and empty lines' do
+      expect(subject.patterns.length).to eq(7)
+    end
+  end
+
+  describe '#parse_attributes' do
+    it 'parses a boolean attribute' do
+      expect(subject.parse_attributes('text')).to eq({ 'text' => true })
+    end
+
+    it 'parses a negated boolean attribute' do
+      expect(subject.parse_attributes('-text')).to eq({ 'text' => false })
+    end
+
+    it 'parses a key-value pair' do
+      expect(subject.parse_attributes('foo=bar')).to eq({ 'foo' => 'bar' })
+    end
+
+    it 'parses multiple attributes' do
+      input = 'boolean key=value -negated'
+
+      expect(subject.parse_attributes(input)).
+        to eq({ 'boolean' => true, 'key' => 'value', 'negated' => false })
+    end
+
+    it 'parses attributes with query string parameters' do
+      expect(subject.parse_attributes('foo=bar?baz=1')).
+        to eq({ 'foo' => 'bar?baz=1' })
+    end
+  end
+
+  describe '#each_line' do
+    it 'iterates over every line in the attributes file' do
+      args = [String] * 11 # the number of lines in the file
+
+      expect { |b| subject.each_line(&b) }.to yield_successive_args(*args)
+    end
+  end
+end

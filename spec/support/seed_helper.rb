@@ -11,6 +11,7 @@ module SeedHelper
     create_bare_seeds
     create_normal_seeds
     create_mutable_seeds
+    create_git_attributes
   end
 
   def create_bare_seeds
@@ -36,6 +37,28 @@ module SeedHelper
 
     system(git_env, *%W(git remote add expendable #{GITLAB_URL}),
            chdir: TEST_MUTABLE_REPO_PATH, out: '/dev/null', err: '/dev/null')
+  end
+
+  def create_git_attributes
+    dir = File.join(SUPPORT_PATH, 'with-git-attributes.git', 'info')
+
+    FileUtils.mkdir_p(dir)
+
+    File.open(File.join(dir, 'attributes'), 'w') do |handle|
+      handle.write <<-EOF.strip
+# This is a comment, it should be ignored.
+
+*.txt     text
+*.jpg     -text
+*.sh      eol=lf gitlab-language=shell
+*.haml.*  gitlab-language=haml
+foo/bar.* foo
+*.cgi     key=value?p1=v1&p2=v2
+
+# This uses a tab instead of spaces to ensure the parser also supports this.
+*.md\tgitlab-language=markdown
+      EOF
+    end
   end
 
   # Prevent developer git configurations from being persisted to test
