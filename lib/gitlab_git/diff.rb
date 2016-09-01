@@ -13,6 +13,12 @@ module Gitlab
 
       attr_accessor :too_large
 
+      # The maximum size of a diff to display.
+      DIFF_SIZE_LIMIT = 102400 # 100 KB
+
+      # The maximum size before a diff is collapsed.
+      DIFF_COLLAPSE_LIMIT = 10240 # 10 KB
+
       class << self
         def between(repo, head, base, options = {}, *paths)
           # Only show what is new in the source branch compared to the target branch, not the other way around.
@@ -158,12 +164,12 @@ module Gitlab
         end
       end
 
-      def initialize(raw_diff)
+      def initialize(raw_diff, collapse: false)
         case raw_diff
         when Hash
-          init_from_hash(raw_diff)
+          init_from_hash(raw_diff, collapse: collapse)
         when Rugged::Patch, Rugged::Diff::Delta
-          init_from_rugged(raw_diff)
+          init_from_rugged(raw_diff, collapse: collapse)
         when nil
           raise "Nil as raw diff passed"
         else
@@ -197,10 +203,14 @@ module Gitlab
 
       def too_large?
         if @too_large.nil?
-          @too_large = @diff.bytesize >= 102400 # 100 KB
+          @too_large = @diff.bytesize >= DIFF_SIZE_LIMIT
         else
           @too_large
         end
+      end
+
+      def collapsible?
+        @diff.bytesize >= DIFF_COLLAPSE_LIMIT
       end
 
       def prune_large_diff!
@@ -214,10 +224,6 @@ module Gitlab
         false
       end
 
-      def collapsible?
-        @diff.bytesize >= 10240 # 10 KB
-      end
-
       def prune_collapsed_diff!
         @diff = ''
         @line_count = 0
@@ -226,9 +232,9 @@ module Gitlab
 
       private
 
-      def init_from_rugged(rugged)
+      def init_from_rugged(rugged, collapse: false)
         if rugged.is_a?(Rugged::Patch)
-          @diff = encode!(strip_diff_headers(rugged.to_s))
+          init_from_rugged_patch(rugged, collapse: collapse)
           d = rugged.delta
         else
           d = rugged
@@ -243,12 +249,46 @@ module Gitlab
         @deleted_file = d.deleted?
       end
 
-      def init_from_hash(hash)
+      def init_from_rugged_patch(patch, collapse: false)
+        # Don't bother initializing diffs that are too large. If a diff is
+        # binary we're not going to display anything so we skip the size check.
+        unless patch.delta.binary?
+          diff_size = patch_size(patch)
+
+          if diff_size >= DIFF_SIZE_LIMIT
+            prune_large_diff!
+            return
+          elsif collapse && diff_size >= DIFF_COLLAPSE_LIMIT
+            prune_collapsed_diff!
+            return
+          end
+        end
+
+        @diff = encode!(strip_diff_headers(patch.to_s))
+      end
+
+      def init_from_hash(hash, collapse: false)
         raw_diff = hash.symbolize_keys
 
         serialize_keys.each do |key|
           send(:"#{key}=", raw_diff[key.to_sym])
         end
+
+        prune_large_diff! if too_large?
+        prune_collapsed_diff! if collapse && collapsible?
+      end
+
+      # Returns the size of a diff without taking any diff markers into account.
+      def patch_size(patch)
+        size = 0
+
+        patch.each_hunk do |hunk|
+          hunk.each_line do |line|
+            size += line.content.bytesize
+          end
+        end
+
+        size
       end
 
       # Strip out the information at the beginning of the patch's text to match

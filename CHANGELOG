@@ -1,3 +1,6 @@
+v 10.6.4
+  - Diff sizes are now checked before loading any extra data into memory
+
 v 10.6.3
   - When parsing Git attributes "diff" is now set to false whenever "binary" is set to true
 

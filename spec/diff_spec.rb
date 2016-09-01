@@ -24,7 +24,7 @@ EOT
       new_file: false,
       renamed_file: false,
       deleted_file: false,
-      too_large: nil
+      too_large: false
     }
 
     @rugged_diff = repository.rugged.diff("5937ac0a7beb003549fc5fd26fc247adbce4a52e^", "5937ac0a7beb003549fc5fd26fc247adbce4a52e", paths:
@@ -32,20 +32,65 @@ EOT
   end
 
   describe :new do
-    context "init from hash" do
-      before do
-        @diff = Gitlab::Git::Diff.new(@raw_diff_hash)
+    context 'using a Hash' do
+      context 'with a small diff' do
+        let(:diff) { Gitlab::Git::Diff.new(@raw_diff_hash) }
+
+        it 'initializes the diff' do
+          expect(diff.to_hash).to eq(@raw_diff_hash)
+        end
+
+        it 'does not prune the diff' do
+          expect(diff).not_to be_too_large
+        end
       end
 
-      it { expect(@diff.to_hash).to eq(@raw_diff_hash) }
+      context 'using a diff that is too large' do
+        it 'prunes the diff' do
+          diff = Gitlab::Git::Diff.new(diff: 'a' * 204800)
+
+          expect(diff.diff).to be_empty
+          expect(diff).to be_too_large
+        end
+      end
     end
 
-    context "init from rugged" do
-      before do
-        @diff = Gitlab::Git::Diff.new(@rugged_diff)
+    context 'using a Rugged::Patch' do
+      context 'with a small diff' do
+        let(:diff) { Gitlab::Git::Diff.new(@rugged_diff) }
+
+        it 'initializes the diff' do
+          expect(diff.to_hash).to eq(@raw_diff_hash.merge(too_large: nil))
+        end
+
+        it 'does not prune the diff' do
+          expect(diff).not_to be_too_large
+        end
       end
 
-      it { expect(@diff.to_hash).to eq(@raw_diff_hash) }
+      context 'using a diff that is too large' do
+        it 'prunes the diff' do
+          expect_any_instance_of(Gitlab::Git::Diff).to receive(:patch_size).
+            with(@rugged_diff).
+            and_return(1024 * 1024 * 1024)
+
+          diff = Gitlab::Git::Diff.new(@rugged_diff)
+
+          expect(diff.diff).to be_empty
+          expect(diff).to be_too_large
+        end
+      end
+
+      context 'using a large binary diff' do
+        it 'does not prune the diff' do
+          expect_any_instance_of(Rugged::Diff::Delta).to receive(:binary?).
+            and_return(true)
+
+          diff = Gitlab::Git::Diff.new(@rugged_diff)
+
+          expect(diff.diff).not_to be_empty
+        end
+      end
     end
   end
 
