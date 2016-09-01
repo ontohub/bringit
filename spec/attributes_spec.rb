@@ -59,6 +59,14 @@ describe Gitlab::Git::Attributes do
     it 'ignores any comments and empty lines' do
       expect(subject.patterns.length).to eq(7)
     end
+
+    it 'does not parse anything when the attributes file does not exist' do
+      expect(File).to receive(:exist?).
+        with(File.join(path, 'info/attributes')).
+        and_return(false)
+
+      expect(subject.patterns).to eq({})
+    end
   end
 
   describe '#parse_attributes' do
@@ -92,6 +100,14 @@ describe Gitlab::Git::Attributes do
       args = [String] * 11 # the number of lines in the file
 
       expect { |b| subject.each_line(&b) }.to yield_successive_args(*args)
+    end
+
+    it 'does not yield when the attributes file does not exist' do
+      expect(File).to receive(:exist?).
+        with(File.join(path, 'info/attributes')).
+        and_return(false)
+
+      expect { |b| subject.each_line(&b) }.not_to yield_control
     end
   end
 end

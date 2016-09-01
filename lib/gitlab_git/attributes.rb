@@ -86,6 +86,8 @@ module Gitlab
       def each_line
         full_path = File.join(@path, 'info/attributes')
 
+        return unless File.exist?(full_path)
+
         File.open(full_path, 'r') do |handle|
           handle.each_line do |line|
             yield line.strip

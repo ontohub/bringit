@@ -1,3 +1,6 @@
+v 10.6.1
+  - Fix parsing Git attributes when $GIT_DIR/info/attributes doesn't exist
+
 v 10.6.0
   - Use a pure Ruby Git attributes file parser to drastically reduce time spent in parsing Git attributes
 
