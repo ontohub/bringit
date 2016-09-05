@@ -18,7 +18,7 @@ module Gitlab
     class Attributes
       # path - The path to the Git repository.
       def initialize(path)
-        @path = path
+        @path = File.expand_path(path)
         @patterns = nil
       end
 
@@ -28,8 +28,10 @@ module Gitlab
       #
       # Returns a Hash.
       def attributes(path)
+        full_path = File.join(@path, path)
+
         patterns.each do |pattern, attrs|
-          return attrs if File.fnmatch(pattern, path)
+          return attrs if File.fnmatch?(pattern, full_path)
         end
 
         {}
@@ -107,7 +109,7 @@ module Gitlab
 
           pattern, attrs = line.split(/\s+/, 2)
 
-          pairs << [pattern, parse_attributes(attrs)]
+          pairs << [File.join(@path, pattern), parse_attributes(attrs)]
         end
 
         # Newer entries take precedence over older entries.

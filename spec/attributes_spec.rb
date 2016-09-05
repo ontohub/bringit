@@ -1,7 +1,9 @@
 require 'spec_helper'
 
 describe Gitlab::Git::Attributes do
-  let(:path) { File.join(SUPPORT_PATH, 'with-git-attributes.git') }
+  let(:path) do
+    File.expand_path(File.join(SUPPORT_PATH, 'with-git-attributes.git'))
+  end
 
   subject { described_class.new(path) }
 
@@ -29,6 +31,20 @@ describe Gitlab::Git::Attributes do
         expect(subject.attributes('foo.cgi')).
           to eq({ 'key' => 'value?p1=v1&p2=v2' })
       end
+
+      it 'returns a Hash containing the attributes for an absolute path' do
+        expect(subject.attributes('/test.txt')).to eq({ 'text' => true })
+      end
+
+      it 'returns a Hash containing the attributes when a pattern is defined using an absolute path' do
+        # When a path is given without a leading slash it should still match
+        # patterns defined with a leading slash.
+        expect(subject.attributes('foo.png')).
+          to eq({ 'gitlab-language' => 'png' })
+
+        expect(subject.attributes('/foo.png')).
+          to eq({ 'gitlab-language' => 'png' })
+      end
     end
 
     context 'using a path without any attributes' do
@@ -44,20 +60,20 @@ describe Gitlab::Git::Attributes do
     end
 
     it 'parses an entry that uses a tab to separate the pattern and attributes' do
-      expect(subject.patterns['*.md']).
+      expect(subject.patterns[File.join(path, '*.md')]).
         to eq({ 'gitlab-language' => 'markdown' })
     end
 
     it 'stores patterns in reverse order' do
       first = subject.patterns.to_a[0]
 
-      expect(first[0]).to eq('*.md')
+      expect(first[0]).to eq(File.join(path, '*.md'))
     end
 
     # It's a bit hard to test for something _not_ being processed. As such we'll
     # just test the number of entries.
     it 'ignores any comments and empty lines' do
-      expect(subject.patterns.length).to eq(7)
+      expect(subject.patterns.length).to eq(8)
     end
 
     it 'does not parse anything when the attributes file does not exist' do
@@ -97,7 +113,7 @@ describe Gitlab::Git::Attributes do
 
   describe '#each_line' do
     it 'iterates over every line in the attributes file' do
-      args = [String] * 11 # the number of lines in the file
+      args = [String] * 12 # the number of lines in the file
 
       expect { |b| subject.each_line(&b) }.to yield_successive_args(*args)
     end

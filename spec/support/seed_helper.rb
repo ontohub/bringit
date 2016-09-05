@@ -54,6 +54,7 @@ module SeedHelper
 *.haml.*  gitlab-language=haml
 foo/bar.* foo
 *.cgi     key=value?p1=v1&p2=v2
+/*.png    gitlab-language=png
 
 # This uses a tab instead of spaces to ensure the parser also supports this.
 *.md\tgitlab-language=markdown
