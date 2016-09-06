@@ -57,28 +57,35 @@ module Gitlab
         values = {}
         dash = '-'
         equal = '='
+        binary = 'binary'
 
         string.split(/\s+/).each do |chunk|
           # Data such as "foo = bar" should be treated as "foo" and "bar" being
           # separate boolean attributes.
           next if chunk == equal
 
+          key = chunk
+
           # Input: "-foo"
           if chunk.start_with?(dash)
             key = chunk.byteslice(1, chunk.length - 1)
-
-            values[key] = false
+            value = false
 
           # Input: "foo=bar"
           elsif chunk.include?(equal)
             key, value = chunk.split(equal, 2)
 
-            values[key] = value
-
           # Input: "foo"
           else
-            values[chunk] = true
+            value = true
           end
+
+          values[key] = value
+
+          # When the "binary" option is set the "diff" option should be set to
+          # the inverse. If "diff" is later set it should overwrite the
+          # automatically set value.
+          values['diff'] = false if key == binary && value
         end
 
         values

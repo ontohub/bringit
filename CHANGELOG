@@ -1,3 +1,6 @@
+v 10.6.3
+  - When parsing Git attributes "diff" is now set to false whenever "binary" is set to true
+
 v 10.6.2
   - Fix parsing Git attributes defined using an absolute path
 

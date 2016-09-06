@@ -45,6 +45,16 @@ describe Gitlab::Git::Attributes do
         expect(subject.attributes('/foo.png')).
           to eq({ 'gitlab-language' => 'png' })
       end
+
+      context 'when the "binary" option is set for a path' do
+        it 'returns true for the "binary" option' do
+          expect(subject.attributes('test.binary')['binary']).to eq(true)
+        end
+
+        it 'returns false for the "diff" option' do
+          expect(subject.attributes('test.binary')['diff']).to eq(false)
+        end
+      end
     end
 
     context 'using a path without any attributes' do
@@ -73,7 +83,7 @@ describe Gitlab::Git::Attributes do
     # It's a bit hard to test for something _not_ being processed. As such we'll
     # just test the number of entries.
     it 'ignores any comments and empty lines' do
-      expect(subject.patterns.length).to eq(8)
+      expect(subject.patterns.length).to eq(9)
     end
 
     it 'does not parse anything when the attributes file does not exist' do
@@ -113,7 +123,7 @@ describe Gitlab::Git::Attributes do
 
   describe '#each_line' do
     it 'iterates over every line in the attributes file' do
-      args = [String] * 12 # the number of lines in the file
+      args = [String] * 13 # the number of lines in the file
 
       expect { |b| subject.each_line(&b) }.to yield_successive_args(*args)
     end
