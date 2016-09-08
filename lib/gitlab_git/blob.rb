@@ -13,7 +13,7 @@ module Gitlab
       # blob data should use load_all_data!.
       MAX_DATA_DISPLAY_SIZE = 10485760
 
-      attr_accessor :name, :path, :size, :data, :mode, :id, :commit_id, :loaded_size
+      attr_accessor :name, :path, :size, :data, :mode, :id, :commit_id, :loaded_size, :binary
 
       class << self
         def find(repository, sha, path)
@@ -38,6 +38,7 @@ module Gitlab
                 mode: blob_entry[:filemode].to_s(8),
                 path: path,
                 commit_id: sha,
+                binary: blob.binary?
               )
             end
           end
@@ -50,6 +51,7 @@ module Gitlab
             id: blob.oid,
             size: blob.size,
             data: blob.content(MAX_DATA_DISPLAY_SIZE),
+            binary: blob.binary?
           )
         end
 
@@ -247,13 +249,17 @@ module Gitlab
       end
 
       def initialize(options)
-        %w(id name path size data mode commit_id).each do |key|
+        %w(id name path size data mode commit_id binary).each do |key|
           self.send("#{key}=", options[key.to_sym])
         end
 
         @loaded_all_data = false
         # Retain the actual size before it is encoded
         @loaded_size = @data.bytesize if @data
+      end
+
+      def binary?
+        @binary.nil? ? super : @binary == true
       end
 
       def empty?
