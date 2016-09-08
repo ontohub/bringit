@@ -103,23 +103,12 @@ module Gitlab
             break
           end
 
-          # Going by the number of files alone it is OK to create a new Diff instance.
-          diff = Gitlab::Git::Diff.new(raw)
+          collapse = !@all_diffs && !@no_collapse
 
-          # If a diff is too large we still want to display some information
-          # about it (e.g. the file path) without keeping the raw data around
-          # (as this would be a waste of memory usage).
-          #
-          # This also removes the line count (from the diff itself) so it
-          # doesn't add up to the total amount of lines.
-          if diff.too_large?
-            diff.prune_large_diff!
-          end
+          diff = Gitlab::Git::Diff.new(raw, collapse: collapse)
 
-          if !@all_diffs && !@no_collapse
-            if diff.collapsible? || over_safe_limits?(i)
-              diff.prune_collapsed_diff!
-            end
+          if collapse && over_safe_limits?(i)
+            diff.prune_collapsed_diff!
           end
 
           @line_count += diff.line_count
