@@ -38,6 +38,7 @@ describe Gitlab::Git::Blob do
       it { expect(blob.data[0..10]).to eq("*.rbc\n*.sas") }
       it { expect(blob.size).to eq(241) }
       it { expect(blob.mode).to eq("100644") }
+      it { expect(blob).not_to be_binary }
     end
 
     context 'file in root with leading slash' do
@@ -68,6 +69,10 @@ describe Gitlab::Git::Blob do
         blob.load_all_data!(repository)
         expect(blob.data).to eq('')
       end
+
+      it 'does not mark the blob as binary' do
+        expect(blob).not_to be_binary
+      end
     end
 
     context 'large file' do
@@ -84,6 +89,14 @@ describe Gitlab::Git::Blob do
       it 'can load all data' do
         blob.load_all_data!(repository)
         expect(blob.data.length).to eq(blob_size)
+      end
+
+      it 'marks the blob as binary' do
+        expect(Gitlab::Git::Blob).to receive(:new).
+          with(hash_including(binary: true)).
+          and_call_original
+
+        expect(blob).to be_binary
       end
     end
   end
