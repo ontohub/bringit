@@ -300,12 +300,11 @@ describe Gitlab::Git::Blob do
 
   describe :rename do
     let(:repository) { Gitlab::Git::Repository.new(TEST_NORMAL_REPO_PATH) }
-
-    let(:commit_options) do
+    let(:rename_options) do
       options = {
         file: {
-          path: 'NEWREADME.md',
-          previous_path: 'README.md',
+          path: 'NEWCONTRIBUTING.md',
+          previous_path: 'CONTRIBUTING.md',
           content: 'Lorem ipsum...',
           update: true
         },
@@ -326,26 +325,47 @@ describe Gitlab::Git::Blob do
       }
     end
 
-    let!(:ref) { commit_options[:commit][:branch] }
-    let!(:prev_commit_count) { repository.commit_count(ref) }
-    let(:commit_sha) { Gitlab::Git::Blob.rename(repository, commit_options) }
-    let(:commit_count) { repository.commit_count(ref) }
-    let(:commit) { repository.lookup(commit_sha) }
-    let(:blob) { Gitlab::Git::Blob.find(repository, commit_sha, "NEWREADME.md") }
-    let(:removed_blob) { Gitlab::Git::Blob.find(repository, commit_sha, "README.md") }
+    let(:rename_options2) do
+      options = {
+         file: {
+           content: 'Lorem ipsum...',
+           path: 'bin/new_executable',
+           previous_path: 'bin/executable',
+         },
+         author: {
+           email: 'user@example.com',
+           name: 'Test User',
+           time: Time.now
+         },
+         committer: {
+           email: 'user@example.com',
+           name: 'Test User',
+           time: Time.now
+         },
+         commit: {
+           message: 'Updates toberenamed.txt',
+           branch: 'master',
+           update_ref: false
+         }
+      }
+    end
 
-    it 'should rename the file with commit' do
-      # Commit message valid
-      expect(commit.message).to eq('Rename readme')
+    it 'maintains file permissions when renaming' do
+      mode = 0o100755
 
-      # Only one commit was made
-      expect(commit_count).to eq(prev_commit_count + 1)
+      Gitlab::Git::Blob.rename(repository, rename_options2)
 
-      # Previous file was removed
-      expect(removed_blob).to be_nil
+      expect(repository.rugged.index.get(rename_options2[:file][:path])[:mode]).to eq(mode)
+    end
 
-      # File was renamed
-      expect(blob).not_to be_nil
+    it 'renames the file with commit and not change file permissions' do
+      ref = rename_options[:commit][:branch]
+
+      expect(repository.rugged.index.get('CONTRIBUTING.md')).not_to be_nil
+      expect { Gitlab::Git::Blob.rename(repository, rename_options) }.to change { repository.commit_count(ref) }.by(1)
+
+      expect(repository.rugged.index.get('CONTRIBUTING.md')).to be_nil
+      expect(repository.rugged.index.get('NEWCONTRIBUTING.md')).not_to be_nil
     end
   end
 

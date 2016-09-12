@@ -44,6 +44,10 @@ GitLab Git used grit as main library in past. Now it uses rugged
     # Access to rugged repo object
     repo.rugged
 
+### Specs
+
+In case it's needed to update https://gitlab.com/gitlab-org/gitlab-git-test with new content changes the developer should update `spec/support/last_commit.rb` with the updated sha of the last commit and the required information. The developer should also run the full set of tests to check which ones are failing and fix them accordingly.
+
 ### Tree
 
     # Tree objects for root dir

@@ -131,6 +131,7 @@ module Gitlab
           ref = commit[:branch]
           update_ref = commit[:update_ref].nil? ? true : commit[:update_ref]
           parents = []
+          mode = 0o100644
 
           unless ref.start_with?('refs/')
             ref = 'refs/heads/' + ref
@@ -154,17 +155,18 @@ module Gitlab
           if action == :remove
             index.remove(filename)
           else
+            file_entry = index.get(filename)
+
             if action == :rename
               old_path_name = PathHelper.normalize_path(file[:previous_path])
               old_filename = old_path_name.to_s
-              index.remove(old_filename)
+              file_entry = index.get(old_filename)
+              index.remove(old_filename) unless file_entry.blank?
             end
-
-            mode = 0o100644
-            file_entry = index.get(filename)
 
             if file_entry
               raise Repository::InvalidBlobName.new("Filename already exists; update not allowed") unless update
+
               # Preserve the current file mode if one is available
               mode = file_entry[:mode] if file_entry[:mode]
             end
