@@ -46,6 +46,10 @@ describe Gitlab::Git::Attributes do
           to eq({ 'gitlab-language' => 'png' })
       end
 
+      it 'returns an empty Hash for a defined path without attributes' do
+        expect(subject.attributes('bla/bla.txt')).to eq({})
+      end
+
       context 'when the "binary" option is set for a path' do
         it 'returns true for the "binary" option' do
           expect(subject.attributes('test.binary')['binary']).to eq(true)
@@ -77,13 +81,13 @@ describe Gitlab::Git::Attributes do
     it 'stores patterns in reverse order' do
       first = subject.patterns.to_a[0]
 
-      expect(first[0]).to eq(File.join(path, '*.md'))
+      expect(first[0]).to eq(File.join(path, 'bla/bla.txt'))
     end
 
     # It's a bit hard to test for something _not_ being processed. As such we'll
     # just test the number of entries.
     it 'ignores any comments and empty lines' do
-      expect(subject.patterns.length).to eq(9)
+      expect(subject.patterns.length).to eq(10)
     end
 
     it 'does not parse anything when the attributes file does not exist' do
@@ -123,7 +127,7 @@ describe Gitlab::Git::Attributes do
 
   describe '#each_line' do
     it 'iterates over every line in the attributes file' do
-      args = [String] * 13 # the number of lines in the file
+      args = [String] * 14 # the number of lines in the file
 
       expect { |b| subject.each_line(&b) }.to yield_successive_args(*args)
     end

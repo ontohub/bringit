@@ -59,6 +59,7 @@ foo/bar.* foo
 
 # This uses a tab instead of spaces to ensure the parser also supports this.
 *.md\tgitlab-language=markdown
+bla/bla.txt
       EOF
     end
   end

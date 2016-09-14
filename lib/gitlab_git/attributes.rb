@@ -116,7 +116,9 @@ module Gitlab
 
           pattern, attrs = line.split(/\s+/, 2)
 
-          pairs << [File.join(@path, pattern), parse_attributes(attrs)]
+          parsed = attrs ? parse_attributes(attrs) : {}
+
+          pairs << [File.join(@path, pattern), parsed]
         end
 
         # Newer entries take precedence over older entries.
