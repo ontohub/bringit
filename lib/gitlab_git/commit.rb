@@ -64,7 +64,7 @@ module Gitlab
           return nil unless obj.is_a?(Rugged::Commit)
 
           decorate(obj)
-        rescue Rugged::ReferenceError, Rugged::InvalidError, Rugged::ObjectError
+        rescue Rugged::ReferenceError, Rugged::InvalidError, Rugged::ObjectError, Gitlab::Git::Repository::NoRepository
           nil
         end
 

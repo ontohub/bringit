@@ -11,6 +11,7 @@ module SeedHelper
     create_bare_seeds
     create_normal_seeds
     create_mutable_seeds
+    create_broken_seeds
     create_git_attributes
   end
 
@@ -37,6 +38,16 @@ module SeedHelper
 
     system(git_env, *%W(git remote add expendable #{GITLAB_URL}),
            chdir: TEST_MUTABLE_REPO_PATH, out: '/dev/null', err: '/dev/null')
+  end
+
+  def create_broken_seeds
+    system(git_env, *%W(git clone --bare #{TEST_REPO_PATH} #{TEST_BROKEN_REPO_PATH}),
+           out: '/dev/null',
+           err: '/dev/null')
+
+    refs_path = File.join(TEST_BROKEN_REPO_PATH, 'refs')
+
+    FileUtils.rm_r(refs_path)
   end
 
   def create_git_attributes

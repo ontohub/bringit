@@ -93,6 +93,14 @@ describe Gitlab::Git::Commit do
       it "should return nil for nonexisting ids" do
         expect(Gitlab::Git::Commit.find(repository, "+123_4532530XYZ")).to be_nil
       end
+
+      context 'with broken repo' do
+        let(:repository) { Gitlab::Git::Repository.new(TEST_BROKEN_REPO_PATH) }
+
+        it 'returns nil' do
+          expect(Gitlab::Git::Commit.find(repository, SeedRepo::Commit::ID)).to be_nil
+        end
+      end
     end
 
     describe :last_for_path do
