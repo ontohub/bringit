@@ -21,10 +21,20 @@ module Gitlab
 
       class << self
         def between(repo, head, base, options = {}, *paths)
-          # Only show what is new in the source branch compared to the target branch, not the other way around.
-          # The linex below with merge_base is equivalent to diff with three dots (git diff branch1...branch2)
-          # From the git documentation: "git diff A...B" is equivalent to "git diff $(git-merge-base A B) B"
-          common_commit = repo.merge_base_commit(head, base)
+          straight = options.delete(:straight) || false
+
+          common_commit = if straight
+                            base
+                          else
+                            # Only show what is new in the source branch
+                            # compared to the target branch, not the other way
+                            # around. The linex below with merge_base is
+                            # equivalent to diff with three dots (git diff
+                            # branch1...branch2) From the git documentation:
+                            # "git diff A...B" is equivalent to "git diff
+                            # $(git-merge-base A B) B"
+                            repo.merge_base_commit(head, base)
+                          end
 
           options ||= {}
           actual_options = filter_diff_options(options)

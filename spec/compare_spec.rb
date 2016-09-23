@@ -2,7 +2,8 @@ require "spec_helper"
 
 describe Gitlab::Git::Compare do
   let(:repository) { Gitlab::Git::Repository.new(TEST_REPO_PATH) }
-  let(:compare) { Gitlab::Git::Compare.new(repository, SeedRepo::BigCommit::ID, SeedRepo::Commit::ID) }
+  let(:compare) { Gitlab::Git::Compare.new(repository, SeedRepo::BigCommit::ID, SeedRepo::Commit::ID, false) }
+  let(:compare_straight) { Gitlab::Git::Compare.new(repository, SeedRepo::BigCommit::ID, SeedRepo::Commit::ID, true) }
 
   describe :commits do
     subject do
@@ -76,5 +77,29 @@ describe Gitlab::Git::Compare do
 
       it { is_expected.to eq(true) }
     end
+  end
+
+  describe :commits_straight do
+    subject do
+      compare_straight.commits.map(&:id)
+    end
+
+    it 'has 8 elements' do
+      expect(subject.size).to eq(8)
+    end
+    it { is_expected.to include(SeedRepo::Commit::PARENT_ID) }
+    it { is_expected.not_to include(SeedRepo::BigCommit::PARENT_ID) }
+  end
+
+  describe :diffs_straight do
+    subject do
+      compare_straight.diffs.map(&:new_path)
+    end
+
+    it 'has 10 elements' do
+      expect(subject.size).to eq(10)
+    end
+    it { is_expected.to include('files/ruby/popen.rb') }
+    it { is_expected.not_to include('LICENSE') }
   end
 end
