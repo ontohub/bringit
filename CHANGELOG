@@ -1,3 +1,6 @@
+v 10.6.8
+  - Add straight parameter to Compare#initialize and straight option to Diff.between
+
 v 10.6.7
   - Commit.find returns nil and no longer throws an error on an empty repository
 

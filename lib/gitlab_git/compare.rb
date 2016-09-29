@@ -1,10 +1,11 @@
 module Gitlab
   module Git
     class Compare
-      attr_reader :head, :base
+      attr_reader :head, :base, :straight
 
-      def initialize(repository, base, head)
+      def initialize(repository, base, head, straight = false)
         @repository = repository
+        @straight = straight
 
         unless base && head
           @commits = []
@@ -34,6 +35,7 @@ module Gitlab
         end
 
         paths = options.delete(:paths) || []
+        options[:straight] = @straight
         Gitlab::Git::Diff.between(@repository, @head.id, @base.id, options, *paths)
       end
     end
