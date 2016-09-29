@@ -13,6 +13,7 @@ describe Gitlab::Git::Compare do
     it 'has 8 elements' do
       expect(subject.size).to eq(8)
     end
+
     it { is_expected.to include(SeedRepo::Commit::PARENT_ID) }
     it { is_expected.not_to include(SeedRepo::BigCommit::PARENT_ID) }
 
@@ -49,6 +50,7 @@ describe Gitlab::Git::Compare do
     it 'has 10 elements' do
       expect(subject.size).to eq(10)
     end
+
     it { is_expected.to include('files/ruby/popen.rb') }
     it { is_expected.not_to include('LICENSE') }
 
@@ -87,6 +89,7 @@ describe Gitlab::Git::Compare do
     it 'has 8 elements' do
       expect(subject.size).to eq(8)
     end
+
     it { is_expected.to include(SeedRepo::Commit::PARENT_ID) }
     it { is_expected.not_to include(SeedRepo::BigCommit::PARENT_ID) }
   end
@@ -99,6 +102,7 @@ describe Gitlab::Git::Compare do
     it 'has 10 elements' do
       expect(subject.size).to eq(10)
     end
+
     it { is_expected.to include('files/ruby/popen.rb') }
     it { is_expected.not_to include('LICENSE') }
   end

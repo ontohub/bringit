@@ -101,6 +101,7 @@ EOT
 
     describe '#size' do
       subject { super().size }
+
       it { is_expected.to eq(24) }
     end
 
@@ -121,6 +122,7 @@ EOT
 
     describe '#size' do
       subject { super().size }
+
       it { is_expected.to eq(1) }
     end
 
@@ -131,11 +133,13 @@ EOT
 
       describe '#new_path' do
         subject { super().new_path }
+
         it { is_expected.to eq('files/ruby/feature.rb') }
       end
 
       describe '#diff' do
         subject { super().diff }
+
         it { is_expected.to include '+class Feature' }
       end
     end
