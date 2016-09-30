@@ -1,28 +1,54 @@
 image: ruby:2.1
 
-before_script:
-  - ./scripts/prepare_build.sh
-  - ruby -v
-  - gem install bundler --no-ri --no-rdoc
-  - bundle install -j $(nproc) --path vendor
-
 cache:
   paths:
     - vendor/ruby
 
-bundler:audit:
-  script:
-    - "bundle exec bundle-audit check --update --ignore OSVDB-115941"
+.rails-42: &rails-42
+  before_script:
+    - ./scripts/prepare_build.sh
+    - ruby -v
+    - gem install bundler --no-ri --no-rdoc
+    - bundle install --gemfile=gemfiles/rails42.gemfile -j $(nproc)
 
-rspec:
-  script:
-  - bundle exec rspec spec
+.rails-50: &rails-50
+  before_script:
+    - ./scripts/prepare_build.sh
+    - ruby -v
+    - gem install bundler --no-ri --no-rdoc
+    - bundle install --gemfile=gemfiles/rails50.gemfile -j $(nproc)
 
-rspec2.3:
+rspec-ruby21-rails42:
+  <<: *rails-42
+  script:
+    - bundle exec rspec spec
+
+rspec-ruby23-rails42:
   image: ruby:2.3.1
+  <<: *rails-42
   script:
-  - bundle exec rspec spec
+    - bundle exec rspec spec
+
+rspec-ruby23-rails50:
+  image: ruby:2.3.1
+  <<: *rails-50
+  script:
+    - bundle exec rspec spec
+
+.static-analysis: &static-analysis
+  image: ruby:2.3.1
+  before_script:
+    - ./scripts/prepare_build.sh
+    - ruby -v
+    - gem install bundler --no-ri --no-rdoc
+    - bundle install -j $(nproc)
 
 rubocop:
+  <<: *static-analysis
   script:
     - bundle exec rubocop
+
+bundler:audit:
+  <<: *static-analysis
+  script:
+    - "bundle exec bundle-audit check --update --ignore OSVDB-115941"
