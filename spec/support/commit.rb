@@ -27,7 +27,7 @@ module SeedRepo
   module Commit
     ID = "570e7b2abdd848b95f2f578043fc23bd6f6fd24d"
     PARENT_ID = "6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9"
-    MESSAGE = "Change some files"
+    MESSAGE = "Change some files\n\nSigned-off-by: Dmitriy Zaporozhets <dmitriy.zaporozhets@gmail.com>\n"
     AUTHOR_FULL_NAME = "Dmitriy Zaporozhets"
 
     FILES = ["files/ruby/popen.rb", "files/ruby/regex.rb"]
