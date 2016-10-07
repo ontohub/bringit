@@ -261,17 +261,7 @@ module Gitlab
       def init_from_rugged_patch(patch, collapse: false)
         # Don't bother initializing diffs that are too large. If a diff is
         # binary we're not going to display anything so we skip the size check.
-        unless patch.delta.binary?
-          diff_size = patch_size(patch)
-
-          if diff_size >= DIFF_SIZE_LIMIT
-            prune_large_diff!
-            return
-          elsif collapse && diff_size >= DIFF_COLLAPSE_LIMIT
-            prune_collapsed_diff!
-            return
-          end
-        end
+        return if !patch.delta.binary? && prune_large_patch(patch, collapse)
 
         @diff = encode!(strip_diff_headers(patch.to_s))
       end
@@ -287,17 +277,28 @@ module Gitlab
         prune_collapsed_diff! if collapse && collapsible?
       end
 
-      # Returns the size of a diff without taking any diff markers into account.
-      def patch_size(patch)
+      # If the patch surpasses any of the diff limits it calls the appropiate
+      # prune method and returns true. Otherwise returns false.
+      def prune_large_patch(patch, collapse)
         size = 0
 
         patch.each_hunk do |hunk|
           hunk.each_line do |line|
             size += line.content.bytesize
+
+            if size >= DIFF_SIZE_LIMIT
+              prune_large_diff!
+              return true
+            end
+
+            if collapse && size >= DIFF_COLLAPSE_LIMIT
+              prune_collapsed_diff!
+              return true
+            end
           end
         end
 
-        size
+        false
       end
 
       # Strip out the information at the beginning of the patch's text to match
