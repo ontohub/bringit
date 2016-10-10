@@ -1,3 +1,6 @@
+v 10.6.9
+  - Optimize diff creation from Rugged::Patch
+
 v 10.6.8
   - Add straight parameter to Compare#initialize and straight option to Diff.between
 

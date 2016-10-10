@@ -70,8 +70,7 @@ EOT
 
       context 'using a diff that is too large' do
         it 'prunes the diff' do
-          expect_any_instance_of(Gitlab::Git::Diff).to receive(:patch_size).
-            with(@rugged_diff).
+          expect_any_instance_of(String).to receive(:bytesize).
             and_return(1024 * 1024 * 1024)
 
           diff = Gitlab::Git::Diff.new(@rugged_diff)
