@@ -1,4 +1,4 @@
-source "http://rubygems.org"
+source 'https://rubygems.org'
 
 gemspec
 
@@ -18,4 +18,8 @@ end
 
 group :test do
   gem 'simplecov', require: false
+end
+
+group :development, :test do
+  gem 'bundler-audit', '~> 0.5.0', require: false
 end
