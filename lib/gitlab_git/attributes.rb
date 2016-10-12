@@ -99,6 +99,8 @@ module Gitlab
 
         File.open(full_path, 'r') do |handle|
           handle.each_line do |line|
+            break unless line.valid_encoding?
+
             yield line.strip
           end
         end
