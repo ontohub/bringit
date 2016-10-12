@@ -139,5 +139,12 @@ describe Gitlab::Git::Attributes do
 
       expect { |b| subject.each_line(&b) }.not_to yield_control
     end
+
+    it 'does not yield when the attributes file has an unsupported encoding' do
+      path = File.expand_path(File.join(SUPPORT_PATH, 'with-invalid-git-attributes.git'))
+      attrs = described_class.new(path)
+
+      expect { |b| attrs.each_line(&b) }.not_to yield_control
+    end
   end
 end

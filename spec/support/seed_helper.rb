@@ -13,6 +13,7 @@ module SeedHelper
     create_mutable_seeds
     create_broken_seeds
     create_git_attributes
+    create_invalid_git_attributes
   end
 
   def create_bare_seeds
@@ -72,6 +73,18 @@ foo/bar.* foo
 *.md\tgitlab-language=markdown
 bla/bla.txt
       EOF
+    end
+  end
+
+  def create_invalid_git_attributes
+    dir = File.join(SUPPORT_PATH, 'with-invalid-git-attributes.git', 'info')
+
+    FileUtils.mkdir_p(dir)
+
+    enc = Encoding::UTF_16
+
+    File.open(File.join(dir, 'attributes'), 'w', encoding: enc) do |handle|
+      handle.write('# hello'.encode(enc))
     end
   end
 
