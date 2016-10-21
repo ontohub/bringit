@@ -19,10 +19,11 @@ describe Gitlab::Git::Branch do
     it { expect(branch.target.sha).to eq("0b4bc9a49b562e85de7cc9e834518ea6828729b9") }
   end
 
-  describe 'last branch' do
-    let(:branch) { repository.branches.last }
+  describe 'master branch' do
+    let(:branch) do
+      repository.branches.find { |branch| branch.name == 'master' }
+    end
 
-    it { expect(branch.name).to eq(SeedRepo::Repo::BRANCHES.last) }
     it { expect(branch.target.sha).to eq(SeedRepo::LastCommit::ID) }
   end
 

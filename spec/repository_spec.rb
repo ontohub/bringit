@@ -469,7 +469,8 @@ describe Gitlab::Git::Repository do
 
     it "should have as many entries as branches and tags" do
       expected_refs = SeedRepo::Repo::BRANCHES + SeedRepo::Repo::TAGS
-      expect(refs.size).to eq(expected_refs.size)
+      # We flatten in case a commit is pointed at by more than one branch and/or tag
+      expect(refs.values.flatten.size).to eq(expected_refs.size)
     end
   end
 
