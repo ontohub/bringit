@@ -290,12 +290,12 @@ module Gitlab
               prune_large_diff!
               return true
             end
-
-            if collapse && size >= DIFF_COLLAPSE_LIMIT
-              prune_collapsed_diff!
-              return true
-            end
           end
+        end
+
+        if collapse && size >= DIFF_COLLAPSE_LIMIT
+          prune_collapsed_diff!
+          return true
         end
 
         false

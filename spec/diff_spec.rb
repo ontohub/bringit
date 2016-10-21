@@ -80,6 +80,24 @@ EOT
         end
       end
 
+      context 'using a collapsable diff that is too large' do
+        before do
+          # The patch total size is 200, with lines between 21 and 54.
+          # This is a quick-and-dirty way to test this. Ideally, a new patch is
+          # added to the test repo with a size that falls between the real limits.
+          stub_const('Gitlab::Git::Diff::DIFF_SIZE_LIMIT', 150)
+          stub_const('Gitlab::Git::Diff::DIFF_COLLAPSE_LIMIT', 100)
+        end
+
+        it 'prunes the diff as a large diff instead of as a collapsed diff' do
+          diff = Gitlab::Git::Diff.new(@rugged_diff, collapse: true)
+
+          expect(diff.diff).to be_empty
+          expect(diff).to be_too_large
+          expect(diff).not_to be_collapsed
+        end
+      end
+
       context 'using a large binary diff' do
         it 'does not prune the diff' do
           expect_any_instance_of(Rugged::Diff::Delta).to receive(:binary?).

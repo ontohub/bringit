@@ -1,5 +1,6 @@
 v 10.6.10
   - Ignore invalid encodings when parsing Git attribute files
+  - Revert to previous diff pruning behavior
 
 v 10.6.9
   - Optimize diff creation from Rugged::Patch
