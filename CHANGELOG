@@ -1,3 +1,6 @@
+v 10.7.0
+  - Refactor Ref's `target` fields to be consistent with Rugged implementation
+
 v 10.6.10
   - Ignore invalid encodings when parsing Git attribute files
   - Revert to previous diff pruning behavior

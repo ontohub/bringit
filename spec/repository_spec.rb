@@ -140,7 +140,7 @@ describe Gitlab::Git::Repository do
       end
 
       context :commit do
-        subject { heads.first.target.sha }
+        subject { heads.first.dereferenced_target.sha }
 
         it { is_expected.to eq("0b4bc9a49b562e85de7cc9e834518ea6828729b9") }
       end
@@ -1139,6 +1139,6 @@ index 0000000..e69de29
   def create_remote_branch(remote_name, branch_name, source_branch_name)
     source_branch = @repo.branches.find { |branch| branch.name == source_branch_name }
     rugged = @repo.rugged
-    rugged.references.create("refs/remotes/#{remote_name}/#{branch_name}", source_branch.target.sha)
+    rugged.references.create("refs/remotes/#{remote_name}/#{branch_name}", source_branch.dereferenced_target.sha)
   end
 end
