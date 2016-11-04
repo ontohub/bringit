@@ -22,4 +22,5 @@ end
 
 group :development, :test do
   gem 'bundler-audit', '~> 0.5.0', require: false
+  gem "appraisal"
 end
