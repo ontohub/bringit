@@ -3,8 +3,8 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
-  gem 'rubocop'
-  gem 'rubocop-rspec', '1.5.1'
+  gem 'rubocop', '~> 0.43.0'
+  gem 'rubocop-rspec', '~> 1.8.0'
   gem 'coveralls', require: false
   gem 'rspec', '~> 3.0'
   gem 'rspec-mocks'
