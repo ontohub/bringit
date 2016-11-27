@@ -246,7 +246,7 @@ module Gitlab
 
       # Return repo size in megabytes
       def size
-        size = popen(%W(du -sk), path).first.strip.to_i
+        size = popen(%w(du -sk), path).first.strip.to_i
         (size.to_f / 1024).round(2)
       end
 
@@ -334,10 +334,10 @@ module Gitlab
       def log_by_shell(sha, options)
         cmd = %W(git --git-dir=#{path} log)
         cmd += %W(-n #{options[:limit].to_i})
-        cmd += %W(--format=%H)
+        cmd += %w(--format=%H)
         cmd += %W(--skip=#{options[:offset].to_i})
-        cmd += %W(--follow) if options[:follow]
-        cmd += %W(--no-merges) if options[:skip_merges]
+        cmd += %w(--follow) if options[:follow]
+        cmd += %w(--no-merges) if options[:skip_merges]
         cmd += %W(--after=#{options[:after].iso8601}) if options[:after]
         cmd += %W(--before=#{options[:before].iso8601}) if options[:before]
         cmd += [sha]
@@ -459,7 +459,6 @@ module Gitlab
         else
           walker.sorting(Rugged::SORT_DATE)
         end
-
 
         commits = []
         offset = actual_options[:skip]
@@ -933,7 +932,7 @@ module Gitlab
 
         raw_output = IO.popen(cmd, &:read).split("\n").map do |f|
           stuff, path = f.split("\t")
-          mode, type, sha = stuff.split(" ")
+          _mode, type, _sha = stuff.split(" ")
           path if type == "blob"
           # Contain only blob type
         end
@@ -957,7 +956,7 @@ module Gitlab
           gitattributes_content = blob_content(commit, '.gitattributes')
         rescue InvalidBlobName
           # No .gitattributes found. Should now remove any info/attributes and return
-          File.delete(info_attributes_path) if File.exists?(info_attributes_path)
+          File.delete(info_attributes_path) if File.exist?(info_attributes_path)
           return
         end
 
@@ -1119,7 +1118,7 @@ module Gitlab
         end
       end
 
-      def archive_to_file(treeish = 'master', filename = 'archive.tar.gz', format = nil, compress_cmd = %W(gzip -n))
+      def archive_to_file(treeish = 'master', filename = 'archive.tar.gz', format = nil, compress_cmd = %w(gzip -n))
         git_archive_cmd = %W(git --git-dir=#{path} archive)
 
         # Put files into a directory before archiving
@@ -1158,9 +1157,9 @@ module Gitlab
       end
 
       def nice(cmd)
-        nice_cmd = %W(nice -n 20)
+        nice_cmd = %w(nice -n 20)
         unless unsupported_platform?
-          nice_cmd += %W(ionice -c 2 -n 7)
+          nice_cmd += %w(ionice -c 2 -n 7)
         end
         nice_cmd + cmd
       end
@@ -1216,7 +1215,7 @@ module Gitlab
           end
 
           # Yield fake 'after' lines for the last line of file_contents
-          (count+1..count+SEARCH_CONTEXT_LINES).each do |i|
+          (count + 1..count + SEARCH_CONTEXT_LINES).each do |i|
             yielder.yield [nil, i]
           end
         end
@@ -1226,7 +1225,7 @@ module Gitlab
         # Loop through consecutive blocks of lines with indexes
         lines_with_index.each_cons(2 * SEARCH_CONTEXT_LINES + 1) do |line_block|
           # Get the 'middle' line and index from the block
-          line, i = line_block[SEARCH_CONTEXT_LINES]
+          line, _ = line_block[SEARCH_CONTEXT_LINES]
 
           next unless line && line.match(/#{Regexp.escape(query)}/i)
 

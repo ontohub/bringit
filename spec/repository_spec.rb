@@ -213,9 +213,9 @@ describe Gitlab::Git::Repository do
       it 'should have valid data' do
         expect(submodule).to eq([
           "six", {
-            "id"=>"409f37c4f05865e4fb208c771485f211a22c4c2d",
-            "path"=>"six",
-            "url"=>"git://github.com/randx/six.git"
+            "id" => "409f37c4f05865e4fb208c771485f211a22c4c2d",
+            "path" => "six",
+            "url" => "git://github.com/randx/six.git"
           }
         ])
       end
@@ -245,11 +245,12 @@ describe Gitlab::Git::Repository do
 
       it 'should handle tags correctly' do
         submodules = repository.submodules('v1.2.1')
-        expect(submodule).to eq([
+
+        expect(submodules.first).to eq([
           "six", {
-            "id"=>"409f37c4f05865e4fb208c771485f211a22c4c2d",
-            "path"=>"six",
-            "url"=>"git://github.com/randx/six.git"
+            "id" => "409f37c4f05865e4fb208c771485f211a22c4c2d",
+            "path" => "six",
+            "url" => "git://github.com/randx/six.git"
           }
         ])
       end
@@ -338,7 +339,7 @@ describe Gitlab::Git::Repository do
       end
 
       it "should create a new branch" do
-        expect(@normal_repo.rugged.branches[new_branch]).to_not be_nil
+        expect(@normal_repo.rugged.branches[new_branch]).not_to be_nil
       end
 
       it "should move the HEAD to the correct commit" do
@@ -425,7 +426,6 @@ describe Gitlab::Git::Repository do
       ensure_seeds
     end
   end
-
 
   describe "#create_branch" do
     before(:all) do
@@ -831,7 +831,7 @@ describe Gitlab::Git::Repository do
     it 'should reload Rugged::Repository and return master' do
       expect(Rugged::Repository).to receive(:new).twice.and_call_original
 
-      branch = repository.find_branch('master')
+      repository.find_branch('master')
       branch = repository.find_branch('master', force_reload: true)
 
       expect(branch).to be_a_kind_of(Gitlab::Git::Branch)

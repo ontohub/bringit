@@ -220,7 +220,6 @@ module Gitlab
           commit(repository, options, :remove)
         end
 
-
         # Rename file from repository and return commit sha
         #
         # options should contain next structure:

@@ -35,7 +35,7 @@ describe Gitlab::Git::DiffCollection do
     end
 
     it 'avoids future iterator iterations' do
-      subject.decorate! { |d| d if !d.nil? }
+      subject.decorate! { |d| d unless d.nil? }
 
       expect(iterator).not_to receive(:each)
 
@@ -365,7 +365,7 @@ describe Gitlab::Git::DiffCollection do
         end
 
         context 'when go over safe limits on files' do
-          let(:iterator) { [ fake_diff(1,1) ] * 4 }
+          let(:iterator) { [ fake_diff(1, 1) ] * 4 }
 
           before(:each) do
             stub_const('Gitlab::Git::DiffCollection::DEFAULT_LIMITS', { max_files: 2, max_lines: max_lines })
@@ -455,6 +455,6 @@ describe Gitlab::Git::DiffCollection do
   end
 
   def fake_diff(line_length, line_count)
-    {'diff' => "#{'a' * line_length}\n" * line_count}
+    { 'diff' => "#{'a' * line_length}\n" * line_count }
   end
 end

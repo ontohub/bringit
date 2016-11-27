@@ -26,4 +26,4 @@ Dir['test/*.rb'].each do |test_file|
 end
 
 desc 'Run all peformance tests'
-task :default => tests
+task default: tests

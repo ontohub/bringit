@@ -112,7 +112,7 @@ EOT
   end
 
   describe 'straight diffs' do
-    let(:options) { { :straight => true } }
+    let(:options) { { straight: true } }
     let(:diffs) { Gitlab::Git::Diff.between(repository, 'feature', 'master', options) }
     subject { diffs }
 
@@ -125,9 +125,9 @@ EOT
     context :diff do
       subject { diffs.first }
 
-      it { should be_kind_of Gitlab::Git::Diff }
-      its(:new_path) { should == '.DS_Store' }
-      its(:diff) { should include 'Binary files /dev/null and b/.DS_Store differ' }
+      it { is_expected.to be_kind_of Gitlab::Git::Diff }
+      its(:new_path) { is_expected.to == '.DS_Store' }
+      its(:diff) { is_expected.to include 'Binary files /dev/null and b/.DS_Store differ' }
     end
   end
 
@@ -213,7 +213,7 @@ EOT
       it { is_expected.to eq(9) }
     end
 
-    its(:line_count) { should eq(9) }
+    its(:line_count) { is_expected.to eq(9) }
   end
 
   describe :too_large? do

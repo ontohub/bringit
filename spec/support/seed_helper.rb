@@ -2,7 +2,7 @@ module SeedHelper
   GITLAB_URL = "https://gitlab.com/gitlab-org/gitlab-git-test.git"
 
   def ensure_seeds
-    if File.exists?(SUPPORT_PATH)
+    if File.exist?(SUPPORT_PATH)
       FileUtils.rm_r(SUPPORT_PATH)
     end
 
@@ -91,6 +91,6 @@ bla/bla.txt
   # Prevent developer git configurations from being persisted to test
   # repositories
   def git_env
-    {'GIT_TEMPLATE_DIR' => ''}
+    { 'GIT_TEMPLATE_DIR' => '' }
   end
 end
