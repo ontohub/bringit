@@ -1,10 +1,5 @@
-if ENV['TRAVIS']
-  require 'coveralls'
-  Coveralls.wear!
-else
-  require 'simplecov'
-  SimpleCov.start
-end
+require 'simplecov'
+SimpleCov.start
 
 require 'gitlab_git'
 require 'pry'
