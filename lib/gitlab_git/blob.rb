@@ -121,6 +121,9 @@ module Gitlab
         #     update_ref: false
         #   }
         #
+        # rubocop:disable Metrics/AbcSize
+        # rubocop:disable Metrics/CyclomaticComplexity
+        # rubocop:disable Metrics/PerceivedComplexity
         def commit(repository, options, action = :add)
           file = options[:file]
           update = file[:update].nil? ? true : file[:update]
@@ -194,6 +197,9 @@ module Gitlab
 
           Rugged::Commit.create(repo, opts)
         end
+        # rubocop:enable Metrics/AbcSize
+        # rubocop:enable Metrics/CyclomaticComplexity
+        # rubocop:enable Metrics/PerceivedComplexity
 
         # Remove file from repository and return commit sha
         #
