@@ -132,7 +132,6 @@ describe Gitlab::Git::Commit do
       end
     end
 
-
     describe "where" do
       context 'path is empty string' do
         subject do

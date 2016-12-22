@@ -226,7 +226,7 @@ describe Gitlab::Git::Blob do
     let(:repository) { Gitlab::Git::Repository.new(TEST_REPO_PATH) }
 
     let(:commit_options) do
-      options = {
+      {
          file: {
            content: 'Lorem ipsum...',
            path: 'documents/story.txt'
@@ -274,8 +274,8 @@ describe Gitlab::Git::Blob do
         expect(commit.message).to eq('Wow such commit')
 
         # Does not update any related ref
-        expect(repository.lookup("fix-mode").oid).to_not eq(commit.oid)
-        expect(repository.lookup("HEAD").oid).to_not eq(commit.oid)
+        expect(repository.lookup("fix-mode").oid).not_to eq(commit.oid)
+        expect(repository.lookup("HEAD").oid).not_to eq(commit.oid)
       end
     end
 
@@ -301,7 +301,7 @@ describe Gitlab::Git::Blob do
   describe :rename do
     let(:repository) { Gitlab::Git::Repository.new(TEST_NORMAL_REPO_PATH) }
     let(:rename_options) do
-      options = {
+      {
         file: {
           path: 'NEWCONTRIBUTING.md',
           previous_path: 'CONTRIBUTING.md',
@@ -326,7 +326,7 @@ describe Gitlab::Git::Blob do
     end
 
     let(:rename_options2) do
-      options = {
+      {
          file: {
            content: 'Lorem ipsum...',
            path: 'bin/new_executable',
@@ -373,7 +373,7 @@ describe Gitlab::Git::Blob do
     let(:repository) { Gitlab::Git::Repository.new(TEST_REPO_PATH) }
 
     let(:commit_options) do
-      options = {
+      {
          file: {
            path: 'README.md'
          },

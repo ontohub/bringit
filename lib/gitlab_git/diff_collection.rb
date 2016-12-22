@@ -5,7 +5,7 @@ module Gitlab
 
       DEFAULT_LIMITS = { max_files: 100, max_lines: 5000 }.freeze
 
-      def initialize(iterator, options={})
+      def initialize(iterator, options = {})
         @iterator = iterator
         @max_files = options.fetch(:max_files, DEFAULT_LIMITS[:max_files])
         @max_lines = options.fetch(:max_lines, DEFAULT_LIMITS[:max_lines])

@@ -44,7 +44,7 @@ module Gitlab
             lines << line[1, line.size]
           elsif m = /^(\w{40}) (\d+) (\d+)/.match(line)
             commit_id, old_lineno, lineno = m[1], m[2].to_i, m[3].to_i
-            commits[commit_id] = nil if !commits.key?(commit_id)
+            commits[commit_id] = nil unless commits.key?(commit_id)
             info[lineno] = [commit_id, old_lineno]
           end
         end

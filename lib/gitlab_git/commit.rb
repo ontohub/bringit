@@ -12,7 +12,7 @@ module Gitlab
         :committed_date, :committer_name, :committer_email
       ].freeze
 
-      attr_accessor *SERIALIZE_KEYS
+      attr_accessor *SERIALIZE_KEYS # rubocop:disable Lint/AmbiguousOperator
 
       def ==(other)
         return false unless other.is_a?(Gitlab::Git::Commit)

@@ -3,15 +3,10 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
-  gem 'rubocop'
-  gem 'rubocop-rspec', '1.5.1'
-  gem 'coveralls', require: false
+  gem 'rubocop', '~> 0.43.0'
+  gem 'rubocop-rspec', '~> 1.8.0'
   gem 'rspec', '~> 3.0'
-  gem 'rspec-mocks'
-  gem 'rspec-its'
   gem 'webmock'
-  gem 'guard'
-  gem 'guard-rspec'
   gem 'pry'
   gem 'rake'
 end

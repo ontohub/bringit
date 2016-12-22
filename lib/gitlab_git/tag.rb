@@ -12,8 +12,6 @@ module Gitlab
       def message
         encode! @message
       end
-
-      private
     end
   end
 end
