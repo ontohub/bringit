@@ -1,6 +1,5 @@
 *.gem
-support/*
-tmp/*
-coverage/*
 .DS_Store
-Gemfile.lock
+/Gemfile.lock
+/coverage/*
+/tmp/*
