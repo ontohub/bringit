@@ -15,5 +15,4 @@ Gem::Specification.new do |s|
   s.add_dependency("activesupport", ">= 4.0")
   s.add_dependency("rugged", "~> 0.24.0")
   s.add_dependency("charlock_holmes", "~> 0.7.3")
-  s.add_development_dependency("listen", "~> 3.0.6")
 end
