@@ -5,8 +5,7 @@ gemspec
 group :development do
   gem 'rubocop', '~> 0.43.0'
   gem 'rubocop-rspec', '~> 1.8.0'
-  gem 'rspec', '~> 3.0'
-  gem 'webmock'
+  gem 'rspec', '~> 3.5.0'
   gem 'pry'
   gem 'rake'
 end
