@@ -3,7 +3,7 @@ require_relative '../lib/gitlab_git/encoding_helper'
 
 describe EncodingHelper do
   let(:ext_class) { Class.new { extend EncodingHelper } }
-  let(:binary_string) { File.join(SUPPORT_PATH, 'gitlab_logo.png') }
+  let(:binary_string) { File.join(SEED_REPOSITORY_PATH, 'gitlab_logo.png') }
 
   describe '#encode!' do
     [

@@ -1,12 +1,18 @@
+SEED_REPOSITORY_PATH   = File.expand_path('../../tmp/repositories', __dir__)
+TEST_REPO_PATH         = File.join(SEED_REPOSITORY_PATH, 'gitlab-git-test.git')
+TEST_NORMAL_REPO_PATH  = File.join(SEED_REPOSITORY_PATH, "not-bare-repo.git")
+TEST_MUTABLE_REPO_PATH = File.join(SEED_REPOSITORY_PATH, "mutable-repo.git")
+TEST_BROKEN_REPO_PATH  = File.join(SEED_REPOSITORY_PATH, "broken-repo.git")
+
 module SeedHelper
   GITLAB_URL = "https://gitlab.com/gitlab-org/gitlab-git-test.git"
 
   def ensure_seeds
-    if File.exist?(SUPPORT_PATH)
-      FileUtils.rm_r(SUPPORT_PATH)
+    if File.exist?(SEED_REPOSITORY_PATH)
+      FileUtils.rm_r(SEED_REPOSITORY_PATH)
     end
 
-    FileUtils.mkdir_p(SUPPORT_PATH)
+    FileUtils.mkdir_p(SEED_REPOSITORY_PATH)
 
     create_bare_seeds
     create_normal_seeds
@@ -18,7 +24,7 @@ module SeedHelper
 
   def create_bare_seeds
     system(git_env, *%W(git clone --bare #{GITLAB_URL}),
-           chdir: SUPPORT_PATH,
+           chdir: SEED_REPOSITORY_PATH,
            out:   '/dev/null',
            err:   '/dev/null')
   end
@@ -52,7 +58,7 @@ module SeedHelper
   end
 
   def create_git_attributes
-    dir = File.join(SUPPORT_PATH, 'with-git-attributes.git', 'info')
+    dir = File.join(SEED_REPOSITORY_PATH, 'with-git-attributes.git', 'info')
 
     FileUtils.mkdir_p(dir)
 
@@ -77,7 +83,7 @@ bla/bla.txt
   end
 
   def create_invalid_git_attributes
-    dir = File.join(SUPPORT_PATH, 'with-invalid-git-attributes.git', 'info')
+    dir = File.join(SEED_REPOSITORY_PATH, 'with-invalid-git-attributes.git', 'info')
 
     FileUtils.mkdir_p(dir)
 
