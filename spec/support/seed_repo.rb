@@ -80,4 +80,20 @@ module SeedRepo
     FILES            = ["bin/executable"]
     FILES_COUNT      = FILES.count
   end
+
+  module Repo
+    HEAD = "master"
+    BRANCHES = %w[
+      feature
+      fix
+      fix-blob-path
+      fix-existing-submodule-dir
+      fix-mode
+      gitattributes
+      gitattributes-updated
+      master
+      merge-test
+    ]
+    TAGS = %w[v1.0.0 v1.1.0 v1.2.0 v1.2.1]
+  end
 end
