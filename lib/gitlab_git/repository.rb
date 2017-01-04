@@ -400,17 +400,6 @@ module Gitlab
         DiffCollection.new(diff_patches(from, to, options, *paths), options)
       end
 
-      # Return the diff between +from+ and +to+ in a single patch string.  The
-      # +options+ hash has the same allowed keys as #diff.
-      def diff_text(from, to, options = {}, *paths)
-        # NOTE: It would be simpler to use the Rugged::Diff#patch method, but
-        # that formats the diff text differently than Rugged::Patch#to_s for
-        # changes to binary files.
-        diff_patches(from, to, options, *paths).map do |p|
-          p.to_s
-        end.join("\n")
-      end
-
       # Returns commits collection
       #
       # Ex.
