@@ -1,6 +1,6 @@
 # GitLab Git
 
-## `Gitlab::Git` has been absorbed into the [main GitLab project](https://gitlab-com/gitlab-org/gitlab-ce), and the `gitlab_git` gem has been deprecated. See the [gitlab-ce issue](https://gitlab.com/gitlab-org/gitlab-ce/issues/24374) and [merge request](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/7536) for more information.
+## `Gitlab::Git` has been absorbed into the [main GitLab project](https://gitlab-com/gitlab-org/gitlab-ce), and the `gitlab_git` gem has been deprecated. See the [gitlab-ce issue](https://gitlab.com/gitlab-org/gitlab-ce/issues/24374) and [merge request](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/8447) for more information.
 
 GitLab wrapper around git objects.
 
