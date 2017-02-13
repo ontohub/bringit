@@ -2,7 +2,9 @@
 require 'ostruct'
 require 'fileutils'
 require 'linguist'
+require 'active_support/core_ext/hash/compact'
 require 'active_support/core_ext/hash/keys'
+require 'active_support/core_ext/hash/slice'
 require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/object/try'
 require 'rugged'
@@ -11,6 +13,7 @@ require "charlock_holmes"
 # Gitlab::Git
 require_relative "gitlab_git/popen"
 require_relative 'gitlab_git/encoding_helper'
+require_relative 'gitlab_git/path_helper'
 require_relative "gitlab_git/blame"
 require_relative "gitlab_git/blob"
 require_relative "gitlab_git/commit"
