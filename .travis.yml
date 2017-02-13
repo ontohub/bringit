@@ -1,0 +1,15 @@
+dist: trusty
+
+language: ruby
+
+rvm:
+  - 2.3.3
+  - 2.4.1
+  - rbx-3.73
+  - rbx-3.74
+
+notifications:
+  email: false
+
+script:
+  - bundle exec rspec
