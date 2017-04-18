@@ -1,5 +1,7 @@
-require 'simplecov'
-SimpleCov.start
+if RUBY_ENGINE == 'ruby' # not 'rbx'
+  require 'simplecov'
+  SimpleCov.start
+end
 
 require 'gitlab_git'
 require 'pry'
