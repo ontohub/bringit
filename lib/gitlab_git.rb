@@ -29,6 +29,7 @@ require_relative "gitlab_git/branch"
 require_relative "gitlab_git/tag"
 require_relative "gitlab_git/util"
 require_relative "gitlab_git/attributes"
+require_relative "gitlab_git/version_info"
 
 module Gitlab
   module Git
