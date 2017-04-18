@@ -9,7 +9,7 @@ module Gitlab
         @repository = repository
         @env = env.presence || {}
         @args = ["git",
-                 "--git-dir=#{repository.path_to_repo}",
+                 "--git-dir=#{repository.path}",
                  "rev-list",
                  "--max-count=1",
                  oldrev,
@@ -22,7 +22,7 @@ module Gitlab
 
       def valid?
         environment_variables.all? do |(name, value)|
-          value.to_s.start_with?(repository.path_to_repo)
+          value.to_s.start_with?(repository.path)
         end
       end
 

@@ -7,7 +7,7 @@ describe Gitlab::Git::RevList, seed_helper: true do
     described_class::ALLOWED_VARIABLES.each do |var|
       context var do
         it "accepts values starting with the repository path" do
-          env = { var => "#{repository.path_to_repo}/objects" }
+          env = { var => "#{repository.path}/objects" }
           rev_list = described_class.new('oldrev', 'newrev', repository: repository, env: env)
 
           expect(rev_list).to be_valid
@@ -21,7 +21,7 @@ describe Gitlab::Git::RevList, seed_helper: true do
         end
 
         it "rejects values containing the  repository path but not starting with it" do
-          env = { var => "/some/other/path/#{repository.path_to_repo}" }
+          env = { var => "/some/other/path/#{repository.path}" }
           rev_list = described_class.new('oldrev', 'newrev', repository: repository, env: env)
 
           expect(rev_list).not_to be_valid
@@ -38,7 +38,7 @@ describe Gitlab::Git::RevList, seed_helper: true do
   end
 
   context "#execute" do
-    let(:env) { { "GIT_OBJECT_DIRECTORY" => repository.path_to_repo } }
+    let(:env) { { "GIT_OBJECT_DIRECTORY" => repository.path } }
     let(:rev_list) { Gitlab::Git::RevList.new('oldrev', 'newrev', repository: repository, env: env) }
 
     it "calls out to `popen` without environment variables if the record is invalid" do
