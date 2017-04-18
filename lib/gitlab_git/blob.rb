@@ -1,11 +1,8 @@
-require_relative 'encoding_helper'
-require_relative 'path_helper'
-
 module Gitlab
   module Git
     class Blob
       include Linguist::BlobHelper
-      include EncodingHelper
+      include Gitlab::Git::EncodingHelper
 
       # This number is the maximum amount of data that we want to display to
       # the user. We load as much as we can for encoding detection
@@ -30,7 +27,7 @@ module Gitlab
             blob = repository.lookup(blob_entry[:oid])
 
             if blob
-              Blob.new(
+              new(
                 id: blob.oid,
                 name: blob_entry[:name],
                 size: blob.size,
@@ -47,7 +44,7 @@ module Gitlab
         def raw(repository, sha)
           blob = repository.lookup(sha)
 
-          Blob.new(
+          new(
             id: blob.oid,
             size: blob.size,
             data: blob.content(MAX_DATA_DISPLAY_SIZE),
@@ -88,170 +85,13 @@ module Gitlab
         end
 
         def submodule_blob(blob_entry, path, sha)
-          Blob.new(
+          new(
             id: blob_entry[:oid],
             name: blob_entry[:name],
             data: '',
             path: path,
             commit_id: sha,
           )
-        end
-
-        # Commit file in repository and return commit sha
-        #
-        # options should contain next structure:
-        #   file: {
-        #     content: 'Lorem ipsum...',
-        #     path: 'documents/story.txt',
-        #     update: true
-        #   },
-        #   author: {
-        #     email: 'user@example.com',
-        #     name: 'Test User',
-        #     time: Time.now
-        #   },
-        #   committer: {
-        #     email: 'user@example.com',
-        #     name: 'Test User',
-        #     time: Time.now
-        #   },
-        #   commit: {
-        #     message: 'Wow such commit',
-        #     branch: 'master',
-        #     update_ref: false
-        #   }
-        #
-        # rubocop:disable Metrics/AbcSize
-        # rubocop:disable Metrics/CyclomaticComplexity
-        # rubocop:disable Metrics/PerceivedComplexity
-        def commit(repository, options, action = :add)
-          file = options[:file]
-          update = file[:update].nil? ? true : file[:update]
-          author = options[:author]
-          committer = options[:committer]
-          commit = options[:commit]
-          repo = repository.rugged
-          ref = commit[:branch]
-          update_ref = commit[:update_ref].nil? ? true : commit[:update_ref]
-          parents = []
-          mode = 0o100644
-
-          unless ref.start_with?('refs/')
-            ref = 'refs/heads/' + ref
-          end
-
-          path_name = PathHelper.normalize_path(file[:path])
-          # Abort if any invalid characters remain (e.g. ../foo)
-          raise Repository::InvalidBlobName.new("Invalid path") if path_name.each_filename.to_a.include?('..')
-
-          filename = path_name.to_s
-          index = repo.index
-
-          unless repo.empty?
-            rugged_ref = repo.references[ref]
-            raise Repository::InvalidRef.new("Invalid branch name") unless rugged_ref
-            last_commit = rugged_ref.target
-            index.read_tree(last_commit.tree)
-            parents = [last_commit]
-          end
-
-          if action == :remove
-            index.remove(filename)
-          else
-            file_entry = index.get(filename)
-
-            if action == :rename
-              old_path_name = PathHelper.normalize_path(file[:previous_path])
-              old_filename = old_path_name.to_s
-              file_entry = index.get(old_filename)
-              index.remove(old_filename) unless file_entry.blank?
-            end
-
-            if file_entry
-              raise Repository::InvalidBlobName.new("Filename already exists; update not allowed") unless update
-
-              # Preserve the current file mode if one is available
-              mode = file_entry[:mode] if file_entry[:mode]
-            end
-
-            content = file[:content]
-            detect = CharlockHolmes::EncodingDetector.new.detect(content) if content
-
-            unless detect && detect[:type] == :binary
-              # When writing to the repo directly as we are doing here,
-              # the `core.autocrlf` config isn't taken into account.
-              content.gsub!("\r\n", "\n") if repository.autocrlf
-            end
-
-            oid = repo.write(content, :blob)
-            index.add(path: filename, oid: oid, mode: mode)
-          end
-
-          opts = {}
-          opts[:tree] = index.write_tree(repo)
-          opts[:author] = author
-          opts[:committer] = committer
-          opts[:message] = commit[:message]
-          opts[:parents] = parents
-          opts[:update_ref] = ref if update_ref
-
-          Rugged::Commit.create(repo, opts)
-        end
-        # rubocop:enable Metrics/AbcSize
-        # rubocop:enable Metrics/CyclomaticComplexity
-        # rubocop:enable Metrics/PerceivedComplexity
-
-        # Remove file from repository and return commit sha
-        #
-        # options should contain next structure:
-        #   file: {
-        #     path: 'documents/story.txt'
-        #   },
-        #   author: {
-        #     email: 'user@example.com',
-        #     name: 'Test User',
-        #     time: Time.now
-        #   },
-        #   committer: {
-        #     email: 'user@example.com',
-        #     name: 'Test User',
-        #     time: Time.now
-        #   },
-        #   commit: {
-        #     message: 'Remove FILENAME',
-        #     branch: 'master'
-        #   }
-        #
-        def remove(repository, options)
-          commit(repository, options, :remove)
-        end
-
-        # Rename file from repository and return commit sha
-        #
-        # options should contain next structure:
-        #   file: {
-        #     previous_path: 'documents/old_story.txt'
-        #     path: 'documents/story.txt'
-        #     content: 'Lorem ipsum...',
-        #     update: true
-        #   },
-        #   author: {
-        #     email: 'user@example.com',
-        #     name: 'Test User',
-        #     time: Time.now
-        #   },
-        #   committer: {
-        #     email: 'user@example.com',
-        #     name: 'Test User',
-        #     time: Time.now
-        #   },
-        #   commit: {
-        #     message: 'Rename FILENAME',
-        #     branch: 'master'
-        #   }
-        #
-        def rename(repository, options)
-          commit(repository, options, :rename)
         end
       end
 

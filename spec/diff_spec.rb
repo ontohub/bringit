@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Gitlab::Git::Diff do
+describe Gitlab::Git::Diff, seed_helper: true do
   let(:repository) { Gitlab::Git::Repository.new(TEST_REPO_PATH) }
 
   before do

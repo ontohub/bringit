@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Gitlab::Git::Attributes do
+describe Gitlab::Git::Attributes, seed_helper: true do
   let(:path) do
     File.join(SEED_REPOSITORY_PATH, 'with-git-attributes.git')
   end
