@@ -1,15 +1,15 @@
 module Gitlab
   module Git
     class RevList
-      attr_reader :project, :env
+      attr_reader :repository, :env
 
       ALLOWED_VARIABLES = %w[GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES].freeze
 
-      def initialize(oldrev, newrev, project:, env: nil)
-        @project = project
+      def initialize(oldrev, newrev, repository:, env: nil)
+        @repository = repository
         @env = env.presence || {}
         @args = ["git",
-                 "--git-dir=#{project.repository.path_to_repo}",
+                 "--git-dir=#{repository.path_to_repo}",
                  "rev-list",
                  "--max-count=1",
                  oldrev,
@@ -22,7 +22,7 @@ module Gitlab
 
       def valid?
         environment_variables.all? do |(name, value)|
-          value.to_s.start_with?(project.repository.path_to_repo)
+          value.to_s.start_with?(repository.path_to_repo)
         end
       end
 

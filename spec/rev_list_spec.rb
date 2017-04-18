@@ -1,35 +1,35 @@
 require 'spec_helper'
 
-describe Gitlab::Git::RevList, lib: true do
-  let(:project) { create(:project, :repository) }
+describe Gitlab::Git::RevList, seed_helper: true do
+  let(:repository) { Gitlab::Git::Repository.new(TEST_REPO_PATH) }
 
   context "validations" do
     described_class::ALLOWED_VARIABLES.each do |var|
       context var do
-        it "accepts values starting with the project repo path" do
-          env = { var => "#{project.repository.path_to_repo}/objects" }
-          rev_list = described_class.new('oldrev', 'newrev', project: project, env: env)
+        it "accepts values starting with the repository path" do
+          env = { var => "#{repository.path_to_repo}/objects" }
+          rev_list = described_class.new('oldrev', 'newrev', repository: repository, env: env)
 
           expect(rev_list).to be_valid
         end
 
-        it "rejects values starting not with the project repo path" do
+        it "rejects values starting not with the repository repo path" do
           env = { var => "/some/other/path" }
-          rev_list = described_class.new('oldrev', 'newrev', project: project, env: env)
+          rev_list = described_class.new('oldrev', 'newrev', repository: repository, env: env)
 
           expect(rev_list).not_to be_valid
         end
 
-        it "rejects values containing the project repo path but not starting with it" do
-          env = { var => "/some/other/path/#{project.repository.path_to_repo}" }
-          rev_list = described_class.new('oldrev', 'newrev', project: project, env: env)
+        it "rejects values containing the  repository path but not starting with it" do
+          env = { var => "/some/other/path/#{repository.path_to_repo}" }
+          rev_list = described_class.new('oldrev', 'newrev', repository: repository, env: env)
 
           expect(rev_list).not_to be_valid
         end
 
         it "ignores nil values" do
           env = { var => nil }
-          rev_list = described_class.new('oldrev', 'newrev', project: project, env: env)
+          rev_list = described_class.new('oldrev', 'newrev', repository: repository, env: env)
 
           expect(rev_list).to be_valid
         end
@@ -38,8 +38,8 @@ describe Gitlab::Git::RevList, lib: true do
   end
 
   context "#execute" do
-    let(:env) { { "GIT_OBJECT_DIRECTORY" => project.repository.path_to_repo } }
-    let(:rev_list) { Gitlab::Git::RevList.new('oldrev', 'newrev', project: project, env: env) }
+    let(:env) { { "GIT_OBJECT_DIRECTORY" => repository.path_to_repo } }
+    let(:rev_list) { Gitlab::Git::RevList.new('oldrev', 'newrev', repository: repository, env: env) }
 
     it "calls out to `popen` without environment variables if the record is invalid" do
       allow(rev_list).to receive(:valid?).and_return(false)

@@ -3,19 +3,19 @@ require 'fileutils'
 
 describe Gitlab::Git::Hook, lib: true do
   describe "#trigger" do
-    let(:project) { create(:project, :repository) }
+    let(:repository) { Gitlab::Git::Repository.new(TEST_REPO_PATH) }
     let(:user_id) { 'user-1' }
 
     def create_hook(name)
-      FileUtils.mkdir_p(File.join(project.repository.path, 'hooks'))
-      File.open(File.join(project.repository.path, 'hooks', name), 'w', 0755) do |f|
+      FileUtils.mkdir_p(File.join(repository.path, 'hooks'))
+      File.open(File.join(repository.path, 'hooks', name), 'w', 0755) do |f|
         f.write('exit 0')
       end
     end
 
     def create_failing_hook(name)
-      FileUtils.mkdir_p(File.join(project.repository.path, 'hooks'))
-      File.open(File.join(project.repository.path, 'hooks', name), 'w', 0755) do |f|
+      FileUtils.mkdir_p(File.join(repository.path, 'hooks'))
+      File.open(File.join(repository.path, 'hooks', name), 'w', 0755) do |f|
         f.write(<<-HOOK)
           echo 'regular message from the hook'
           echo 'error message from the hook' 1>&2
@@ -29,7 +29,7 @@ describe Gitlab::Git::Hook, lib: true do
         context "when the hook is successful" do
           it "returns success with no errors" do
             create_hook(hook_name)
-            hook = Gitlab::Git::Hook.new(hook_name, project.repository.path)
+            hook = Gitlab::Git::Hook.new(hook_name, repository.path)
             blank = Gitlab::Git::BLANK_SHA
             ref = Gitlab::Git::BRANCH_REF_PREFIX + 'new_branch'
 
@@ -42,7 +42,7 @@ describe Gitlab::Git::Hook, lib: true do
         context "when the hook is unsuccessful" do
           it "returns failure with errors" do
             create_failing_hook(hook_name)
-            hook = Gitlab::Git::Hook.new(hook_name, project.repository.path)
+            hook = Gitlab::Git::Hook.new(hook_name, repository.path)
             blank = Gitlab::Git::BLANK_SHA
             ref = Gitlab::Git::BRANCH_REF_PREFIX + 'new_branch'
 
@@ -56,7 +56,7 @@ describe Gitlab::Git::Hook, lib: true do
 
     context "when the hook doesn't exist" do
       it "returns success with no errors" do
-        hook = Gitlab::Git::Hook.new('unknown_hook', project.repository.path)
+        hook = Gitlab::Git::Hook.new('unknown_hook', repository.path)
         blank = Gitlab::Git::BLANK_SHA
         ref = Gitlab::Git::BRANCH_REF_PREFIX + 'new_branch'
 
