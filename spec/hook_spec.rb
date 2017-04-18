@@ -4,7 +4,7 @@ require 'fileutils'
 describe Gitlab::Git::Hook, lib: true do
   describe "#trigger" do
     let(:project) { create(:project, :repository) }
-    let(:user) { create(:user) }
+    let(:user_id) { 'user-1' }
 
     def create_hook(name)
       FileUtils.mkdir_p(File.join(project.repository.path, 'hooks'))
@@ -33,7 +33,7 @@ describe Gitlab::Git::Hook, lib: true do
             blank = Gitlab::Git::BLANK_SHA
             ref = Gitlab::Git::BRANCH_REF_PREFIX + 'new_branch'
 
-            status, errors = hook.trigger(Gitlab::GlId.gl_id(user), blank, blank, ref)
+            status, errors = hook.trigger(user_id, blank, blank, ref)
             expect(status).to be true
             expect(errors).to be_blank
           end
@@ -46,7 +46,7 @@ describe Gitlab::Git::Hook, lib: true do
             blank = Gitlab::Git::BLANK_SHA
             ref = Gitlab::Git::BRANCH_REF_PREFIX + 'new_branch'
 
-            status, errors = hook.trigger(Gitlab::GlId.gl_id(user), blank, blank, ref)
+            status, errors = hook.trigger(user_id, blank, blank, ref)
             expect(status).to be false
             expect(errors).to eq("error message from the hook\n")
           end
@@ -60,7 +60,7 @@ describe Gitlab::Git::Hook, lib: true do
         blank = Gitlab::Git::BLANK_SHA
         ref = Gitlab::Git::BRANCH_REF_PREFIX + 'new_branch'
 
-        status, errors = hook.trigger(Gitlab::GlId.gl_id(user), blank, blank, ref)
+        status, errors = hook.trigger(user_id, blank, blank, ref)
         expect(status).to be true
         expect(errors).to be_nil
       end

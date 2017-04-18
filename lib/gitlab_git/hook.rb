@@ -14,29 +14,29 @@ module Gitlab
         File.exist?(path)
       end
 
-      def trigger(gl_id, oldrev, newrev, ref)
+      def trigger(user_id, oldrev, newrev, ref)
         return [true, nil] unless exists?
 
         Bundler.with_clean_env do
           case name
           when "pre-receive", "post-receive"
-            call_receive_hook(gl_id, oldrev, newrev, ref)
+            call_receive_hook(user_id, oldrev, newrev, ref)
           when "update"
-            call_update_hook(gl_id, oldrev, newrev, ref)
+            call_update_hook(user_id, oldrev, newrev, ref)
           end
         end
       end
 
       private
 
-      def call_receive_hook(gl_id, oldrev, newrev, ref)
+      def call_receive_hook(user_id, oldrev, newrev, ref)
         changes = [oldrev, newrev, ref].join(" ")
 
         exit_status = false
         exit_message = nil
 
         vars = {
-          'GL_ID' => gl_id,
+          'USER_ID' => user_id,
           'PWD' => repo_path,
           'GL_PROTOCOL' => GL_PROTOCOL
         }
@@ -71,9 +71,9 @@ module Gitlab
         [exit_status, exit_message]
       end
 
-      def call_update_hook(gl_id, oldrev, newrev, ref)
+      def call_update_hook(user_id, oldrev, newrev, ref)
         Dir.chdir(repo_path) do
-          stdout, stderr, status = Open3.capture3({ 'GL_ID' => gl_id }, path, ref, oldrev, newrev)
+          stdout, stderr, status = Open3.capture3({ 'USER_ID' => user_id }, path, ref, oldrev, newrev)
           [status.success?, stderr.presence || stdout]
         end
       end
