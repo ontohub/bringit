@@ -66,7 +66,7 @@ module Gitlab
         def find_entry_by_path(repository, root_id, path)
           root_tree = repository.lookup(root_id)
           # Strip leading slashes
-          path[/^\/*/] = ''
+          path = path.sub(/^\/*/, '')
           path_arr = path.split('/')
 
           entry = root_tree.find do |entry|
