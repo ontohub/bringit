@@ -1,3 +1,4 @@
+require "base64"
 require 'spec_helper'
 
 describe Gitlab::Git::Index, seed_helper: true do

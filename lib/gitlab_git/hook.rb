@@ -1,3 +1,5 @@
+require "bundler"
+
 module Gitlab
   module Git
     class Hook

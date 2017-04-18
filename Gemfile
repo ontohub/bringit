@@ -9,6 +9,7 @@ group :development do
 end
 
 group :test do
+  gem 'ffaker', '~> 2.5.0'
   gem 'simplecov', require: false
 end
 
