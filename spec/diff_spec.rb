@@ -70,8 +70,8 @@ EOT
 
       context 'using a diff that is too large' do
         it 'prunes the diff' do
-          expect_any_instance_of(String).to receive(:bytesize).
-            and_return(1024 * 1024 * 1024)
+          stub_const("Gitlab::Git::Diff::DIFF_SIZE_LIMIT", 2)
+          stub_const("Gitlab::Git::Diff::DIFF_COLLAPSE_LIMIT", 1)
 
           diff = described_class.new(@rugged_diff)
 
