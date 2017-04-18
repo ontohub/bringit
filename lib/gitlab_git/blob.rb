@@ -33,7 +33,7 @@ module Gitlab
                 size: blob.size,
                 data: blob.content(MAX_DATA_DISPLAY_SIZE),
                 mode: blob_entry[:filemode].to_s(8),
-                path: path,
+                path: Gitlab::Git::PathHelper.normalize_path(path).to_s,
                 commit_id: sha,
                 binary: blob.binary?
               )
