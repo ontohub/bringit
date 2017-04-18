@@ -17,7 +17,7 @@ module Gitlab
       end
 
       def execute
-        popen(@args, nil, parse_environment_variables)
+        Gitlab::Git::Popen.popen(@args, nil, parse_environment_variables)
       end
 
       def valid?
