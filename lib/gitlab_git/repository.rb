@@ -337,7 +337,7 @@ module Gitlab
         offset_in_ruby = use_follow_flag && options[:offset].present?
         limit += offset if offset_in_ruby
 
-        cmd = %W[#{Gitlab.config.git.bin_path} --git-dir=#{path} log]
+        cmd = %W[git --git-dir=#{path} log]
         cmd << "--max-count=#{limit}"
         cmd << '--format=%H'
         cmd << "--skip=#{offset}" unless offset_in_ruby
@@ -355,7 +355,7 @@ module Gitlab
       end
 
       def count_commits(options)
-        cmd = %W[#{Gitlab.config.git.bin_path} --git-dir=#{path} rev-list]
+        cmd = %W[git --git-dir=#{path} rev-list]
         cmd << "--after=#{options[:after].iso8601}" if options[:after]
         cmd << "--before=#{options[:before].iso8601}" if options[:before]
         cmd += %W[--count #{options[:ref]}]
@@ -874,7 +874,7 @@ module Gitlab
           return []
         end
 
-        cmd = %W(#{Gitlab.config.git.bin_path} --git-dir=#{path} ls-tree)
+        cmd = %W(git --git-dir=#{path} ls-tree)
         cmd += %w(-r)
         cmd += %w(--full-tree)
         cmd += %w(--full-name)
@@ -1069,7 +1069,7 @@ module Gitlab
       end
 
       def archive_to_file(treeish = 'master', filename = 'archive.tar.gz', format = nil, compress_cmd = %w(gzip -n))
-        git_archive_cmd = %W(#{Gitlab.config.git.bin_path} --git-dir=#{path} archive)
+        git_archive_cmd = %W(git --git-dir=#{path} archive)
 
         # Put files into a directory before archiving
         prefix = "#{archive_name(treeish)}/"

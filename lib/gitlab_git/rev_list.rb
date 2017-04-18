@@ -8,7 +8,7 @@ module Gitlab
       def initialize(oldrev, newrev, project:, env: nil)
         @project = project
         @env = env.presence || {}
-        @args = [Gitlab.config.git.bin_path,
+        @args = ["git",
                  "--git-dir=#{project.repository.path_to_repo}",
                  "rev-list",
                  "--max-count=1",
