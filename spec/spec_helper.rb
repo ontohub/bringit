@@ -1,7 +1,10 @@
-require 'simplecov'
-SimpleCov.start
+if RUBY_ENGINE == 'ruby' # not 'rbx'
+  require 'simplecov'
+  SimpleCov.start
+end
 
 require 'gitlab_git'
+require 'ffaker'
 require 'pry'
 
 Dir[File.expand_path('../support/**/*.rb', __FILE__)].each { |f| require f }

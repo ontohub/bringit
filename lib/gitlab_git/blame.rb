@@ -1,9 +1,7 @@
-require_relative 'encoding_helper'
-
 module Gitlab
   module Git
     class Blame
-      include EncodingHelper
+      include Gitlab::Git::EncodingHelper
 
       attr_reader :lines, :blames
 

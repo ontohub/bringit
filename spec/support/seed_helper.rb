@@ -1,3 +1,5 @@
+# This file is specific to specs in spec/lib/gitlab/git/
+
 SEED_REPOSITORY_PATH   = File.expand_path('../../tmp/repositories', __dir__)
 TEST_REPO_PATH         = File.join(SEED_REPOSITORY_PATH, 'gitlab-git-test.git')
 TEST_NORMAL_REPO_PATH  = File.join(SEED_REPOSITORY_PATH, "not-bare-repo.git")
@@ -98,5 +100,13 @@ bla/bla.txt
   # repositories
   def git_env
     { 'GIT_TEMPLATE_DIR' => '' }
+  end
+end
+
+RSpec.configure do |config|
+  config.include SeedHelper, :seed_helper
+
+  config.before(:all, :seed_helper) do
+    ensure_seeds
   end
 end

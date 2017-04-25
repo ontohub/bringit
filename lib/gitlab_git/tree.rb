@@ -1,7 +1,7 @@
 module Gitlab
   module Git
     class Tree
-      include EncodingHelper
+      include Gitlab::Git::EncodingHelper
 
       attr_accessor :id, :root_id, :name, :path, :type,
         :mode, :commit_id, :submodule_url
@@ -17,7 +17,7 @@ module Gitlab
           root_tree = commit.tree
 
           tree = if path
-                   id = Tree.find_id_by_path(repository, root_tree.oid, path)
+                   id = find_id_by_path(repository, root_tree.oid, path)
                    if id
                      repository.lookup(id)
                    else
@@ -28,7 +28,7 @@ module Gitlab
                  end
 
           tree.map do |entry|
-            Tree.new(
+            new(
               id: entry[:oid],
               root_id: root_tree.oid,
               name: entry[:name],
