@@ -109,8 +109,7 @@ module Gitlab
       #   file: {
       #     previous_path: 'documents/old_story.txt'
       #     path: 'documents/story.txt'
-      #     content: 'Lorem ipsum...',
-      #     update: true/false
+      #     content: 'Lorem ipsum...'
       #   },
       #   author: {
       #     email: 'user@example.com',
