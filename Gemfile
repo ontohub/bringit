@@ -3,12 +3,13 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
-  gem 'rspec', '~> 3.5.0'
+  gem 'rspec', '~> 3.6.0'
   gem 'pry'
   gem 'rake'
 end
 
 group :test do
+  gem 'factory_girl', '~> 4.8.0'
   gem 'ffaker', '~> 2.5.0'
   gem 'simplecov', require: false
 end
