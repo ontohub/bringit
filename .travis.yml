@@ -9,5 +9,10 @@ rvm:
 notifications:
   email: false
 
+addons:
+  apt:
+    packages:
+    - git-svn
+
 script:
   - bundle exec rspec
