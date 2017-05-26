@@ -12,11 +12,11 @@ FactoryGirl.define do
   end
 
   sequence(:commit_message) do |n|
-    "#{n}: #{FFaker::Lorem.sentence}"
+    "#{n}: #{Faker::Lorem.sentence}"
   end
 
   sequence(:content) do |n|
-    "#{n}: #{FFaker::Lorem.sentence}\n"
+    "#{n}: #{Faker::Lorem.sentence}\n"
   end
 
   factory :git_commit_hash, class: Hash do
