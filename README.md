@@ -109,7 +109,7 @@ In case it's needed to update https://gitlab.com/gitlab-org/gitlab-git-test with
     raw_blob.size
     raw_blob.data
 
-#### Commiting blob
+#### Committing a blob
 
     options = {
       file: {
@@ -130,7 +130,6 @@ In case it's needed to update https://gitlab.com/gitlab-org/gitlab-git-test with
         message: 'Wow such commit',
         branch: 'master',    # optional - default: 'master'
         update_ref: false    # optional - default: true
-      }
     }
 
     # Create a file in the repository.
@@ -141,7 +140,8 @@ In case it's needed to update https://gitlab.com/gitlab-org/gitlab-git-test with
     options = {
       file: {
         content: 'Lorem ipsum...',
-        path: 'documents/story.txt'
+        path: 'documents/story.txt',
+        previous_path: 'documents/old_story.txt' # optional - used for renaming while updating
       },
       author: {
         email: 'user@example.com',
@@ -180,13 +180,12 @@ In case it's needed to update https://gitlab.com/gitlab-org/gitlab-git-test with
         time: Time.now    # optional - default: Time.now
       },
       commit: {
-        message: 'Wow such commit',
-        branch: 'master',    # optional - default: 'master'
-        update_ref: false    # optional - default: true
+        message: 'Remove FILENAME',
+        branch: 'master'    # optional - default: 'master'
       }
     }
 
-    # Create a file in the repository.
+    # Delete a file from the repository.
     # Returns sha of commit that did a change
     Gitlab::Git::Wrapper.new('path/to/repository.git').remove_file(options)
 
@@ -194,7 +193,6 @@ In case it's needed to update https://gitlab.com/gitlab-org/gitlab-git-test with
       file: {
         previous_path: 'documents/old_story.txt'
         path: 'documents/story.txt'
-        content: 'Lorem ipsum...' # Supply +content+ if you want to change the file content
       },
       author: {
         email: 'user@example.com',
@@ -207,15 +205,16 @@ In case it's needed to update https://gitlab.com/gitlab-org/gitlab-git-test with
         time: Time.now    # optional - default: Time.now
       },
       commit: {
-        message: 'Wow such commit',
-        branch: 'master',    # optional - default: 'master'
-        update_ref: false    # optional - default: true
+        message: 'Rename FILENAME',
+        branch: 'master'    # optional - default: 'master'
       }
     }
 
-    # Create a file in the repository.
+    # Rename a file in the repository. This does not change the file content.
     # Returns sha of commit that did a change
     Gitlab::Git::Wrapper.new('path/to/repository.git').rename_file(options)
+
+
 
     options = {
       author: {
@@ -235,9 +234,51 @@ In case it's needed to update https://gitlab.com/gitlab-org/gitlab-git-test with
       }
     }
 
-    # Create a file in the repository.
+    # Create a directory (via .gitkeep) in the repository.
     # Returns sha of commit that did a change
     Gitlab::Git::Wrapper.new('path/to/repository.git').mkdir(path, options)
+
+
+
+    options = {
+      files: {
+        [{content: 'Lorem ipsum...',
+          path: 'documents/story.txt',
+          action: :create},
+         {content: 'New Lorem ipsum...',
+          path: 'documents/old_story',
+          previus_path: 'documents/really_old_story.txt', # optional - moves the file from +previous_path+ to +path+ if this is given
+          action: :update},
+         {path: 'documents/obsolet_story.txt',
+          action: :remove},
+         {path: 'documents/old_story',
+          previus_path: 'documents/really_old_story.txt',
+          action: :rename},
+         {path: 'documents/secret',
+          action: :mkdir}
+        ]
+        }
+      },
+      author: {
+        email: 'user@example.com',
+        name: 'Test User',
+        time: Time.now    # optional - default: Time.now
+      },
+      committer: {
+        email: 'user@example.com',
+        name: 'Test User',
+        time: Time.now    # optional - default: Time.now
+      },
+      commit: {
+        message: 'Wow such commit',
+        branch: 'master',    # optional - default: 'master'
+        update_ref: false    # optional - default: true
+      }
+    }
+
+    # Apply multiple file changes to the repository
+    # Returns sha of commit that did a change
+    Gitlab::Git::Wrapper.new('path/to/repository.git').commit_multichange(options)
 
 
 ### Commit

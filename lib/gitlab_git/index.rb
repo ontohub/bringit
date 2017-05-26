@@ -69,6 +69,10 @@ module Gitlab
           raise Gitlab::Git::Repository::InvalidBlobName.new("File doesn't exist")
         end
 
+        if get(options[:file_path])
+          raise IndexError, "A file with this name already exists"
+        end
+
         raw_index.remove(options[:previous_path])
 
         add_blob(options, mode: file_entry[:mode])

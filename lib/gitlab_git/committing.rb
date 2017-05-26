@@ -20,7 +20,7 @@ module Gitlab
 
       # Create a file in repository and return commit sha
       #
-      # options should contain next structure:
+      # options should contain the following structure:
       #   file: {
       #     content: 'Lorem ipsum...',
       #     path: 'documents/story.txt'
@@ -41,17 +41,16 @@ module Gitlab
       #     update_ref: false    # optional - default: true
       #   }
       def create_file(options, previous_head_sha = nil)
-        commit_with(options, previous_head_sha) do |index_options|
-          Gitlab::Git::Index.new(gitlab).create(index_options)
-        end
+        commit_multichange(convert_options(options, :create), previous_head_sha)
       end
 
-      # Commit (add or update) file in repository and return commit sha
+      # Change (contents and path of) file in repository and return commit sha
       #
-      # options should contain next structure:
+      # options should contain the following structure:
       #   file: {
       #     content: 'Lorem ipsum...',
-      #     path: 'documents/story.txt'
+      #     path: 'documents/story.txt',
+      #     previous_path: 'documents/old_story.txt' # optional - used for renaming while updating
       #   },
       #   author: {
       #     email: 'user@example.com',
@@ -69,17 +68,12 @@ module Gitlab
       #     update_ref: false    # optional - default: true
       #   }
       def update_file(options, previous_head_sha = nil)
-        previous_path = options[:file].delete(:previous_path)
-        action = previous_path && previous_path != path ? :move : :update
-
-        commit_with(options, previous_head_sha) do |index_options|
-          Gitlab::Git::Index.new(gitlab).send(action, index_options)
-        end
+        commit_multichange(convert_options(options, :update), previous_head_sha)
       end
 
       # Remove file from repository and return commit sha
       #
-      # options should contain next structure:
+      # options should contain the following structure:
       #   file: {
       #     path: 'documents/story.txt'
       #   },
@@ -98,18 +92,16 @@ module Gitlab
       #     branch: 'master'    # optional - default: 'master'
       #   }
       def remove_file(options, previous_head_sha = nil)
-        commit_with(options, previous_head_sha) do |index_options|
-          Gitlab::Git::Index.new(gitlab).delete(index_options)
-        end
+        commit_multichange(convert_options(options, :remove), previous_head_sha)
       end
 
       # Rename file from repository and return commit sha
+      # This does not change the file content.
       #
-      # options should contain next structure:
+      # options should contain the following structure:
       #   file: {
       #     previous_path: 'documents/old_story.txt'
       #     path: 'documents/story.txt'
-      #     content: 'Lorem ipsum...'
       #   },
       #   author: {
       #     email: 'user@example.com',
@@ -127,15 +119,13 @@ module Gitlab
       #   }
       #
       def rename_file(options, previous_head_sha = nil)
-        commit_with(options, previous_head_sha) do |index_options|
-          Gitlab::Git::Index.new(gitlab).move(index_options)
-        end
+        commit_multichange(convert_options(options, :rename), previous_head_sha)
       end
 
       # Create a new directory with a .gitkeep file. Creates
       # all required nested directories (i.e. mkdir -p behavior)
       #
-      # options should contain next structure:
+      # options should contain the following structure:
       #   author: {
       #     email: 'user@example.com',
       #     name: 'Test User',
@@ -152,23 +142,97 @@ module Gitlab
       #     update_ref: false    # optional - default: true
       #   }
       def mkdir(path, options, previous_head_sha = nil)
-        options[:file][:path] = path
-        insert_defaults(options)
-        commit_with(options, previous_head_sha) do |index_options|
-          Gitlab::Git::Index.new(gitlab).create_dir(index_options)
+        options[:file] = {path: path}
+        commit_multichange(convert_options(options, :mkdir), previous_head_sha)
+      end
+
+      # Apply multiple file changes to the repository
+      #
+      # options should contain the following structure:
+      #   files: {
+      #     [{content: 'Lorem ipsum...',
+      #       path: 'documents/story.txt',
+      #       action: :create},
+      #      {content: 'New Lorem ipsum...',
+      #       path: 'documents/old_story',
+      #       previus_path: 'documents/really_old_story.txt', # optional - moves the file from +previous_path+ to +path+ if this is given
+      #       action: :update},
+      #      {path: 'documents/obsolet_story.txt',
+      #       action: :remove},
+      #      {path: 'documents/old_story',
+      #       previus_path: 'documents/really_old_story.txt',
+      #       action: :rename},
+      #      {path: 'documents/secret',
+      #       action: :mkdir}
+      #     ]
+      #     }
+      #   },
+      #   author: {
+      #     email: 'user@example.com',
+      #     name: 'Test User',
+      #     time: Time.now    # optional - default: Time.now
+      #   },
+      #   committer: {
+      #     email: 'user@example.com',
+      #     name: 'Test User',
+      #     time: Time.now    # optional - default: Time.now
+      #   },
+      #   commit: {
+      #     message: 'Wow such commit',
+      #     branch: 'master',    # optional - default: 'master'
+      #     update_ref: false    # optional - default: true
+      #   }
+      def commit_multichange(options, previous_head_sha = nil)
+        commit_with(options, previous_head_sha) do |index|
+          options[:files].each do |file|
+            file_options = {}
+            file_options[:file_path] = file[:path] if file[:path]
+            file_options[:content] = file[:content] if file[:content]
+            file_options[:encoding] = file[:encoding] if file[:encoding]
+            case file[:action]
+            when :create
+              index.create(file_options)
+            when :rename
+              file_options[:previous_path] = file[:previous_path]
+              file_options[:content] ||=
+                blob(options[:commit][:branch], file[:previous_path]).data
+              index.move(file_options)
+            when :update
+              previous_path = file[:previous_path]
+              if previous_path && previous_path != path
+                file_options[:previous_path] = previous_path
+                index.move(file_options)
+              else
+                index.update(file_options)
+              end
+            when :remove
+              index.delete(file_options)
+            when :mkdir
+              index.create_dir(file_options)
+            end
+          end
         end
       end
 
       protected
 
-      # TODO: Instead of comparing the HEAD with the previous commit_sha, actually
-      # try merging and only raise if there is a conflict. Add the merge conflict
-      # to the Error.
+      # TODO: Instead of comparing the HEAD with the previous commit_sha,
+      # actually try merging and only raise if there is a conflict. Add the
+      # merge conflict to the Error.
       # See issue https://github.com/ontohub/ontohub-backend/issues/97.
       def prevent_overwriting_previous_changes(options, previous_head_sha)
         return unless conflict?(options, previous_head_sha)
         raise HeadChangedError.new('The branch has changed since editing.',
                                    options)
+      end
+
+      # Converts the options from a single change commit to a multi change
+      # commit.
+      def convert_options(options, action)
+        converted = options.dup
+        converted.delete(:file)
+        converted[:files] = [options[:file].merge(action: action)]
+        converted
       end
 
       def conflict?(options, previous_head_sha)
@@ -217,15 +281,7 @@ module Gitlab
           parents = [last_commit]
         end
 
-        file = options[:file]
-        index_options = {}
-        index_options[:file_path] = file[:path] if file[:path]
-        index_options[:content] = file[:content] if file[:content]
-        index_options[:encoding] = file[:encoding] if file[:encoding]
-        if file[:previous_path]
-          index_options[:previous_path] = file[:previous_path]
-        end
-        yield(index_options)
+        yield(index)
 
         opts = {}
         opts[:tree] = index.write_tree
