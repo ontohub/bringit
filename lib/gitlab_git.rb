@@ -34,6 +34,10 @@ require_relative "gitlab_git/tag"
 require_relative "gitlab_git/util"
 require_relative "gitlab_git/attributes"
 require_relative "gitlab_git/version_info"
+require_relative "gitlab_git/committing"
+require_relative "gitlab_git/cloning"
+require_relative "gitlab_git/pulling"
+require_relative "gitlab_git/wrapper"
 
 module Gitlab
   module Git

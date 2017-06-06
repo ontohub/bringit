@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Gitlab::Git, lib: true do
-  let(:committer_email) { FFaker::Internet.email }
+  let(:committer_email) { Faker::Internet.email }
 
   # I have to remove periods from the end of the name
   # This happened when the user's name had a suffix (i.e. "Sr.")
@@ -15,7 +15,7 @@ describe Gitlab::Git, lib: true do
   # ...
   # Author: Foo Sr <foo@example.com>
   # ...
-  let(:committer_name) { FFaker::Name.name.chomp("\.") }
+  let(:committer_name) { Faker::Name.name.chomp("\.") }
 
   describe 'committer_hash' do
     it "returns a hash containing the given email and name" do

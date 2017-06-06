@@ -109,32 +109,176 @@ In case it's needed to update https://gitlab.com/gitlab-org/gitlab-git-test with
     raw_blob.size
     raw_blob.data
 
-#### Commiting blob
+#### Committing a blob
 
     options = {
-       file: {
-         content: 'Lorem ipsum...',
-         path: 'documents/story.txt'
-       },
-       author: {
-         email: 'user@example.com',
-         name: 'Test User',
-         time: Time.now
-       },
-       committer: {
-         email: 'user@example.com',
-         name: 'Test User',
-         time: Time.now
-       },
-       commit: {
-         message: 'Wow such commit',
-         branch: 'master'
-       }
+      file: {
+        content: 'Lorem ipsum...',
+        path: 'documents/story.txt'
+      },
+      author: {
+        email: 'user@example.com',
+        name: 'Test User',
+        time: Time.now    # optional - default: Time.now
+      },
+      committer: {
+        email: 'user@example.com',
+        name: 'Test User',
+        time: Time.now    # optional - default: Time.now
+      },
+      commit: {
+        message: 'Wow such commit',
+        branch: 'master',    # optional - default: 'master'
+        update_ref: false    # optional - default: true
     }
 
-    # Create or update file in repository.
+    # Create a file in the repository.
     # Returns sha of commit that did a change
-    Gitlab::Git::Blob.commit(repository, commit_options)
+    Gitlab::Git::Wrapper.new('path/to/repository.git').create_file(options)
+
+
+    options = {
+      file: {
+        content: 'Lorem ipsum...',
+        path: 'documents/story.txt',
+        previous_path: 'documents/old_story.txt' # optional - used for renaming while updating
+      },
+      author: {
+        email: 'user@example.com',
+        name: 'Test User',
+        time: Time.now    # optional - default: Time.now
+      },
+      committer: {
+        email: 'user@example.com',
+        name: 'Test User',
+        time: Time.now    # optional - default: Time.now
+      },
+      commit: {
+        message: 'Wow such commit',
+        branch: 'master',    # optional - default: 'master'
+        update_ref: false    # optional - default: true
+      }
+    }
+
+    # Update a file in the repository.
+    # Returns sha of commit that did a change
+    Gitlab::Git::Wrapper.new('path/to/repository.git').update_file(options)
+
+
+    options = {
+      file: {
+        path: 'documents/story.txt'
+      },
+      author: {
+        email: 'user@example.com',
+        name: 'Test User',
+        time: Time.now    # optional - default: Time.now
+      },
+      committer: {
+        email: 'user@example.com',
+        name: 'Test User',
+        time: Time.now    # optional - default: Time.now
+      },
+      commit: {
+        message: 'Remove FILENAME',
+        branch: 'master'    # optional - default: 'master'
+      }
+    }
+
+    # Delete a file from the repository.
+    # Returns sha of commit that did a change
+    Gitlab::Git::Wrapper.new('path/to/repository.git').remove_file(options)
+
+    options = {
+      file: {
+        previous_path: 'documents/old_story.txt'
+        path: 'documents/story.txt'
+      },
+      author: {
+        email: 'user@example.com',
+        name: 'Test User',
+        time: Time.now    # optional - default: Time.now
+      },
+      committer: {
+        email: 'user@example.com',
+        name: 'Test User',
+        time: Time.now    # optional - default: Time.now
+      },
+      commit: {
+        message: 'Rename FILENAME',
+        branch: 'master'    # optional - default: 'master'
+      }
+    }
+
+    # Rename a file in the repository. This does not change the file content.
+    # Returns sha of commit that did a change
+    Gitlab::Git::Wrapper.new('path/to/repository.git').rename_file(options)
+
+
+
+    options = {
+      author: {
+        email: 'user@example.com',
+        name: 'Test User',
+        time: Time.now    # optional - default: Time.now
+      },
+      committer: {
+        email: 'user@example.com',
+        name: 'Test User',
+        time: Time.now    # optional - default: Time.now
+      },
+      commit: {
+        message: 'Wow such commit',
+        branch: 'master',    # optional - default: 'master'
+        update_ref: false    # optional - default: true
+      }
+    }
+
+    # Create a directory (via .gitkeep) in the repository.
+    # Returns sha of commit that did a change
+    Gitlab::Git::Wrapper.new('path/to/repository.git').mkdir(path, options)
+
+
+
+    options = {
+      files: {
+        [{content: 'Lorem ipsum...',
+          path: 'documents/story.txt',
+          action: :create},
+         {content: 'New Lorem ipsum...',
+          path: 'documents/old_story',
+          previus_path: 'documents/really_old_story.txt', # optional - moves the file from +previous_path+ to +path+ if this is given
+          action: :update},
+         {path: 'documents/obsolet_story.txt',
+          action: :remove},
+         {path: 'documents/old_story',
+          previus_path: 'documents/really_old_story.txt',
+          action: :rename},
+         {path: 'documents/secret',
+          action: :mkdir}
+        ]
+        }
+      },
+      author: {
+        email: 'user@example.com',
+        name: 'Test User',
+        time: Time.now    # optional - default: Time.now
+      },
+      committer: {
+        email: 'user@example.com',
+        name: 'Test User',
+        time: Time.now    # optional - default: Time.now
+      },
+      commit: {
+        message: 'Wow such commit',
+        branch: 'master',    # optional - default: 'master'
+        update_ref: false    # optional - default: true
+      }
+    }
+
+    # Apply multiple file changes to the repository
+    # Returns sha of commit that did a change
+    Gitlab::Git::Wrapper.new('path/to/repository.git').commit_multichange(options)
 
 
 ### Commit
@@ -239,3 +383,17 @@ Allows you to get difference (commits, diffs) between two SHA/branch/tag:
 
     compare.diffs
     # [ <Gitlab::Git::Diff:0x000..>, <Gitlab::Git::Diff:0x000..>]
+
+### Clone
+
+Allows you to clone a remote git or svn repository.
+Note that `git` must be in the `PATH` and that `git-svn` must be installed if svn functionality is needed.
+
+    Gitlab::Git::Wrapper.clone(path, remote_address)
+
+### Pull
+
+Allows you to pull from a remote git or svn repository.
+Note that `git` must be in the `PATH` and that `git-svn` must be installed if svn functionality is needed.
+
+    Gitlab::Git::Wrapper.new(path).pull

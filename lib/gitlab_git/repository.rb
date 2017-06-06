@@ -242,7 +242,7 @@ module Gitlab
 
       # Return repo size in megabytes
       def size
-        size = popen(%w(du -sk), path).first.strip.to_i
+        size = Gitlab::Git::Popen.popen(%w(du -sk), path).first.strip.to_i
         (size.to_f / 1024).round(2)
       end
 
@@ -320,7 +320,7 @@ module Gitlab
       def log_by_walk(sha, options)
         walk_options = {
           show: sha,
-          sort: Rugged::SORT_DATE,
+          sort: Rugged::SORT_TOPO,
           limit: options[:limit],
           offset: options[:offset]
         }
@@ -382,7 +382,7 @@ module Gitlab
       # a detailed list of valid arguments.
       def commits_between(from, to)
         walker = Rugged::Walker.new(rugged)
-        walker.sorting(Rugged::SORT_DATE | Rugged::SORT_REVERSE)
+        walker.sorting(Rugged::SORT_TOPO | Rugged::SORT_REVERSE)
 
         sha_from = sha_from_ref(from)
         sha_to = sha_from_ref(to)
