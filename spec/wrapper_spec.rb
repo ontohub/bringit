@@ -435,4 +435,150 @@ RSpec.describe(Gitlab::Git::Wrapper) do
       expect(subject.ls_files(branch)).to match_array(filepaths)
     end
   end
+
+  context 'diff' do
+    let(:num_setup_commits) { 6 }
+    let!(:file_range) { (0 .. num_setup_commits - 1) }
+    let!(:old_files) { file_range.map { generate(:filepath) } }
+    let!(:old_contents) { file_range.map { generate(:content) } }
+    let!(:setup_commits) do
+      file_range.map do |i|
+        subject.create_file(create(:git_commit_info,
+                                   filepath: old_files[i],
+                                   content: old_contents[i],
+                                   branch: branch))
+      end
+    end
+    let!(:new_files) { file_range.map { generate(:filepath) } }
+    let!(:new_contents) { file_range.map { generate(:content) } }
+    let(:commit_info_files) do
+      [{path: new_files[0],
+        content: new_contents[0],
+        action: :create},
+
+       {path: new_files[1],
+        previous_path: old_files[1],
+        action: :rename},
+
+       {path: old_files[2],
+        content: new_contents[2],
+        action: :update},
+
+       {path: new_files[3],
+        content: new_contents[3],
+        previous_path: old_files[3],
+        action: :update},
+
+       {path: old_files[4],
+        action: :remove},
+
+       {path: new_files[5],
+        action: :mkdir}]
+    end
+
+    before do
+      info = create(:git_commit_info, branch: branch)
+      info.delete(:file)
+      info[:files] = commit_info_files
+      subject.commit_multichange(info)
+    end
+
+    context 'diff' do
+      context 'without paths' do
+        let(:diffs) { subject.diff(setup_commits.first, setup_commits.last) }
+
+        it 'is of the correct class' do
+          expect(diffs).to be_a(Gitlab::Git::DiffCollection)
+        end
+
+        it 'has elements of the correct class' do
+          expect(diffs.first).to be_a(Gitlab::Git::Diff)
+        end
+
+        it 'has the correct number of diffs (changed files)' do
+          expect(diffs.count).to eq(setup_commits.size - 1)
+        end
+      end
+
+      context 'with paths' do
+        context 'from root' do
+          let(:diffs) do
+            subject.diff(nil, setup_commits.last, {}, *(old_files[0..3]))
+          end
+
+          it 'is of the correct class' do
+            expect(diffs).to be_a(Gitlab::Git::DiffCollection)
+          end
+
+          it 'has elements of the correct class' do
+            expect(diffs.first).to be_a(Gitlab::Git::Diff)
+          end
+
+          it 'has the correct number of diffs (changed files)' do
+            # The first file is not in the diff, because that one is not changed
+            # in this range.  The other three files are in the diff.
+            expect(diffs.count).to eq(4)
+          end
+        end
+
+        context 'from a commit' do
+          let(:diffs) do
+            subject.diff(setup_commits.first, setup_commits.last, {},
+                         *(old_files[0..3]))
+          end
+
+          it 'is of the correct class' do
+            expect(diffs).to be_a(Gitlab::Git::DiffCollection)
+          end
+
+          it 'has elements of the correct class' do
+            expect(diffs.first).to be_a(Gitlab::Git::Diff)
+          end
+
+          it 'has the correct number of diffs (changed files)' do
+            # The first file is not in the diff, because that one is not changed
+            # in this range.  The other three files are in the diff.
+            expect(diffs.count).to eq(3)
+          end
+        end
+      end
+    end
+
+    context 'diff_from_parent' do
+      context 'without a ref' do
+        let(:diffs) { subject.diff_from_parent }
+
+        it 'is of the correct class' do
+          expect(diffs).to be_a(Gitlab::Git::DiffCollection)
+        end
+
+        it 'has elements of the correct class' do
+          expect(diffs.first).to be_a(Gitlab::Git::Diff)
+        end
+
+        it 'has the correct number of diffs (changed files)' do
+          # one additional diff because the update/rename combination is
+          # recognized as delete + create due to a too large content change.
+          expect(diffs.count).to eq(commit_info_files.size + 1)
+        end
+      end
+
+      context 'with a ref' do
+        let(:ref) { "#{subject.default_branch}~1" }
+        let(:diffs) { subject.diff_from_parent(ref) }
+
+        it 'is of the correct class' do
+          expect(diffs).to be_a(Gitlab::Git::DiffCollection)
+        end
+
+        it 'has elements of the correct class' do
+          expect(diffs.first).to be_a(Gitlab::Git::Diff)
+        end
+
+        it 'has the correct number of diffs (changed files)' do
+          expect(diffs.count).to eq(1)
+        end
+      end
+    end
+  end
 end
