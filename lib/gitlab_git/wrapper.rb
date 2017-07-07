@@ -12,8 +12,8 @@ module Gitlab
 
       attr_reader :gitlab
       delegate :bare?, :branches, :branch_count, :branch_exists?, :branch_names,
-               :commit_count, :find_commits, :empty?, :log, :ls_files, :rugged,
-               to: :gitlab
+               :commit_count, :diff, :find_commits, :empty?, :log, :ls_files,
+               :rugged, to: :gitlab
 
       def self.create(path)
         raise Error, "Path #{path} already exists." if Pathname.new(path).exist?
@@ -77,6 +77,10 @@ module Gitlab
       # Create a branch with name +name+ at the reference +ref+.
       def create_branch(name, ref)
         gitlab.create_branch(name, ref)
+      end
+
+      def diff_from_parent(ref = default_branch, options = {})
+        Commit.find(gitlab, ref).diffs(options)
       end
     end
   end
