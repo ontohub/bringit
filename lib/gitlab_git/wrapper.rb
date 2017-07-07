@@ -78,6 +78,10 @@ module Gitlab
       def create_branch(name, ref)
         gitlab.create_branch(name, ref)
       end
+
+      def diff_from_parent(ref = default_branch, options = {})
+        Commit.find(gitlab, ref).diffs(options)
+      end
     end
   end
 end
