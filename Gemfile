@@ -10,11 +10,11 @@ end
 
 group :test do
   gem 'factory_girl', '~> 4.8.0'
-  gem 'faker', '~> 1.7.3'
+  gem 'faker', '~> 1.8.4'
   gem 'simplecov', require: false
 end
 
 group :development, :test do
-  gem 'bundler-audit', '~> 0.5.0', require: false
+  gem 'bundler-audit', '~> 0.6.0', require: false
   gem "appraisal"
 end
