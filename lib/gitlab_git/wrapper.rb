@@ -9,11 +9,12 @@ module Gitlab
       include ::Gitlab::Git::Pulling
 
       class ::Gitlab::Git::Error < ::StandardError; end
+      class ::Gitlab::Git::InvalidRefName < ::Gitlab::Git::Error; end
 
       attr_reader :gitlab
       delegate :bare?, :branches, :branch_count, :branch_exists?, :branch_names,
                :commit_count, :diff, :find_commits, :empty?, :log, :ls_files,
-               :rugged, to: :gitlab
+               :rugged, :tag_names, :tags, to: :gitlab
 
       def self.create(path)
         raise Error, "Path #{path} already exists." if Pathname.new(path).exist?
@@ -77,6 +78,31 @@ module Gitlab
       # Create a branch with name +name+ at the reference +ref+.
       def create_branch(name, ref)
         gitlab.create_branch(name, ref)
+      end
+
+      # If +annotation+ is not +nil+, it will cause the creation of an
+      # annotated tag object.  +annotation+ has to contain the following key
+      # value pairs:
+      # :tagger ::
+      #   An optional Hash containing a git signature. Defaults to the signature
+      #   from the configuration if only `:message` is given. Will cause the
+      #   creation of an annotated tag object if present.
+      # :message ::
+      #   An optional string containing the message for the new tag.
+      def create_tag(name, revision, annotation = nil)
+        raise ::Gitlab::Git::InvalidRefName unless Ref.name_valid?(name)
+        rugged.tags.create(name, revision, annotation)
+        find_tag(name)
+      rescue Rugged::TagError => error
+        raise Gitlab::Git::Repository::InvalidRef, error.message
+      end
+
+      def find_tag(name)
+        Gitlab::Git::Tag.find(self, name)
+      end
+
+      def rm_tag(name)
+        rugged.tags.delete(name) if find_tag(name)
       end
 
       def diff_from_parent(ref = default_branch, options = {})
