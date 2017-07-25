@@ -76,8 +76,16 @@ module Gitlab
       end
 
       # Create a branch with name +name+ at the reference +ref+.
-      def create_branch(name, ref)
-        gitlab.create_branch(name, ref)
+      def create_branch(name, revision)
+        gitlab.create_branch(name, revision)
+      end
+
+      def find_branch(name)
+        Gitlab::Git::Branch.find(self, name)
+      end
+
+      def rm_branch(name)
+        rugged.branches.delete(name) if find_branch(name)
       end
 
       # If +annotation+ is not +nil+, it will cause the creation of an

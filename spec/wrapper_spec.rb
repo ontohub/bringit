@@ -384,7 +384,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
     end
   end
 
-  context 'create_branch' do
+  context 'branches' do
     let!(:sha1) do
       subject.create_file(FactoryGirl.create(:git_commit_info, branch: branch))
     end
@@ -393,32 +393,104 @@ RSpec.describe(Gitlab::Git::Wrapper) do
       subject.create_file(FactoryGirl.create(:git_commit_info, branch: branch))
     end
 
-    let(:new_branch) { 'new_branch' }
+    let(:name) { 'new_branch' }
 
-    RSpec.shared_examples 'a valid branch' do
-      it 'points to the correct sha' do
-        expect(subject.branch_sha(new_branch)).to eq(sha)
+    context 'create_branch' do
+      RSpec.shared_examples 'a valid branch' do
+        it 'points to the correct sha' do
+          expect(subject.branch_sha(name)).to eq(sha)
+        end
+      end
+
+      context 'by sha' do
+        before { subject.create_branch(name, sha1) }
+        it_behaves_like 'a valid branch' do
+          let(:sha) { sha1 }
+        end
+      end
+
+      context 'by branch' do
+        before { subject.create_branch(name, branch) }
+        it_behaves_like 'a valid branch' do
+          let(:sha) { subject.branch_sha(branch) }
+        end
+      end
+
+      context 'by revision' do
+        before { subject.create_branch(name, "#{branch}~1") }
+        it_behaves_like 'a valid branch' do
+          let(:sha) { sha1 }
+        end
+      end
+
+      context 'duplicate' do
+        before do
+          subject.create_branch(name, sha2)
+        end
+
+        it 'fails' do
+          expect { subject.create_branch(name, sha2) }.
+            to raise_error(Gitlab::Git::Repository::InvalidRef,
+                           'Branch new_branch already exists')
+        end
+
+        it 'has the correct number of branches' do
+          # master and `name`
+          expect(subject.branches.size).to eq(2)
+        end
       end
     end
 
-    context 'by sha' do
-      before { subject.create_branch(new_branch, sha1) }
-      it_behaves_like 'a valid branch' do
-        let(:sha) { sha1 }
+    context 'find_branch' do
+      before do
+        subject.create_branch("pre_#{name}", sha1)
+        subject.create_branch(name, sha2)
+      end
+
+      let(:base_branch) { Gitlab::Git::Branch.find(subject, name) }
+      let(:found_branch) { subject.find_branch(name) }
+
+      it 'points to the correct commit' do
+        expect(found_branch.dereferenced_target.sha).
+          to eq(base_branch.dereferenced_target.sha)
+      end
+
+      it 'has the correct name' do
+        expect(found_branch.name).to eq(base_branch.name)
       end
     end
 
-    context 'by branch' do
-      before { subject.create_branch(new_branch, branch) }
-      it_behaves_like 'a valid branch' do
-        let(:sha) { subject.branch_sha(branch) }
+    context 'rm_branch' do
+      before do
+        subject.create_branch("pre_#{name}", sha1)
+        subject.create_branch(name, sha2)
       end
-    end
 
-    context 'by branch-backtrace' do
-      before { subject.create_branch(new_branch, "#{branch}~1") }
-      it_behaves_like 'a valid branch' do
-        let(:sha) { sha1 }
+      context 'with an existing branch' do
+        before { subject.rm_branch(name) }
+
+        it 'the deleted branch cannot be found' do
+          expect(Gitlab::Git::Branch.find(subject, name)).to be(nil)
+        end
+
+        it 'the other tag can still be found' do
+          expect(Gitlab::Git::Branch.find(subject, "pre_#{name}")).
+            not_to be(nil)
+        end
+
+        it 'reduces the number of branches' do
+          # master and `name`
+          expect(subject.branches.size).to eq(2)
+        end
+      end
+
+      context 'with an inexistant branch' do
+        before { subject.rm_branch('inexistant.') }
+
+        it 'does not reduce the number of branches' do
+          # master, pre_`name` and `name`
+          expect(subject.branches.size).to eq(3)
+        end
       end
     end
   end
