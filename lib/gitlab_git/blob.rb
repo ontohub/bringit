@@ -10,6 +10,7 @@ module Gitlab
       # blob data should use load_all_data!.
       MAX_DATA_DISPLAY_SIZE = 10485760
 
+      attr_reader :repository
       attr_accessor :name, :path, :size, :data, :mode, :id, :commit_id, :loaded_size, :binary
 
       class << self
@@ -22,12 +23,12 @@ module Gitlab
           return nil unless blob_entry
 
           if blob_entry[:type] == :commit
-            submodule_blob(blob_entry, path, sha)
+            submodule_blob(repository, blob_entry, path, sha)
           else
             blob = repository.lookup(blob_entry[:oid])
 
             if blob
-              new(
+              new(repository,
                 id: blob.oid,
                 name: blob_entry[:name],
                 size: blob.size,
@@ -44,7 +45,7 @@ module Gitlab
         def raw(repository, sha)
           blob = repository.lookup(sha)
 
-          new(
+          new(repository,
             id: blob.oid,
             size: blob.size,
             data: blob.content(MAX_DATA_DISPLAY_SIZE),
@@ -84,8 +85,8 @@ module Gitlab
           end
         end
 
-        def submodule_blob(blob_entry, path, sha)
-          new(
+        def submodule_blob(repository, blob_entry, path, sha)
+          new(repository,
             id: blob_entry[:oid],
             name: blob_entry[:name],
             data: '',
@@ -95,7 +96,8 @@ module Gitlab
         end
       end
 
-      def initialize(options)
+      def initialize(repository, options)
+        @repository = repository
         %w(id name path size data mode commit_id binary).each do |key|
           self.send("#{key}=", options[key.to_sym])
         end
@@ -119,7 +121,7 @@ module Gitlab
 
       # Load all blob data (not just the first MAX_DATA_DISPLAY_SIZE bytes) into
       # memory as a Ruby string.
-      def load_all_data!(repository)
+      def load_all_data!
         return if @data == '' # don't mess with submodule blobs
         return @data if @loaded_all_data
 

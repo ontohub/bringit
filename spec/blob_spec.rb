@@ -6,7 +6,7 @@ describe Gitlab::Git::Blob, seed_helper: true do
   let(:repository) { Gitlab::Git::Repository.new(TEST_REPO_PATH) }
 
   describe :initialize do
-    let(:blob) { Gitlab::Git::Blob.new(name: 'test') }
+    let(:blob) { Gitlab::Git::Blob.new(repository, name: 'test') }
 
     it 'handles nil data' do
       expect(blob.name).to eq('test')
@@ -66,7 +66,7 @@ describe Gitlab::Git::Blob, seed_helper: true do
       it { expect(blob.data).to eq('') }
 
       it 'does not get messed up by load_all_data!' do
-        blob.load_all_data!(repository)
+        blob.load_all_data!
         expect(blob.data).to eq('')
       end
 
@@ -87,13 +87,13 @@ describe Gitlab::Git::Blob, seed_helper: true do
       end
 
       it 'can load all data' do
-        blob.load_all_data!(repository)
+        blob.load_all_data!
         expect(blob.data.length).to eq(blob_size)
       end
 
       it 'marks the blob as binary' do
         expect(Gitlab::Git::Blob).to receive(:new).
-          with(hash_including(binary: true)).
+          with(repository, hash_including(binary: true)).
           and_call_original
 
         expect(blob).to be_binary
@@ -120,7 +120,7 @@ describe Gitlab::Git::Blob, seed_helper: true do
         expect(blob.data.length).to eq(Gitlab::Git::Blob::MAX_DATA_DISPLAY_SIZE)
         expect(blob.truncated?).to be_truthy
 
-        blob.load_all_data!(repository)
+        blob.load_all_data!
         expect(blob.loaded_size).to eq(blob_size)
       end
     end

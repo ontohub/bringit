@@ -261,7 +261,7 @@ module Gitlab
           # Skip binary files
           next if blob.data.encoding == Encoding::ASCII_8BIT
 
-          blob.load_all_data!(self)
+          blob.load_all_data!
           greps += build_greps(blob.data, query, ref, entry[:path])
         end
 
