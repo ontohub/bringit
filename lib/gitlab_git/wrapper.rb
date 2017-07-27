@@ -77,6 +77,7 @@ module Gitlab
 
       # Create a branch with name +name+ at the reference +ref+.
       def create_branch(name, revision)
+        raise_invalid_name_error(name) unless Ref.name_valid?(name)
         gitlab.create_branch(name, revision)
       end
 
@@ -98,7 +99,7 @@ module Gitlab
       # :message ::
       #   An optional string containing the message for the new tag.
       def create_tag(name, revision, annotation = nil)
-        raise ::Gitlab::Git::InvalidRefName unless Ref.name_valid?(name)
+        raise_invalid_name_error(name) unless Ref.name_valid?(name)
         rugged.tags.create(name, revision, annotation)
         find_tag(name)
       rescue Rugged::TagError => error
@@ -115,6 +116,14 @@ module Gitlab
 
       def diff_from_parent(ref = default_branch, options = {})
         Commit.find(gitlab, ref).diffs(options)
+      end
+
+      protected
+
+      def raise_invalid_name_error(name)
+        url = 'https://git-scm.com/docs/git-check-ref-format'
+        raise ::Gitlab::Git::InvalidRefName,
+          %(Name "#{name}" is invalid. See #{url} for a valid format.)
       end
     end
   end

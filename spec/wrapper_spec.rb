@@ -423,6 +423,22 @@ RSpec.describe(Gitlab::Git::Wrapper) do
         end
       end
 
+      context 'invalid name' do
+        it 'fails' do
+          expect { subject.create_branch("#{name}.", branch) }.
+            to raise_error(Gitlab::Git::InvalidRefName)
+        end
+
+        it 'has the correct number of branches' do
+          expect do
+            begin
+              subject.create_branch("#{name}.", branch)
+            rescue Gitlab::Git::InvalidRefName
+            end
+          end.not_to(change { subject.branches.size })
+        end
+      end
+
       context 'duplicate' do
         before do
           subject.create_branch(name, sha2)
