@@ -467,7 +467,7 @@ module Gitlab
         offset = actual_options[:skip]
         limit = actual_options[:max_count]
         walker.each(offset: offset, limit: limit) do |commit|
-          gitlab_commit = Gitlab::Git::Commit.decorate(commit)
+          gitlab_commit = Gitlab::Git::Commit.decorate(commit, self)
           commits.push(gitlab_commit)
         end
 

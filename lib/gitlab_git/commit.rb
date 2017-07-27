@@ -4,6 +4,7 @@ module Gitlab
     class Commit
       include Gitlab::Git::EncodingHelper
 
+      attr_reader :repository
       attr_accessor :raw_commit, :head, :refs
 
       SERIALIZE_KEYS = [
@@ -44,7 +45,7 @@ module Gitlab
           repo = options.delete(:repo)
           raise 'Gitlab::Git::Repository is required' unless repo.respond_to?(:log)
 
-          repo.log(options).map { |c| decorate(c) }
+          repo.log(options).map { |c| decorate(c, repo) }
         end
 
         # Get single commit
@@ -55,7 +56,7 @@ module Gitlab
         #   Commit.find(repo, 'master')
         #
         def find(repo, commit_id = "HEAD")
-          return decorate(commit_id) if commit_id.is_a?(Rugged::Commit)
+          return decorate(commit_id, repo) if commit_id.is_a?(Rugged::Commit)
 
           obj = if commit_id.is_a?(String)
                   repo.rev_parse_target(commit_id)
@@ -65,7 +66,7 @@ module Gitlab
 
           return nil unless obj.is_a?(Rugged::Commit)
 
-          decorate(obj)
+          decorate(obj, repo)
         rescue Rugged::ReferenceError, Rugged::InvalidError, Rugged::ObjectError, Gitlab::Git::Repository::NoRepository
           nil
         end
@@ -103,7 +104,7 @@ module Gitlab
         #
         def between(repo, base, head)
           repo.commits_between(base, head).map do |commit|
-            decorate(commit)
+            decorate(commit, repo)
           end
         rescue Rugged::ReferenceError
           []
@@ -114,8 +115,8 @@ module Gitlab
           repo.find_commits(options)
         end
 
-        def decorate(commit, ref = nil)
-          Gitlab::Git::Commit.new(commit, ref)
+        def decorate(commit, repository, ref = nil)
+          Gitlab::Git::Commit.new(commit, repository, ref)
         end
 
         # Returns a diff object for the changes introduced by +rugged_commit+.
@@ -138,7 +139,7 @@ module Gitlab
         end
       end
 
-      def initialize(raw_commit, head = nil)
+      def initialize(raw_commit, repository = nil, head = nil)
         raise "Nil as raw commit passed" unless raw_commit
 
         if raw_commit.is_a?(Hash)
@@ -149,6 +150,7 @@ module Gitlab
           raise "Invalid raw commit type: #{raw_commit.class}"
         end
 
+        @repository = repository
         @head = head
       end
 
@@ -217,7 +219,7 @@ module Gitlab
       end
 
       def parents
-        raw_commit.parents.map { |c| Gitlab::Git::Commit.new(c) }
+        raw_commit.parents.map { |c| Gitlab::Git::Commit.new(c, repository) }
       end
 
       def stats
@@ -237,19 +239,19 @@ module Gitlab
       # Get a collection of Rugged::Reference objects for this commit.
       #
       # Ex.
-      #   commit.ref(repo)
+      #   commit.ref
       #
-      def refs(repo)
-        repo.refs_hash[id]
+      def refs
+        repository.refs_hash[id]
       end
 
       # Get ref names collection
       #
       # Ex.
-      #   commit.ref_names(repo)
+      #   commit.ref_names
       #
-      def ref_names(repo)
-        refs(repo).map do |ref|
+      def ref_names
+        repository.refs_hash[id].map do |ref|
           ref.name.sub(%r{^refs/(heads|remotes|tags)/}, "")
         end
       end

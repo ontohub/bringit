@@ -24,7 +24,8 @@ describe Gitlab::Git::Commit, seed_helper: true do
       }
 
       @parents = [repo.head.target]
-      @gitlab_parents = @parents.map { |c| Gitlab::Git::Commit.decorate(c) }
+      @gitlab_parents =
+        @parents.map { |c| Gitlab::Git::Commit.decorate(c, repo) }
       @tree = @parents.first.tree
 
       sha = Rugged::Commit.create(
@@ -38,7 +39,7 @@ describe Gitlab::Git::Commit, seed_helper: true do
       )
 
       @raw_commit = repo.lookup(sha)
-      @commit = Gitlab::Git::Commit.new(@raw_commit)
+      @commit = Gitlab::Git::Commit.new(@raw_commit, repo)
     end
 
     it { expect(@commit.short_id).to eq(@raw_commit.oid[0..10]) }
@@ -305,7 +306,7 @@ describe Gitlab::Git::Commit, seed_helper: true do
   end
 
   describe :init_from_rugged do
-    let(:gitlab_commit) { Gitlab::Git::Commit.new(rugged_commit) }
+    let(:gitlab_commit) { Gitlab::Git::Commit.new(rugged_commit, repository) }
     subject { gitlab_commit }
 
     describe '#id' do
@@ -315,7 +316,7 @@ describe Gitlab::Git::Commit, seed_helper: true do
   end
 
   describe :init_from_hash do
-    let(:commit) { Gitlab::Git::Commit.new(sample_commit_hash) }
+    let(:commit) { Gitlab::Git::Commit.new(sample_commit_hash, repository) }
     subject { commit }
 
     describe '#id' do
@@ -383,7 +384,7 @@ describe Gitlab::Git::Commit, seed_helper: true do
 
   describe :ref_names do
     let(:commit) { Gitlab::Git::Commit.find(repository, 'master') }
-    subject { commit.ref_names(repository) }
+    subject { commit.ref_names }
 
     it 'has 1 element' do
       expect(subject.size).to eq(1)
