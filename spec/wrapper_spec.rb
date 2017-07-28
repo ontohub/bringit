@@ -455,6 +455,15 @@ RSpec.describe(Gitlab::Git::Wrapper) do
           expect(subject.branches.size).to eq(2)
         end
       end
+
+      context 'bad revision' do
+        let(:revision) { '0' * 40 }
+        it 'fails' do
+          expect { subject.create_branch(name, revision) }.
+            to raise_error(Rugged::OdbError,
+                           /object not found - no match for id/)
+        end
+      end
     end
 
     context 'find_branch' do
@@ -606,6 +615,15 @@ RSpec.describe(Gitlab::Git::Wrapper) do
 
         it 'has the correct number of tags' do
           expect(subject.tags.size).to eq(1)
+        end
+      end
+
+      context 'bad revision' do
+        let(:revision) { '0' * 40 }
+        it 'fails' do
+          expect { subject.create_tag(name, revision) }.
+            to raise_error(Rugged::OdbError,
+                           /object not found - no match for id/)
         end
       end
 
