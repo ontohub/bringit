@@ -601,7 +601,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
         it 'fails' do
           expect { subject.create_tag(name, branch) }.
             to raise_error(Gitlab::Git::Repository::InvalidRef,
-                           'tag already exists')
+                           'Tag already exists')
         end
 
         it 'has the correct number of tags' do
