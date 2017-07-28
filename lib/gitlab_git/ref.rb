@@ -4,8 +4,9 @@ module Gitlab
       include Gitlab::Git::EncodingHelper
 
       def self.name_valid?(name)
-        return false if name.start_with?('refs/heads/')
-        return false if name.start_with?('refs/remotes/')
+        if name.start_with?('refs/heads/') || name.start_with?('refs/remotes/')
+          return false
+        end
 
         Popen.popen(%W(git check-ref-format refs/#{name})).last == 0
       end

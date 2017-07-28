@@ -461,7 +461,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
         it 'fails' do
           expect { subject.create_branch(name, revision) }.
             to raise_error(Rugged::OdbError,
-                           /object not found - no match for id/)
+                           /object not found - no match for id/i)
         end
       end
     end
@@ -623,7 +623,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
         it 'fails' do
           expect { subject.create_tag(name, revision) }.
             to raise_error(Rugged::OdbError,
-                           /object not found - no match for id/)
+                           /object not found - no match for id/i)
         end
       end
 
