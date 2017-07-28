@@ -21,5 +21,41 @@ describe Gitlab::Git::Tag, seed_helper: true do
     it { expect(tag.message).to eq("Version 1.2.1") }
   end
 
+  describe 'find' do
+    RSpec.shared_examples 'the correctly found tag' do
+      it 'points to the correct commit' do
+        expect(found_tag.dereferenced_target.id).
+          to eq(base_tag.dereferenced_target.id)
+      end
+
+      it 'has the correct name' do
+        expect(found_tag.name).to eq(base_tag.name)
+      end
+
+      it 'has the correct message' do
+        expect(found_tag.message).to eq(base_tag.message)
+      end
+    end
+
+    context 'finds the first tag' do
+      let(:base_tag) { repository.tags.first }
+      let(:found_tag) { Gitlab::Git::Tag.find(repository, base_tag.name) }
+      it_behaves_like 'the correctly found tag'
+    end
+
+    context 'finds the last tag' do
+      let(:base_tag) { repository.tags.last }
+      let(:found_tag) { Gitlab::Git::Tag.find(repository, base_tag.name) }
+      it_behaves_like 'the correctly found tag'
+    end
+
+    it 'returns nil on a non-existant tag' do
+      # This name cannot be a tag. See
+      # https://git-scm.com/docs/git-check-ref-format:
+      # 7. They cannot end with a dot `.`.
+      expect(Gitlab::Git::Tag.find(repository, 'non existant tag.')).to be(nil)
+    end
+  end
+
   it { expect(repository.tags.size).to eq(SeedRepo::Repo::TAGS.size) }
 end

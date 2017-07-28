@@ -3,6 +3,10 @@ module Gitlab
     class Tag < Ref
       attr_reader :object_sha
 
+      def self.find(repository, name)
+        repository.tags.find { |tag| tag.name == name }
+      end
+
       def initialize(repository, name, target, message = nil)
         super(repository, name, target)
 

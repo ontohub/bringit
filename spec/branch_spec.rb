@@ -27,5 +27,35 @@ describe Gitlab::Git::Branch, seed_helper: true do
     it { expect(branch.dereferenced_target.sha).to eq(SeedRepo::LastCommit::ID) }
   end
 
+  describe 'find' do
+    RSpec.shared_examples 'the correctly found branch' do
+      it 'points to the correct commit' do
+        expect(found_branch.dereferenced_target.sha).
+          to eq(base_branch.dereferenced_target.sha)
+      end
+
+      it 'has the correct name' do
+        expect(found_branch.name).to eq(base_branch.name)
+      end
+    end
+
+    context 'finds the first branch' do
+      let(:base_branch) { repository.branches.first }
+      let(:found_branch) { Gitlab::Git::Branch.find(repository, base_branch.name) }
+      it_behaves_like 'the correctly found branch'
+    end
+
+    context 'finds the last branch' do
+      let(:base_branch) { repository.branches.last }
+      let(:found_branch) { Gitlab::Git::Branch.find(repository, base_branch.name) }
+      it_behaves_like 'the correctly found branch'
+    end
+
+    it 'returns nil on a non-existant branch' do
+      expect(Gitlab::Git::Branch.find(repository, 'non existant branch.')).
+        to be(nil)
+    end
+  end
+
   it { expect(repository.branches.size).to eq(SeedRepo::Repo::BRANCHES.size) }
 end

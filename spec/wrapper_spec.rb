@@ -384,7 +384,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
     end
   end
 
-  context 'create_branch' do
+  context 'branches' do
     let!(:sha1) do
       subject.create_file(FactoryGirl.create(:git_commit_info, branch: branch))
     end
@@ -393,32 +393,311 @@ RSpec.describe(Gitlab::Git::Wrapper) do
       subject.create_file(FactoryGirl.create(:git_commit_info, branch: branch))
     end
 
-    let(:new_branch) { 'new_branch' }
+    let(:name) { 'new_branch' }
 
-    RSpec.shared_examples 'a valid branch' do
-      it 'points to the correct sha' do
-        expect(subject.branch_sha(new_branch)).to eq(sha)
+    context 'create_branch' do
+      RSpec.shared_examples 'a valid branch' do
+        it 'points to the correct sha' do
+          expect(subject.branch_sha(name)).to eq(sha)
+        end
+      end
+
+      context 'by sha' do
+        before { subject.create_branch(name, sha1) }
+        it_behaves_like 'a valid branch' do
+          let(:sha) { sha1 }
+        end
+      end
+
+      context 'by branch' do
+        before { subject.create_branch(name, branch) }
+        it_behaves_like 'a valid branch' do
+          let(:sha) { subject.branch_sha(branch) }
+        end
+      end
+
+      context 'by revision' do
+        before { subject.create_branch(name, "#{branch}~1") }
+        it_behaves_like 'a valid branch' do
+          let(:sha) { sha1 }
+        end
+      end
+
+      context 'invalid name' do
+        it 'fails' do
+          expect { subject.create_branch("#{name}.", branch) }.
+            to raise_error(Gitlab::Git::InvalidRefName)
+        end
+
+        it 'has the correct number of branches' do
+          expect do
+            begin
+              subject.create_branch("#{name}.", branch)
+            rescue Gitlab::Git::InvalidRefName
+            end
+          end.not_to(change { subject.branches.size })
+        end
+      end
+
+      context 'duplicate' do
+        before do
+          subject.create_branch(name, sha2)
+        end
+
+        it 'fails' do
+          expect { subject.create_branch(name, sha2) }.
+            to raise_error(Gitlab::Git::Repository::InvalidRef,
+                           'Branch new_branch already exists')
+        end
+
+        it 'has the correct number of branches' do
+          # master and `name`
+          expect(subject.branches.size).to eq(2)
+        end
+      end
+
+      context 'bad revision' do
+        let(:revision) { '0' * 40 }
+        it 'fails' do
+          expect { subject.create_branch(name, revision) }.
+            to raise_error(Rugged::OdbError,
+                           /object not found - no match for id/i)
+        end
       end
     end
 
-    context 'by sha' do
-      before { subject.create_branch(new_branch, sha1) }
-      it_behaves_like 'a valid branch' do
-        let(:sha) { sha1 }
+    context 'find_branch' do
+      before do
+        subject.create_branch("pre_#{name}", sha1)
+        subject.create_branch(name, sha2)
+      end
+
+      let(:base_branch) { Gitlab::Git::Branch.find(subject, name) }
+      let(:found_branch) { subject.find_branch(name) }
+
+      it 'points to the correct commit' do
+        expect(found_branch.dereferenced_target.sha).
+          to eq(base_branch.dereferenced_target.sha)
+      end
+
+      it 'has the correct name' do
+        expect(found_branch.name).to eq(base_branch.name)
       end
     end
 
-    context 'by branch' do
-      before { subject.create_branch(new_branch, branch) }
-      it_behaves_like 'a valid branch' do
-        let(:sha) { subject.branch_sha(branch) }
+    context 'rm_branch' do
+      before do
+        subject.create_branch("pre_#{name}", sha1)
+        subject.create_branch(name, sha2)
+      end
+
+      context 'with an existing branch' do
+        before { subject.rm_branch(name) }
+
+        it 'the deleted branch cannot be found' do
+          expect(Gitlab::Git::Branch.find(subject, name)).to be(nil)
+        end
+
+        it 'the other tag can still be found' do
+          expect(Gitlab::Git::Branch.find(subject, "pre_#{name}")).
+            not_to be(nil)
+        end
+
+        it 'reduces the number of branches' do
+          # master and `name`
+          expect(subject.branches.size).to eq(2)
+        end
+      end
+
+      context 'with an inexistant branch' do
+        before { subject.rm_branch('inexistant.') }
+
+        it 'does not reduce the number of branches' do
+          # master, pre_`name` and `name`
+          expect(subject.branches.size).to eq(3)
+        end
+      end
+    end
+  end
+
+  context 'tags' do
+    let!(:sha1) do
+      subject.create_file(FactoryGirl.create(:git_commit_info, branch: branch))
+    end
+
+    let!(:sha2) do
+      subject.create_file(FactoryGirl.create(:git_commit_info, branch: branch))
+    end
+
+    let(:name) { 'new_tag' }
+
+    context 'create_tag' do
+      let(:created_tag) do
+        subject.tags.select { |tag| tag.name == name }.first
+      end
+
+      RSpec.shared_examples 'a valid tag' do
+        it 'points to the correct sha' do
+          expect(created_tag.dereferenced_target.id).to eq(sha)
+        end
+
+        it 'has the correct name' do
+          expect(created_tag.name).to eq(name)
+        end
+      end
+
+      context 'by sha' do
+        before { subject.create_tag(name, sha1) }
+
+        it_behaves_like 'a valid tag' do
+          let(:sha) { sha1 }
+        end
+
+        it 'is not annotated' do
+          expect(created_tag.message).to be(nil)
+        end
+
+        it 'has the correct number of tags' do
+          expect(subject.tags.size).to eq(1)
+        end
+      end
+
+      context 'by branch' do
+        before { subject.create_tag(name, branch) }
+
+        it_behaves_like 'a valid tag' do
+          let(:sha) { sha2 }
+        end
+
+        it 'has the correct number of tags' do
+          expect(subject.tags.size).to eq(1)
+        end
+      end
+
+      context 'by rev' do
+        before { subject.create_tag(name, "#{branch}~1") }
+
+        it_behaves_like 'a valid tag' do
+          let(:sha) { sha1 }
+        end
+
+        it 'has the correct number of tags' do
+          expect(subject.tags.size).to eq(1)
+        end
+      end
+
+      context 'invalid name' do
+        it 'fails' do
+          expect { subject.create_tag("#{name}.", branch) }.
+            to raise_error(Gitlab::Git::InvalidRefName)
+        end
+
+        it 'has the correct number of tags' do
+          expect do
+            begin
+              subject.create_tag("#{name}.", branch)
+            rescue Gitlab::Git::InvalidRefName
+            end
+          end.not_to(change { subject.tags.size })
+        end
+      end
+
+      context 'duplicate' do
+        before do
+          subject.create_tag(name, branch)
+        end
+
+        it 'fails' do
+          expect { subject.create_tag(name, branch) }.
+            to raise_error(Gitlab::Git::Repository::InvalidRef,
+                           'Tag already exists')
+        end
+
+        it 'has the correct number of tags' do
+          expect(subject.tags.size).to eq(1)
+        end
+      end
+
+      context 'bad revision' do
+        let(:revision) { '0' * 40 }
+        it 'fails' do
+          expect { subject.create_tag(name, revision) }.
+            to raise_error(Rugged::OdbError,
+                           /object not found - no match for id/i)
+        end
+      end
+
+      context 'with message' do
+        let(:message) { "test tag message\nwith many\nlines\n" }
+        let(:tagger) do
+          FactoryGirl.create(:git_commit_info)[:author]
+        end
+        before do
+          subject.create_tag(name, branch, {message: message, tagger: tagger})
+        end
+
+        it_behaves_like 'a valid tag' do
+          let(:sha) { subject.branch_sha(branch) }
+        end
+
+        it 'has an annotation' do
+          expect(created_tag.message).to eq(message.strip)
+        end
       end
     end
 
-    context 'by branch-backtrace' do
-      before { subject.create_branch(new_branch, "#{branch}~1") }
-      it_behaves_like 'a valid branch' do
-        let(:sha) { sha1 }
+    context 'find_tag' do
+      before do
+        subject.create_tag("pre_#{name}", sha1)
+        subject.create_tag(name, sha2)
+      end
+
+      let(:base_tag) { Gitlab::Git::Tag.find(subject, name) }
+      let(:found_tag) { subject.find_tag(name) }
+
+      it 'points to the correct commit' do
+        expect(found_tag.dereferenced_target.id).
+          to eq(base_tag.dereferenced_target.id)
+      end
+
+      it 'has the correct name' do
+        expect(found_tag.name).to eq(base_tag.name)
+      end
+
+      it 'has the correct message' do
+        expect(found_tag.message).to eq(base_tag.message)
+      end
+    end
+
+    context 'rm_tag' do
+      before do
+        subject.create_tag("pre_#{name}", sha1)
+        subject.create_tag(name, sha2)
+      end
+
+      context 'with an existing tag' do
+        before { subject.rm_tag(name) }
+
+        it 'the deleted tag cannot be found' do
+          expect(Gitlab::Git::Tag.find(subject, name)).to be(nil)
+        end
+
+        it 'the other tag can still be found' do
+          expect(Gitlab::Git::Tag.find(subject, "pre_#{name}")).
+            not_to be(nil)
+        end
+
+        it 'reduces the number of tags' do
+          expect(subject.tags.size).to eq(1)
+        end
+      end
+
+      context 'with an inexistant tag' do
+        before { subject.rm_tag('inexistant.') }
+
+        it 'does not reduce the number of tags' do
+          expect(subject.tags.size).to eq(2)
+        end
       end
     end
   end

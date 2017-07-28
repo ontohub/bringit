@@ -3,6 +3,15 @@ module Gitlab
     class Ref
       include Gitlab::Git::EncodingHelper
 
+      def self.name_valid?(name)
+        if name.start_with?('refs/heads/') || name.start_with?('refs/remotes/')
+          return false
+        end
+
+        Popen.popen(%W(git check-ref-format refs/#{name})).last == 0
+      end
+
+
       # Branch or tag name
       # without "refs/tags|heads" prefix
       attr_reader :name
