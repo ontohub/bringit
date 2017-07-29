@@ -1206,6 +1206,7 @@ module Gitlab
         actual_options = Gitlab::Git::Diff.filter_diff_options(options.merge(paths: paths))
 
         diff = rugged.diff(from, to, actual_options)
+        return [] if diff.nil?
         diff.find_similar!(break_rewrites: break_rewrites)
         diff.each_patch
       end
