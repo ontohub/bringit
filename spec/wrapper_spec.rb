@@ -447,7 +447,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
         it 'fails' do
           expect { subject.create_branch(name, sha2) }.
             to raise_error(Gitlab::Git::Repository::InvalidRef,
-                           'Branch new_branch already exists')
+                           /branch new_branch already exists/i)
         end
 
         it 'has the correct number of branches' do
@@ -610,7 +610,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
         it 'fails' do
           expect { subject.create_tag(name, branch) }.
             to raise_error(Gitlab::Git::Repository::InvalidRef,
-                           'Tag already exists')
+                           /tag already exists/i)
         end
 
         it 'has the correct number of tags' do
@@ -760,6 +760,34 @@ RSpec.describe(Gitlab::Git::Wrapper) do
       info.delete(:file)
       info[:files] = commit_info_files
       subject.commit_multichange(info)
+    end
+
+    context 'with nil revisions' do
+      it "is empty if both revisions are nil" do
+        expect(subject.diff(nil, nil)).to be_empty
+      end
+
+      it "has all but the last commit if the 'from' argument is nil" do
+        expect(subject.diff(nil, setup_commits.last).map(&:new_path)).
+          to match_array(old_files)
+      end
+
+      it "only has the first commit if the 'to' argument is nil" do
+        expect(subject.diff(setup_commits.first, nil).map(&:new_path)).
+          to match_array(old_files[0])
+      end
+    end
+
+    context 'with bad revisions' do
+      it "raises an error if the 'from' argument is bad" do
+        expect { subject.diff('0' * 40, setup_commits.last) }.
+          to raise_error(Rugged::ReferenceError)
+      end
+
+      it "raises an error if the 'to' argument is bad" do
+        expect { subject.diff(setup_commits.first, '0' * 40) }.
+          to raise_error(Rugged::ReferenceError)
+      end
     end
 
     context 'diff' do
