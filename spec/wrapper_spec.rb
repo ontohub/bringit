@@ -447,7 +447,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
         it 'fails' do
           expect { subject.create_branch(name, sha2) }.
             to raise_error(Gitlab::Git::Repository::InvalidRef,
-                           'Branch new_branch already exists')
+                           /branch new_branch already exists/i)
         end
 
         it 'has the correct number of branches' do
@@ -610,7 +610,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
         it 'fails' do
           expect { subject.create_tag(name, branch) }.
             to raise_error(Gitlab::Git::Repository::InvalidRef,
-                           'Tag already exists')
+                           /tag already exists/i)
         end
 
         it 'has the correct number of tags' do
