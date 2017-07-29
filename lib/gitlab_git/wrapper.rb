@@ -13,7 +13,7 @@ module Gitlab
 
       attr_reader :gitlab
       delegate :bare?, :branches, :branch_count, :branch_exists?, :branch_names,
-               :commit_count, :diff, :find_commits, :empty?, :log, :ls_files,
+               :commit_count, :diff, :find_commits, :empty?, :ls_files,
                :rugged, :tag_names, :tags, to: :gitlab
 
       def self.create(path)
@@ -116,6 +116,12 @@ module Gitlab
 
       def diff_from_parent(ref = default_branch, options = {})
         Commit.find(gitlab, ref).diffs(options)
+      end
+
+      def log(*args)
+        gitlab.log(*args).map do |commit|
+          Gitlab::Git::Commit.new(commit, gitlab)
+        end
       end
 
       protected

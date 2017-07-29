@@ -338,7 +338,7 @@ module Gitlab
         limit += offset if offset_in_ruby
 
         cmd = %W[git --git-dir=#{path} log]
-        cmd << "--max-count=#{limit}"
+        cmd << "--max-count=#{limit}" if limit > 0
         cmd << '--format=%H'
         cmd << "--skip=#{offset}" unless offset_in_ruby
         cmd << '--follow' if use_follow_flag
