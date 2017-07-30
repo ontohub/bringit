@@ -393,6 +393,54 @@ describe Gitlab::Git::Commit, seed_helper: true do
     it { is_expected.not_to include("feature") }
   end
 
+  describe :references do
+    let(:commit) { Gitlab::Git::Commit.find(repository, 'master') }
+    before do
+      repository.rugged.tags.create('tag_with_annotation', commit.id,
+                                    message: 'my tag message',
+                                    tagger: {name: commit.author_name,
+                                             email: commit.author_email,
+                                             date: Time.now})
+      repository.rugged.tags.create('tag_without_annotation', commit.id)
+    end
+
+    after do
+      repository.rugged.tags.delete('tag_with_annotation')
+      repository.rugged.tags.delete('tag_without_annotation')
+    end
+
+    subject { commit.references }
+
+    it 'has 3 elements' do
+      expect(subject.size).to eq(3)
+    end
+
+    it 'the tag with the annotation has the correct annotation' do
+      expect(subject.find { |r| r.name == 'tag_with_annotation' }.message).
+        to eq('my tag message')
+    end
+
+    it 'the tag with the annotation is a tag' do
+      expect(subject.find { |r| r.name == 'tag_with_annotation' }).
+        to be_a(Gitlab::Git::Tag)
+    end
+
+    it 'the tag without the annotation has the correct annotation' do
+      expect(subject.find { |r| r.name == 'tag_without_annotation' }.message).
+        to be(nil)
+    end
+
+    it 'the tag without the annotation is a tag' do
+      expect(subject.find { |r| r.name == 'tag_without_annotation' }).
+        to be_a(Gitlab::Git::Tag)
+    end
+
+    it 'the branch is a branch' do
+      expect(subject.find { |r| r.name == 'master' }).
+        to be_a(Gitlab::Git::Branch)
+    end
+  end
+
   def sample_commit_hash
     {
       author_email: "dmitriy.zaporozhets@gmail.com",

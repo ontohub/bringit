@@ -245,6 +245,29 @@ module Gitlab
         repository.refs_hash[id]
       end
 
+      # Get a collection of Gitlab::Git::Ref (its subclasses) objects
+      def references
+        refs.map do |ref|
+          if ref.name.match(%r{\Arefs/heads/})
+            Gitlab::Git::Branch.new(repository, ref.name, ref.target)
+          elsif ref.name.match(%r{\Arefs/tags/})
+            message = nil
+
+            if ref.target.is_a?(Rugged::Tag::Annotation)
+              tag_message = ref.target.message
+
+              if tag_message.respond_to?(:chomp)
+                message = tag_message.chomp
+              end
+            end
+
+            Gitlab::Git::Tag.new(self, ref.name, ref.target, message)
+          else
+            Gitlab::Git::Ref.new(repository, ref.name, ref.target)
+          end
+        end
+      end
+
       # Get ref names collection
       #
       # Ex.
