@@ -888,4 +888,24 @@ RSpec.describe(Gitlab::Git::Wrapper) do
       end
     end
   end
+
+  context 'log' do
+    let(:num_setup_commits) { 6 }
+    let!(:file_range) { (0 .. num_setup_commits - 1) }
+    let!(:old_files) { file_range.map { generate(:filepath) } }
+    let!(:old_contents) { file_range.map { generate(:content) } }
+    let!(:setup_commits) do
+      file_range.map do |i|
+        subject.create_file(create(:git_commit_info,
+                                   filepath: old_files[i],
+                                   content: old_contents[i],
+                                   branch: branch))
+      end
+    end
+
+    it 'contains objects of the correct class' do
+      expect(subject.log(ref: branch).map(&:class).uniq).
+        to eq([Gitlab::Git::Commit])
+    end
+  end
 end

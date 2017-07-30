@@ -45,7 +45,7 @@ RSpec.describe(Gitlab::Git::Committing) do
           end
 
           it 'creates the correct number of commits on that file' do
-            expect(subject.log(ref: branch, path: filepath).map(&:oid)).
+            expect(subject.log(ref: branch, path: filepath).map(&:id)).
               to eq([sha])
           end
 
@@ -75,7 +75,7 @@ RSpec.describe(Gitlab::Git::Committing) do
           end
 
           it 'creates the correct number of commits on that file' do
-            expect(subject.log(ref: branch, path: filepath).map(&:oid)).
+            expect(subject.log(ref: branch, path: filepath).map(&:id)).
               to eq([sha2, sha1])
           end
 
@@ -109,7 +109,7 @@ RSpec.describe(Gitlab::Git::Committing) do
           end
 
           it 'creates the correct number of commits on that file' do
-            expect(subject.log(ref: branch, path: filepath2).map(&:oid)).
+            expect(subject.log(ref: branch, path: filepath2).map(&:id)).
               to eq([sha2])
           end
 
@@ -149,7 +149,7 @@ RSpec.describe(Gitlab::Git::Committing) do
           end
 
           it 'creates the correct number of commits on that file' do
-            expect(subject.log(ref: branch, path: filepath2).map(&:oid)).
+            expect(subject.log(ref: branch, path: filepath2).map(&:id)).
               to eq([sha2])
           end
 
@@ -179,7 +179,7 @@ RSpec.describe(Gitlab::Git::Committing) do
           end
 
           it 'creates the correct number of commits on that file' do
-            expect(subject.log(ref: branch, path: filepath).map(&:oid)).
+            expect(subject.log(ref: branch, path: filepath).map(&:id)).
               to eq([sha2, sha1])
           end
 
@@ -305,7 +305,7 @@ RSpec.describe(Gitlab::Git::Committing) do
           end
 
           it 'only adds one log entry' do
-            expect(subject.log(ref: "#{branch}~").first.oid).
+            expect(subject.log(ref: "#{branch}~").first.id).
               to eq(setup_commits.last)
           end
         end
