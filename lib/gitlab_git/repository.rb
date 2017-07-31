@@ -346,7 +346,9 @@ module Gitlab
         cmd << "--after=#{options[:after].iso8601}" if options[:after]
         cmd << "--before=#{options[:before].iso8601}" if options[:before]
         cmd << sha
-        cmd += %W[-- #{options[:path]}] if options[:path].present?
+        if options[:path].present?
+          cmd += %W[-- #{options[:path].sub(%r{\A/*}, '')}]
+        end
 
         raw_output = IO.popen(cmd) { |io| io.read }
         lines = offset_in_ruby ? raw_output.lines.drop(offset) : raw_output.lines
@@ -1202,6 +1204,7 @@ module Gitlab
       # Return the Rugged patches for the diff between +from+ and +to+.
       def diff_patches(from, to, options = {}, *paths)
         options ||= {}
+        paths = paths.map { |p| p.sub(%r{\A/}, '') }
         break_rewrites = options[:break_rewrites]
         actual_options = Gitlab::Git::Diff.filter_diff_options(options.merge(paths: paths))
 

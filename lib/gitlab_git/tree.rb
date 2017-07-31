@@ -11,6 +11,7 @@ module Gitlab
         # for repository based on commit sha and path
         # Uses rugged for raw objects
         def where(repository, sha, path = nil)
+          path = path&.sub(%r{\A/*}, '')
           path = nil if path == '' || path == '/'
 
           commit = repository.lookup(sha)
@@ -53,6 +54,7 @@ module Gitlab
         #
         def find_id_by_path(repository, root_id, path)
           root_tree = repository.lookup(root_id)
+          path = path.sub(%r{\A/*}, '')
           path_arr = path.split('/')
 
           entry = root_tree.find do |entry|
