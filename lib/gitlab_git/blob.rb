@@ -15,6 +15,7 @@ module Gitlab
 
       class << self
         def find(repository, sha, path)
+          path = path&.sub(%r{\A/*}, '')
           commit = repository.lookup(sha)
           root_tree = commit.tree
 
@@ -67,7 +68,7 @@ module Gitlab
         def find_entry_by_path(repository, root_id, path)
           root_tree = repository.lookup(root_id)
           # Strip leading slashes
-          path = path.sub(/^\/*/, '')
+          path = path.sub(%r{\A/*}, '')
           path_arr = path.split('/')
 
           entry = root_tree.find do |entry|
@@ -86,6 +87,7 @@ module Gitlab
         end
 
         def submodule_blob(repository, blob_entry, path, sha)
+          path = path&.sub(%r{\A/*}, '')
           new(repository,
             id: blob_entry[:oid],
             name: blob_entry[:name],
