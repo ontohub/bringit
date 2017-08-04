@@ -8,8 +8,6 @@ require 'factory_girl'
 require 'gitlab_git'
 require 'pry'
 
-Faker::Config.random = Random.new
-
 Dir[File.expand_path('../support/**/*.rb', __FILE__)].each { |f| require f }
 
 RSpec.configure do |config|
