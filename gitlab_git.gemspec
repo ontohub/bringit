@@ -1,13 +1,20 @@
+# frozen_string_literal: true
+
+$LOAD_PATH.push File.expand_path('../lib', __FILE__)
+
+# Maintain your gem's version:
+require 'gitlab_git/version'
+
 Gem::Specification.new do |s|
   s.name        = 'gitlab_git'
-  s.version     = `cat VERSION`
+  s.version     = Gitlab::Git::VERSION
   s.date        = Time.now.strftime("%Y-%m-%d")
   s.summary     = "Gitlab::Git library"
   s.description = "GitLab wrapper around git objects"
   s.authors     = ['Dmitriy Zaporozhets']
   s.email       = 'dmitriy.zaporozhets@gmail.com'
   s.license     = 'MIT'
-  s.files       = `git ls-files lib/`.split("\n") << 'VERSION'
+  s.files       = `git ls-files lib/`.split("\n")
   s.homepage    =
     'https://gitlab.com/gitlab-org/gitlab_git'
 
