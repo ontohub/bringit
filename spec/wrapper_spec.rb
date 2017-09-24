@@ -297,8 +297,8 @@ RSpec.describe(Gitlab::Git::Wrapper) do
 
   context 'default_branch' do
     context 'without branches' do
-      it 'is nil' do
-        expect(subject.default_branch).to be(nil)
+      it 'is master' do
+        expect(subject.default_branch).to eq('master')
       end
     end
 
