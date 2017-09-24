@@ -67,7 +67,7 @@ module Gitlab
       end
 
       def default_branch
-        gitlab.discover_default_branch
+        gitlab.discover_default_branch || 'master'
       end
 
       def default_branch=(name)
