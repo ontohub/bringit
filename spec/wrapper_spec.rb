@@ -907,5 +907,17 @@ RSpec.describe(Gitlab::Git::Wrapper) do
       expect(subject.log(ref: branch).map(&:class).uniq).
         to eq([Gitlab::Git::Commit])
     end
+
+    it 'allows to specify ranges' do
+      expect(subject.log(ref: "#{setup_commits[2]}..#{setup_commits[4]}",
+                         unsafe_range: true).map(&:id)).
+        to eq(setup_commits[3..4].reverse)
+    end
+
+    it 'allows to specify open ranges' do
+      expect(subject.log(ref: "#{setup_commits[2]}..",
+                         unsafe_range: true).map(&:id)).
+        to eq(setup_commits[3..-1].reverse)
+    end
   end
 end
