@@ -347,7 +347,7 @@ module Gitlab
         cmd << "--before=#{options[:before].iso8601}" if options[:before]
         cmd << sha
         if options[:path].present?
-          cmd += %W[-- #{options[:path].sub(%r{\A/*}, '')}]
+          cmd += %W[-- #{options[:path].sub(%r{\A/*}, './')}]
         end
 
         raw_output = IO.popen(cmd) { |io| io.read }
