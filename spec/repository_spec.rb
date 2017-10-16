@@ -733,22 +733,46 @@ describe Gitlab::Git::Repository, seed_helper: true do
 
       it { expect(commits_by_walk).to eq(commits_by_shell) }
 
-      context "with limit" do
-        let(:options) { { ref: "master", limit: 1 } }
+      context "without path" do
+        context "with limit" do
+          let(:options) { { ref: "master", limit: 1 } }
 
-        it { expect(commits_by_walk).to eq(commits_by_shell) }
+          it { expect(commits_by_walk).to eq(commits_by_shell) }
+        end
+
+        context "with offset" do
+          let(:options) { { ref: "master", offset: 1 } }
+
+          it { expect(commits_by_walk).to eq(commits_by_shell) }
+        end
+
+        context "with skip_merges" do
+          let(:options) { { ref: "master", skip_merges: true } }
+
+          it { expect(commits_by_walk).to eq(commits_by_shell) }
+        end
       end
 
-      context "with offset" do
-        let(:options) { { ref: "master", offset: 1 } }
+      context "with root path" do
+        let(:path) { "/" }
 
-        it { expect(commits_by_walk).to eq(commits_by_shell) }
-      end
+        context "with limit" do
+          let(:options) { { ref: "master", limit: 1, path: path } }
 
-      context "with skip_merges" do
-        let(:options) { { ref: "master", skip_merges: true } }
+          it { expect(commits_by_walk).to eq(commits_by_shell) }
+        end
 
-        it { expect(commits_by_walk).to eq(commits_by_shell) }
+        context "with offset" do
+          let(:options) { { ref: "master", offset: 1, path: path } }
+
+          it { expect(commits_by_walk).to eq(commits_by_shell) }
+        end
+
+        context "with skip_merges" do
+          let(:options) { { ref: "master", skip_merges: true, path: path } }
+
+          it { expect(commits_by_walk).to eq(commits_by_shell) }
+        end
       end
 
       context "with path" do
