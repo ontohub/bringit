@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
-  gem 'rspec', '~> 3.6.0'
+  gem 'rspec', '~> 3.7.0'
   gem 'pry'
   gem 'rake'
 end
