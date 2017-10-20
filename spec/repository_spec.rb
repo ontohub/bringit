@@ -726,6 +726,16 @@ describe Gitlab::Git::Repository, seed_helper: true do
       end
     end
 
+    context "only_commit_sha" do
+      let(:options) { { ref: "master", only_commit_sha: true } }
+      let(:commits_by_walk) { repository.log(options) }
+      let(:commits_by_shell) { repository.log(options.merge(disable_walk: true)) }
+
+      it { expect(commits_by_walk).to eq(commits_by_shell) }
+
+      it { expect(commits_by_walk.first).to match(/[a-z0-9]{40}/) }
+    end
+
     context "compare results between log_by_walk and log_by_shell" do
       let(:options) { { ref: "master" } }
       let(:commits_by_walk) { repository.log(options).map(&:oid) }

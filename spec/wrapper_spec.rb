@@ -903,6 +903,11 @@ RSpec.describe(Gitlab::Git::Wrapper) do
       end
     end
 
+    it 'contains objects of the correct class when given only_commit_sha' do
+      expect(subject.log(ref: branch, only_commit_sha: true).map(&:class).uniq).
+        to eq([String])
+    end
+
     it 'contains objects of the correct class' do
       expect(subject.log(ref: branch).map(&:class).uniq).
         to eq([Gitlab::Git::Commit])

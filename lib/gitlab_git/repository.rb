@@ -329,7 +329,12 @@ module Gitlab
           limit: options[:limit],
           offset: options[:offset]
         }
-        Rugged::Walker.walk(rugged, walk_options).to_a
+        commits = Rugged::Walker.walk(rugged, walk_options).to_a
+        if options[:only_commit_sha]
+          commits.map(&:oid)
+        else
+          commits
+        end
       end
 
       def log_by_shell(sha, options)
@@ -358,7 +363,11 @@ module Gitlab
         raw_output = IO.popen(cmd) { |io| io.read }
         lines = offset_in_ruby ? raw_output.lines.drop(offset) : raw_output.lines
 
-        lines.map! { |c| Rugged::Commit.new(rugged, c.strip) }
+        if options[:only_commit_sha]
+          lines.map(&:strip)
+        else
+          lines.map! { |c| Rugged::Commit.new(rugged, c.strip) }
+        end
       end
 
       def count_commits(options)
