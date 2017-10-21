@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe(Gitlab::Git::Wrapper) do
-  subject { FactoryGirl.create(:git) }
+  subject { FactoryBot.create(:git) }
   let(:branch) { 'master' }
   let(:invalid_sha) { '0' * 40 }
 
@@ -86,7 +86,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
     let(:filepath) { generate(:filepath) }
     let(:content) { 'some content' }
     let!(:sha) do
-      subject.create_file(FactoryGirl.create(:git_commit_info,
+      subject.create_file(FactoryBot.create(:git_commit_info,
                                              filepath: filepath,
                                              content: content,
                                              branch: branch))
@@ -132,13 +132,13 @@ RSpec.describe(Gitlab::Git::Wrapper) do
     let(:filepath2) { generate(:filepath) }
     let(:content) { 'some content' }
     let!(:sha1) do
-      subject.create_file(FactoryGirl.create(:git_commit_info,
+      subject.create_file(FactoryBot.create(:git_commit_info,
                                              filepath: filepath1,
                                              content: content,
                                              branch: branch))
     end
     let!(:sha2) do
-      subject.create_file(FactoryGirl.create(:git_commit_info,
+      subject.create_file(FactoryBot.create(:git_commit_info,
                                              filepath: filepath2,
                                              content: content,
                                              branch: branch))
@@ -198,7 +198,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
     let(:committer) { generate(:git_user) }
     let(:message) { generate(:commit_message) }
     let(:commit_info) do
-      commit_info = FactoryGirl.create(:git_commit_info,
+      commit_info = FactoryBot.create(:git_commit_info,
                                        filepath: filepath,
                                        content: content,
                                        branch: branch)
@@ -259,7 +259,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
   context 'path_exists?' do
     let(:filepath) { generate(:filepath) }
     let!(:sha) do
-      subject.create_file(FactoryGirl.create(:git_commit_info,
+      subject.create_file(FactoryBot.create(:git_commit_info,
                                              filepath: filepath,
                                              branch: branch))
     end
@@ -283,7 +283,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
 
   context 'branch_sha' do
     let!(:sha) do
-      subject.create_file(FactoryGirl.create(:git_commit_info, branch: branch))
+      subject.create_file(FactoryBot.create(:git_commit_info, branch: branch))
     end
 
     it 'is the correct sha if the branch exists' do
@@ -305,7 +305,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
     context 'with only one branch' do
       let(:default_branch) { 'main' }
       before do
-        commit_info = FactoryGirl.create(:git_commit_info)
+        commit_info = FactoryBot.create(:git_commit_info)
         commit_info[:commit][:branch] = default_branch
         subject.create_file(commit_info)
       end
@@ -320,13 +320,13 @@ RSpec.describe(Gitlab::Git::Wrapper) do
       let(:other_branch) { 'other' }
 
       before do
-        commit_info = FactoryGirl.create(:git_commit_info)
+        commit_info = FactoryBot.create(:git_commit_info)
         commit_info[:commit][:branch] = default_branch
         subject.create_file(commit_info)
 
         subject.create_branch(other_branch, default_branch)
 
-        commit_info = FactoryGirl.create(:git_commit_info)
+        commit_info = FactoryBot.create(:git_commit_info)
         commit_info[:commit][:branch] = other_branch
         subject.create_file(commit_info)
       end
@@ -350,20 +350,20 @@ RSpec.describe(Gitlab::Git::Wrapper) do
       let(:default_branch) { 'main' }
       let(:other_branch) { 'other' }
       before do
-        commit_info = FactoryGirl.create(:git_commit_info)
+        commit_info = FactoryBot.create(:git_commit_info)
         commit_info[:commit][:branch] = default_branch
         subject.create_file(commit_info)
 
         subject.create_branch(other_branch, default_branch)
 
-        commit_info = FactoryGirl.create(:git_commit_info)
+        commit_info = FactoryBot.create(:git_commit_info)
         commit_info[:commit][:branch] = other_branch
         subject.create_file(commit_info)
 
         master_branch = 'master'
         subject.create_branch(master_branch, default_branch)
 
-        commit_info = FactoryGirl.create(:git_commit_info)
+        commit_info = FactoryBot.create(:git_commit_info)
         commit_info[:commit][:branch] = master_branch
         subject.create_file(commit_info)
       end
@@ -386,11 +386,11 @@ RSpec.describe(Gitlab::Git::Wrapper) do
 
   context 'branches' do
     let!(:sha1) do
-      subject.create_file(FactoryGirl.create(:git_commit_info, branch: branch))
+      subject.create_file(FactoryBot.create(:git_commit_info, branch: branch))
     end
 
     let!(:sha2) do
-      subject.create_file(FactoryGirl.create(:git_commit_info, branch: branch))
+      subject.create_file(FactoryBot.create(:git_commit_info, branch: branch))
     end
 
     let(:name) { 'new_branch' }
@@ -522,11 +522,11 @@ RSpec.describe(Gitlab::Git::Wrapper) do
 
   context 'tags' do
     let!(:sha1) do
-      subject.create_file(FactoryGirl.create(:git_commit_info, branch: branch))
+      subject.create_file(FactoryBot.create(:git_commit_info, branch: branch))
     end
 
     let!(:sha2) do
-      subject.create_file(FactoryGirl.create(:git_commit_info, branch: branch))
+      subject.create_file(FactoryBot.create(:git_commit_info, branch: branch))
     end
 
     let(:name) { 'new_tag' }
@@ -630,7 +630,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
       context 'with message' do
         let(:message) { "test tag message\nwith many\nlines\n" }
         let(:tagger) do
-          FactoryGirl.create(:git_commit_info)[:author]
+          FactoryBot.create(:git_commit_info)[:author]
         end
         before do
           subject.create_tag(name, branch, {message: message, tagger: tagger})
@@ -706,7 +706,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
     let(:filepaths) { (1..5).map { generate(:filepath) } }
     before do
       filepaths.each do |filepath|
-        subject.create_file(FactoryGirl.create(:git_commit_info, filepath: filepath))
+        subject.create_file(FactoryBot.create(:git_commit_info, filepath: filepath))
       end
     end
 

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   sequence(:git_repository_path) do |n|
     File.join(Dir.pwd, 'git_repositories', n.to_s).to_s
   end
