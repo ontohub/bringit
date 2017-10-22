@@ -15,4 +15,4 @@ addons:
     - git-svn
 
 script:
-  - bundle exec rspec
+  - bundle exec rspec --format progress
