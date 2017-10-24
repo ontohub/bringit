@@ -7,6 +7,7 @@ require 'faker'
 require 'factory_bot'
 require 'gitlab_git'
 require 'pry'
+require 'fuubar'
 
 Dir[File.expand_path('../support/**/*.rb', __FILE__)].each { |f| require f }
 
@@ -22,4 +23,8 @@ RSpec.configure do |config|
   config.before(:suite) do
     FactoryBot.find_definitions
   end
+
+  config.fuubar_progress_bar_options = {format: '[%B] %c/%C',
+                                        progress_mark: '#',
+                                        remainder_mark: '-'}
 end
