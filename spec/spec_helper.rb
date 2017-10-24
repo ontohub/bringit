@@ -4,7 +4,7 @@ if RUBY_ENGINE == 'ruby' # not 'rbx'
 end
 
 require 'faker'
-require 'factory_girl'
+require 'factory_bot'
 require 'gitlab_git'
 require 'pry'
 
@@ -18,8 +18,8 @@ RSpec.configure do |config|
   config.before(:all) { ensure_seeds }
 
   # Allow to find all factories
-  config.include FactoryGirl::Syntax::Methods
+  config.include FactoryBot::Syntax::Methods
   config.before(:suite) do
-    FactoryGirl.find_definitions
+    FactoryBot.find_definitions
   end
 end

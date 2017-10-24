@@ -8,7 +8,7 @@ def exec_silently(cmd, working_directory = nil)
   # :nocov:
 end
 
-FactoryGirl.define do
+FactoryBot.define do
   sequence(:svn_repository_path_bare) do |n|
     File.join(Dir.pwd, 'svn_repositories_bare', n.to_s).to_s
   end

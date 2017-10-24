@@ -9,7 +9,7 @@ group :development do
 end
 
 group :test do
-  gem 'factory_girl', '~> 4.8.0'
+  gem 'factory_bot', '~> 4.8.2'
   gem 'faker', '~> 1.8.4'
   gem 'simplecov', require: false
 end
