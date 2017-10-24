@@ -118,8 +118,10 @@ module Gitlab
         Commit.find(gitlab, ref).diffs(options)
       end
 
-      def log(*args)
-        gitlab.log(*args).map do |commit|
+      def log(options)
+        result = gitlab.log(options)
+        return result if options[:only_commit_sha]
+        result.map do |commit|
           Gitlab::Git::Commit.new(commit, gitlab)
         end
       end

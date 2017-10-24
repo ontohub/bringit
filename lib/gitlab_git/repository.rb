@@ -288,24 +288,29 @@ module Gitlab
           skip_merges: false,
           disable_walk: false,
           after: nil,
-          before: nil
+          before: nil,
+          unsafe_range: false,
         }
 
         options = default_options.merge(options)
         options[:limit] ||= 0
         options[:offset] ||= 0
         actual_ref = options[:ref] || root_ref
-        begin
-          sha = sha_from_ref(actual_ref)
-        rescue Rugged::OdbError, Rugged::InvalidError, Rugged::ReferenceError
-          # Return an empty array if the ref wasn't found
-          return []
-        end
 
-        if log_using_shell?(options)
-          log_by_shell(sha, options)
+        if options[:unsafe_range]
+          log_by_shell(actual_ref, options)
         else
-          log_by_walk(sha, options)
+          begin
+            sha = sha_from_ref(actual_ref)
+          rescue Rugged::OdbError, Rugged::InvalidError, Rugged::ReferenceError
+            # Return an empty array if the ref wasn't found
+            return []
+          end
+          if log_using_shell?(options)
+            log_by_shell(sha, options)
+          else
+            log_by_walk(sha, options)
+          end
         end
       end
 
@@ -324,7 +329,12 @@ module Gitlab
           limit: options[:limit],
           offset: options[:offset]
         }
-        Rugged::Walker.walk(rugged, walk_options).to_a
+        commits = Rugged::Walker.walk(rugged, walk_options).to_a
+        if options[:only_commit_sha]
+          commits.map(&:oid)
+        else
+          commits
+        end
       end
 
       def log_by_shell(sha, options)
@@ -353,7 +363,11 @@ module Gitlab
         raw_output = IO.popen(cmd) { |io| io.read }
         lines = offset_in_ruby ? raw_output.lines.drop(offset) : raw_output.lines
 
-        lines.map! { |c| Rugged::Commit.new(rugged, c.strip) }
+        if options[:only_commit_sha]
+          lines.map(&:strip)
+        else
+          lines.map! { |c| Rugged::Commit.new(rugged, c.strip) }
+        end
       end
 
       def count_commits(options)

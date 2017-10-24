@@ -903,9 +903,26 @@ RSpec.describe(Gitlab::Git::Wrapper) do
       end
     end
 
+    it 'contains objects of the correct class when given only_commit_sha' do
+      expect(subject.log(ref: branch, only_commit_sha: true).map(&:class).uniq).
+        to eq([String])
+    end
+
     it 'contains objects of the correct class' do
       expect(subject.log(ref: branch).map(&:class).uniq).
         to eq([Gitlab::Git::Commit])
+    end
+
+    it 'allows to specify ranges' do
+      expect(subject.log(ref: "#{setup_commits[2]}..#{setup_commits[4]}",
+                         unsafe_range: true).map(&:id)).
+        to eq(setup_commits[3..4].reverse)
+    end
+
+    it 'allows to specify open ranges' do
+      expect(subject.log(ref: "#{setup_commits[2]}..",
+                         unsafe_range: true).map(&:id)).
+        to eq(setup_commits[3..-1].reverse)
     end
   end
 end
