@@ -746,7 +746,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
        {path: new_files[3],
         content: new_contents[3],
         previous_path: old_files[3],
-        action: :update},
+        action: :rename_and_update},
 
        {path: old_files[4],
         action: :remove},

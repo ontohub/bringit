@@ -44,13 +44,12 @@ module Gitlab
         commit_multichange(convert_options(options, :create), previous_head_sha)
       end
 
-      # Change (contents and path of) file in repository and return commit sha
+      # Change the contents of a file in repository and return commit sha
       #
       # options should contain the following structure:
       #   file: {
       #     content: 'Lorem ipsum...',
-      #     path: 'documents/story.txt',
-      #     previous_path: 'documents/old_story.txt' # optional - used for renaming while updating
+      #     path: 'documents/story.txt'
       #   },
       #   author: {
       #     email: 'user@example.com',
@@ -69,6 +68,33 @@ module Gitlab
       #   }
       def update_file(options, previous_head_sha = nil)
         commit_multichange(convert_options(options, :update), previous_head_sha)
+      end
+
+      # Change contents and path of a file in repository and return commit sha
+      #
+      # options should contain the following structure:
+      #   file: {
+      #     content: 'Lorem ipsum...',
+      #     path: 'documents/story.txt',
+      #     previous_path: 'documents/old_story.txt'
+      #   },
+      #   author: {
+      #     email: 'user@example.com',
+      #     name: 'Test User',
+      #     time: Time.now    # optional - default: Time.now
+      #   },
+      #   committer: {
+      #     email: 'user@example.com',
+      #     name: 'Test User',
+      #     time: Time.now    # optional - default: Time.now
+      #   },
+      #   commit: {
+      #     message: 'Wow such commit',
+      #     branch: 'master',    # optional - default: 'master'
+      #     update_ref: false    # optional - default: true
+      #   }
+      def rename_and_update_file(options, previous_head_sha = nil)
+        commit_multichange(convert_options(options, :rename_and_update), previous_head_sha)
       end
 
       # Remove file from repository and return commit sha
@@ -155,8 +181,11 @@ module Gitlab
       #       action: :create},
       #      {content: 'New Lorem ipsum...',
       #       path: 'documents/old_story',
-      #       previus_path: 'documents/really_old_story.txt', # optional - moves the file from +previous_path+ to +path+ if this is given
       #       action: :update},
+      #      {content: 'New Lorem ipsum...',
+      #       previous_path: 'documents/really_old_story.txt',
+      #       path: 'documents/old_story',
+      #       action: :rename_and_update},
       #      {path: 'documents/obsolet_story.txt',
       #       action: :remove},
       #      {path: 'documents/old_story',
@@ -198,13 +227,11 @@ module Gitlab
                 blob(options[:commit][:branch], file[:previous_path]).data
               index.move(file_options)
             when :update
+              index.update(file_options)
+            when :rename_and_update
               previous_path = file[:previous_path]
-              if previous_path && previous_path != path
-                file_options[:previous_path] = previous_path
-                index.move(file_options)
-              else
-                index.update(file_options)
-              end
+              file_options[:previous_path] = previous_path
+              index.move(file_options)
             when :remove
               index.delete(file_options)
             when :mkdir

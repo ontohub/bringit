@@ -101,7 +101,7 @@ RSpec.describe(Gitlab::Git::Committing) do
                                  content: content2,
                                  branch: branch)
             commit_info[:file].merge!(previous_path: filepath1)
-            subject.update_file(commit_info, sha1)
+            subject.rename_and_update_file(commit_info, sha1)
           end
 
           it 'sets the HEAD of the branch to the latest commit' do
@@ -241,7 +241,7 @@ RSpec.describe(Gitlab::Git::Committing) do
               {path: new_files[3],
                content: new_contents[3],
                previous_path: old_files[3],
-               action: :update},
+               action: :rename_and_update},
 
               {path: old_files[4],
                action: :remove},
