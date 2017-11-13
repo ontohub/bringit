@@ -180,6 +180,91 @@ Note that `git` must be in the `PATH` and that `git-svn` must be installed if sv
 
     Gitlab::Git::Wrapper.new(path).pull
 
+### Creating a commit
+
+The `Gitlab::Git::Wrapper` adds convenience-methods to create commits.
+All of these need a committer and an author object as well as some commit options.
+
+    # Preliminary objects - the time and update_ref keys are optional.
+    author = {name: 'author', email: 'author@example.com', time: Time.now}
+    committer = {name: 'committer', email: 'committer@example.com', time: Time.now}
+    commit_info = {message: 'Some message', branch: 'master', update_ref: true}
+
+    # Create a new file with a single commit
+    wrapper.create_file({file: {path: 'path/to/file.txt',
+                               content: 'some content',
+                               encoding: 'plain'}, # supported: 'plain', 'base64', default: 'plain'
+                         author: author,
+                         committer: committer,
+                         commit: commit_info})
+      # => 'c7454ef14304af343b6bc8b1545e224364d5a44b'
+
+    # Update file contents with a single commit
+    wrapper.update_file({file: {path: 'path/to/file.txt',
+                               content: 'some new content',
+                               encoding: 'plain'}, # supported: 'plain', 'base64', default: 'plain'
+                         author: author,
+                         committer: committer,
+                         commit: commit_info})
+      # => 'c7454ef14304af343b6bc8b1545e224364d5a44b'
+
+    # Update file contents and move the file with a single commit
+    wrapper.rename_and_update_file({file: {path: 'path/to/other_file.txt',
+                                          previous_path: 'path/to/file.txt',
+                                          content: 'some new content',
+                                          encoding: 'plain'}, # supported: 'plain', 'base64', default: 'plain'
+                                    author: author,
+                                    committer: committer,
+                                    commit: commit_info})
+      # => 'c7454ef14304af343b6bc8b1545e224364d5a44b'
+
+    # Rename a file with a single commit
+    wrapper.rename_file({file: {path: 'path/to/other_file.txt',
+                                previous_path: 'path/to/file.txt'}
+                         author: author,
+                         committer: committer,
+                         commit: commit_info})
+      # => 'c7454ef14304af343b6bc8b1545e224364d5a44b'
+
+    # Remove a file with a single commit
+    wrapper.update_file({file: {path: 'path/to/file.txt'},
+                         author: author,
+                         committer: committer,
+                         commit: commit_info})
+      # => 'c7454ef14304af343b6bc8b1545e224364d5a44b'
+
+    # Create a directory (with a .gitkeep file) with a single commit
+    wrapper.mkdir('path/to/file.txt',
+                  {author: author, committer: committer, commit: commit_info})
+      # => 'c7454ef14304af343b6bc8b1545e224364d5a44b'
+
+    # Create a single commit with multiple actions:
+    files =
+      [{content: 'Lorem ipsum...',
+        path: 'documents/story.txt',
+        action: :create},
+       {content: 'New Lorem ipsum...',
+        path: 'documents/old_story',
+        action: :update},
+       {content: 'New Lorem ipsum...',
+        path: 'documents/another_old_story',
+        previus_path: 'documents/another_really_old_story.txt',
+        action: :rename_and_update},
+       {path: 'documents/obsolet_story.txt',
+        action: :remove},
+       {path: 'documents/old_story',
+        previus_path: 'documents/really_old_story.txt',
+        action: :rename},
+       {path: 'documents/secret',
+        action: :mkdir}
+      ]
+    wrapper.commit_multichange({files: files,
+                                author: author,
+                                committer: committer,
+                                commit: commit_info})
+      # => 'c7454ef14304af343b6bc8b1545e224364d5a44b'
+
+
 ### Repository
 
     # Init repo with full path
