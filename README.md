@@ -6,8 +6,9 @@ GitLab wrapper around git objects.
 This is the Ontohub-fork of [gitlab_git](https://gitlab.com/gitlab-org/gitlab_git).
 Since `Gitlab::Git` has been absorbed into the [main GitLab project](https://gitlab-com/gitlab-org/gitlab-ce), the original `gitlab_git` gem has been deprecated. See the [gitlab-ce issue](https://gitlab.com/gitlab-org/gitlab-ce/issues/24374) and [merge request](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/8447) for more information.
 
-In this repository, some updates to gitlab_git from the integrated gitlab-git are copied over and adjusted to work as a gem.
+In this fork, some updates to gitlab_git from the integrated gitlab-git are copied over and adjusted to work as a gem.
 However, newer changes to the git layer of Gitlab are so tightly intergrated with Gitlab that pulling them back into this gem is impossible.
+Even though this will not receive any more changes introduced by Gitlab, this fork is still maintained by the Ontohub team.
 
 This fork of the original gem adds a wrapper `Gitlab::Git::Wrapper` around the original Gitlab::Git objects to allow for easier handling.
 
@@ -18,6 +19,166 @@ This fork of the original gem adds a wrapper `Gitlab::Git::Wrapper` around the o
 GitLab Git used grit as main library in past. Now it uses rugged
 
 ## How to use
+
+### Wrapper
+
+The Wrapper is an object encapsulating the Gitlab::Git functionality to provide a more convenient interface.
+
+    # Create a new bare git repository
+    wrapper = Gitlab::Git::Wrapper.create('/path/to/the/new/repository.git') # => #<Gitlab::Git::Wrapper:0x00007fa91fa1e440 ...>
+
+    # Delete an existing git repository
+    Gitlab::Git::Wrapper.destroy('/path/to/the/repository.git')
+
+    # Initialize a Wrapper object on an existing repository
+    wrapper = Gitlab::Git::Wrapper.new('/path/to/the/repository.git') # => #<Gitlab::Git::Wrapper:0x00007fa91fa1e440 ...>
+
+    # Check if a git repository exists in the given path
+    wrapper.repo_exists? # => true
+
+    # Check if the repository is a bare repository
+    wrapper.bare? # => true
+
+    # Check if the repository is a bare repository
+    wrapper.empty? # => false
+
+    # Get the full absolute path of the repository
+    wrapper.path # => #<Pathname:/path/to/the/repository>
+
+    # Get the list of all files
+    wrapper.ls_files('master') # => ['path/to/my_file.txt', 'another_file.txt']
+
+    # Find a blob (file)
+    wrapper.blob('master~3', 'path/to/my_file.txt') # => #<Gitlab::Git::Blob:0x00007fa91fe3dcb0 ...>
+
+    # Find a tree (directory)
+    wrapper.tree('master~3', 'path/to/my_directory') # => [#<Gitlab::Git::Tree:0x00007fa92005e968 ...>, ...]
+
+    # Find a commit
+    wrapper.commit('master~3') # => #<Gitlab::Git::Commit:0x00007fa91cef58e0 ...>
+
+    # The the number of commits up to a revision
+    wrapper.commit_count('master') # => 17
+
+    # Check if a path exists (as a blob or a tree)
+    wrapper.path_exists?('master~3', 'some/path') # => true
+
+    # Get the commit hash of a branch
+    wrapper.branch_sha('master') # => "98cf6fcfb912fb733bd3ed7480fc75ba5a762d35"
+
+    # Get the name of the default branch
+    wrapper.default_branch # => "master"
+
+    # Set the name of the default branch
+    wrapper.default_branch = "staging" # => "staging"
+
+    # Create a new branch at revision 322ba8d
+    wrapper.create_branch('my_feature', '322ba8d') # => #<Gitlab::Git::Branch:0x00007fa91507f178 ...>
+
+    # Get a list of all branches
+    wrapper.branches # => [#<Gitlab::Git::Branch:0x00007fa920372488 ...>, ...]
+
+    # Get a list of all branch names
+    wrapper.branch_names # => ["master", "my_feature"]
+
+    # Get the number of branches
+    wrapper.branch_count => 2
+
+    # Check if a branch exists
+    wrapper.branch_exists?('my_feature') # => true
+
+    # Find a branch by its name
+    wrapper.find_branch('my_feature') # => #<Gitlab::Git::Branch:0x00007fa920606b18 ...>
+
+    # Delete a branch
+    wrapper.rm_branch('my_feature') # => nil
+
+    # Create a new tag at revision 322ba8d
+    wrapper.create_tag('v1.0.0', '322ba8d') # => => #<Gitlab::Git::Tag:0x00007fa921828440 ...>
+
+    # Create a new tag with an annotation at revision 322ba8d
+    wrapper.create_tag('v1.0.1', '22ba8d3',
+                       message: 'My tag message',
+                       tagger: {name: 'Tagger',
+                                email: 'tagger@example.com',
+                                time: Time.now}) # => #<Gitlab::Git::Tag:0x00007fa91ed669a0 ...>
+
+    # Get a list of all tags
+    wrapper.tags # => [#<Gitlab::Git::Tag:0x00007fa91b25c990 ...>, ...]
+
+    # Get a list of all tag names
+    wrapper.tag_names # => ['v1.0', 'v1.1']
+
+    # Find a tag by its name
+    wrapper.find_tag('v1.0') # => #<Gitlab::Git::Tag:0x00007fa91cd52998 ...>
+
+    # Delete a tag
+    wrapper.rm_tag('v1.0') # => nil
+
+    # Diff of a single commit (compared to its parent commit)
+    wrapper.diff_from_parent('322ba8d') # => => #<Gitlab::Git::DiffCollection:0x00007fa91fb603d0 ...>
+
+    # Diff of a commit range
+    wrapper.diff('322ba8d', 'master') # => #<Gitlab::Git::DiffCollection:0x00007fa91d341840 ...>
+
+    # Diff of a commit range at some paths (the empty hash argument is for options)
+    wrapper.diff('322ba8d', 'master', {}, 'src/lib/', 'assets/javascript/application.js') # => #<Gitlab::Git::DiffCollection:0x00007fa91d341840 ...>
+
+    # Diff: Please see the lib/gitlab_git/diff.rb (filter_diff_options) for documentation of the options.
+    # The allowed options are:
+    #   :max_size, :context_lines, :interhunk_lines,
+    #   :old_prefix, :new_prefix, :reverse, :force_text,
+    #   :ignore_whitespace, :ignore_whitespace_change,
+    #   :ignore_whitespace_eol, :ignore_submodules,
+    #   :patience, :include_ignored, :include_untracked,
+    #   :include_unmodified, :recurse_untracked_dirs,
+    #   :disable_pathspec_match, :deltas_are_icase,
+    #   :include_untracked_content, :skip_binary_check,
+    #   :include_typechange, :include_typechange_trees,
+    #   :ignore_filemode, :recurse_ignored_dirs, :paths,
+    #   :max_files, :max_lines, :all_diffs, :no_collapse
+
+    # Log
+    wrapper.log(ref: 'master') # => [#<Gitlab::Git::Commit:0x00007fa91f971588 ...>, ...]
+
+    # Log that returns only the commit hashes (a lot faster)
+    wrapper.log(ref: 'master', only_commit_sha: true) # => ["98cf6fcfb912fb733bd3ed7480fc75ba5a762d35", ...]
+
+    # Log of a commit range. This is unsafe because the end commit might not
+    # have the start commit as a parent. In this case, the result is empty and a
+    # warning is printed on the console.
+    wrapper.log(ref: '322ba8d..master', unsafe_range: true) # => [#<Gitlab::Git::Commit:0x00007fa91e4334a0 ...>, ...]
+
+    # Log: The options and their defaults are:
+    #     limit: 10,           # How many commits should be retrieved
+    #     offset: 0,           # Skip a number of commits before starting to show the commit output
+    #     path: nil,           # Show only commits that are enough to explain how the files that match the specified paths came to be
+    #     follow: false,       # Continue listing the history of a file beyond renames
+    #     skip_merges: false,  # Do not print commits with more than one parent
+    #     disable_walk: false, # Retrieve the log using the git command line client instead of Rugged
+    #     after: nil,          # Show commits more recent than a specific date
+    #     before: nil,         # Show commits older than a specific date
+    #     unsafe_range: false, # Allow commit ranges in the ref option
+
+    # Get the Gitlab::Git::Repository instance
+    wrapper.gitlab
+
+    # Get the Rugged::Repository instance
+    wrapper.rugged
+
+### Clone
+
+Allows you to clone a remote git or svn repository.
+Note that `git` must be in the `PATH` and that `git-svn` must be installed if svn functionality is needed.
+
+    Gitlab::Git::Wrapper.clone(path, remote_address)
+
+### Pull
+
+Allows you to pull from a remote git or svn repository.
+Note that `git` must be in the `PATH` and that `git-svn` must be installed if svn functionality is needed.
+
+    Gitlab::Git::Wrapper.new(path).pull
 
 ### Repository
 
@@ -386,17 +547,3 @@ Allows you to get difference (commits, diffs) between two SHA/branch/tag:
 
     compare.diffs
     # [ <Gitlab::Git::Diff:0x000..>, <Gitlab::Git::Diff:0x000..>]
-
-### Clone
-
-Allows you to clone a remote git or svn repository.
-Note that `git` must be in the `PATH` and that `git-svn` must be installed if svn functionality is needed.
-
-    Gitlab::Git::Wrapper.clone(path, remote_address)
-
-### Pull
-
-Allows you to pull from a remote git or svn repository.
-Note that `git` must be in the `PATH` and that `git-svn` must be installed if svn functionality is needed.
-
-    Gitlab::Git::Wrapper.new(path).pull
