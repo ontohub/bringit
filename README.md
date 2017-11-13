@@ -1,14 +1,17 @@
 # GitLab Git
-
-## `Gitlab::Git` has been absorbed into the [main GitLab project](https://gitlab-com/gitlab-org/gitlab-ce), and the `gitlab_git` gem has been deprecated. See the [gitlab-ce issue](https://gitlab.com/gitlab-org/gitlab-ce/issues/24374) and [merge request](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/8447) for more information.
-
-In this repository, some updates to gitlab_git from the integrated gitlab-git are copied over and adjusted to work as a gem.
-There is no guarantee that this repository will be up to date in the future because some changes to the gitlab_git-part of gitlab-ce can introduce changes that are too large for us to maintain.
+[![Build Status](https://travis-ci.org/ontohub/gitlab_git.svg?branch=master)](https://travis-ci.org/ontohub/gitlab_git)
 
 GitLab wrapper around git objects.
 
-[![build status](https://gitlab.com/gitlab-org/gitlab_git/badges/master/build.svg)](https://gitlab.com/gitlab-org/gitlab_git/commits/master)
-[![Gem Version](https://badge.fury.io/rb/gitlab_git.svg)](http://badge.fury.io/rb/gitlab_git)
+This is the Ontohub-fork of [gitlab_git](https://gitlab.com/gitlab-org/gitlab_git).
+Since `Gitlab::Git` has been absorbed into the [main GitLab project](https://gitlab-com/gitlab-org/gitlab-ce), the original `gitlab_git` gem has been deprecated. See the [gitlab-ce issue](https://gitlab.com/gitlab-org/gitlab-ce/issues/24374) and [merge request](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/8447) for more information.
+
+In this repository, some updates to gitlab_git from the integrated gitlab-git are copied over and adjusted to work as a gem.
+However, newer changes to the git layer of Gitlab are so tightly intergrated with Gitlab that pulling them back into this gem is impossible.
+
+This fork of the original gem adds a wrapper `Gitlab::Git::Wrapper` around the original Gitlab::Git objects to allow for easier handling.
+
+# Documentation
 
 ## Moved from Grit to Rugged
 
