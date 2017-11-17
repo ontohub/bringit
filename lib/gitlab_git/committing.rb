@@ -273,11 +273,21 @@ module Gitlab
         options[:commit][:branch] ||= 'master'
         options[:commit][:update_ref] = true if options[:commit][:update_ref].nil?
         normalize_ref(options)
+        normalize_update_ref(options)
       end
 
       def normalize_ref(options)
         return if options[:commit][:branch].start_with?('refs/')
         options[:commit][:branch] = 'refs/heads/' + options[:commit][:branch]
+      end
+
+      def normalize_update_ref(options)
+        options[:commit][:update_ref] =
+          if options[:commit][:update_ref].nil?
+            true
+          else
+            options[:commit][:update_ref]
+          end
       end
 
       # This method does the actual committing. Use this mutexed with the git
@@ -287,43 +297,48 @@ module Gitlab
       # rubocop:disable Metrics/PerceivedComplexity
       # rubocop:disable Metrics/MethodLength
       def commit_with(options, previous_head_sha)
+        # rubocop:enable Metrics/AbcSize
+        # rubocop:enable Metrics/CyclomaticComplexity
+        # rubocop:enable Metrics/PerceivedComplexity
+        # rubocop:enable Metrics/MethodLength
         insert_defaults(options)
         prevent_overwriting_previous_changes(options, previous_head_sha)
 
-        commit = options[:commit]
-        ref = commit[:branch]
-        ref = 'refs/heads/' + ref unless ref.start_with?('refs/')
-        update_ref = commit[:update_ref].nil? ? true : commit[:update_ref]
-
         index = Gitlab::Git::Index.new(gitlab)
+        parents, last_commit = parents_and_last_commit(options)
+        index.read_tree(last_commit.tree) if last_commit
 
+        yield(index)
+        create_commit(index, options, parents)
+      end
+
+      def parents_and_last_commit(options)
         parents = []
+        last_commit = nil
         unless empty?
-          rugged_ref = rugged.references[ref]
+          rugged_ref = rugged.references[options[:commit][:branch]]
           unless rugged_ref
             raise Gitlab::Git::Repository::InvalidRef, 'Invalid branch name'
           end
           last_commit = rugged_ref.target
-          index.read_tree(last_commit.tree)
           parents = [last_commit]
         end
+        [parents, last_commit]
+      end
 
-        yield(index)
-
+      def create_commit(index, options, parents)
         opts = {}
         opts[:tree] = index.write_tree
         opts[:author] = options[:author]
         opts[:committer] = options[:committer]
-        opts[:message] = commit[:message]
+        opts[:message] = options[:commit][:message]
         opts[:parents] = parents
-        opts[:update_ref] = ref if update_ref
+        if options[:commit][:update_ref]
+          opts[:update_ref] = options[:commit][:branch]
+        end
 
         Rugged::Commit.create(rugged, opts)
       end
-      # rubocop:enable Metrics/AbcSize
-      # rubocop:enable Metrics/CyclomaticComplexity
-      # rubocop:enable Metrics/PerceivedComplexity
-      # rubocop:enable Metrics/MethodLength
     end
   end
 end
