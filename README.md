@@ -191,11 +191,16 @@ Gitlab::Git::Wrapper.new(path).pull
 The `Gitlab::Git::Wrapper` adds convenience-methods to create commits.
 All of these need a committer and an author object as well as some commit options.
 
+If the optional parameter `previous_head_sha` is supplied to any of the following methods, and the HEAD of the branch is different from that parameter (i.e. the branch has changed since authoring the commit-changes) Gitlab::Git::Wrapper attempts to merge the new commit on top of the current HEAD.
+If merging is not possible, a `Gitlab::Git::Committing::HeadChangedError` is raised that contains data about the conflicts in its `conflicts` attribute.
+If the parameter `previous_head_sha` is not set (`nil`), then the new commit overwrites possible changes to the branch that occurred in the meantime.
+
 ```ruby
 # Preliminary objects - the time and update_ref keys are optional.
 author = {name: 'author', email: 'author@example.com', time: Time.now}
 committer = {name: 'committer', email: 'committer@example.com', time: Time.now}
 commit_info = {message: 'Some message', branch: 'master', update_ref: true}
+previous_head_sha = wrapper.commit('master').id # optional, set long before creating the commit
 
 # Create a new file with a single commit
 wrapper.create_file({file: {path: 'path/to/file.txt',
@@ -203,7 +208,7 @@ wrapper.create_file({file: {path: 'path/to/file.txt',
                            encoding: 'plain'}, # supported: 'plain', 'base64', default: 'plain'
                      author: author,
                      committer: committer,
-                     commit: commit_info})
+                     commit: commit_info}, previous_head_sha) # previous_head_sha is optional (default: nil)
   # => 'c7454ef14304af343b6bc8b1545e224364d5a44b'
 
 # Update file contents with a single commit
@@ -212,7 +217,7 @@ wrapper.update_file({file: {path: 'path/to/file.txt',
                            encoding: 'plain'}, # supported: 'plain', 'base64', default: 'plain'
                      author: author,
                      committer: committer,
-                     commit: commit_info})
+                     commit: commit_info}, previous_head_sha) # previous_head_sha is optional (default: nil)
   # => 'c7454ef14304af343b6bc8b1545e224364d5a44b'
 
 # Update file contents and move the file with a single commit
@@ -222,7 +227,7 @@ wrapper.rename_and_update_file({file: {path: 'path/to/other_file.txt',
                                       encoding: 'plain'}, # supported: 'plain', 'base64', default: 'plain'
                                 author: author,
                                 committer: committer,
-                                commit: commit_info})
+                                commit: commit_info}, previous_head_sha) # previous_head_sha is optional (default: nil)
   # => 'c7454ef14304af343b6bc8b1545e224364d5a44b'
 
 # Rename a file with a single commit
@@ -230,19 +235,19 @@ wrapper.rename_file({file: {path: 'path/to/other_file.txt',
                             previous_path: 'path/to/file.txt'}
                      author: author,
                      committer: committer,
-                     commit: commit_info})
+                     commit: commit_info}, previous_head_sha) # previous_head_sha is optional (default: nil)
   # => 'c7454ef14304af343b6bc8b1545e224364d5a44b'
 
 # Remove a file with a single commit
 wrapper.update_file({file: {path: 'path/to/file.txt'},
                      author: author,
                      committer: committer,
-                     commit: commit_info})
+                     commit: commit_info}, previous_head_sha) # previous_head_sha is optional (default: nil)
   # => 'c7454ef14304af343b6bc8b1545e224364d5a44b'
 
 # Create a directory (with a .gitkeep file) with a single commit
 wrapper.mkdir('path/to/file.txt',
-              {author: author, committer: committer, commit: commit_info})
+              {author: author, committer: committer, commit: commit_info}, previous_head_sha) # previous_head_sha is optional (default: nil)
   # => 'c7454ef14304af343b6bc8b1545e224364d5a44b'
 
 # Create a single commit with multiple actions:
@@ -268,7 +273,7 @@ files =
 wrapper.commit_multichange({files: files,
                             author: author,
                             committer: committer,
-                            commit: commit_info})
+                            commit: commit_info}, previous_head_sha) # previous_head_sha is optional (default: nil)
   # => 'c7454ef14304af343b6bc8b1545e224364d5a44b'
 ```
 
