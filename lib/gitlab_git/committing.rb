@@ -1,19 +1,24 @@
 # frozen_string_literal: true
 
+require_relative "committing/merge"
+
 module Gitlab
   module Git
     # Methods for committing. Use all these methods only mutexed with the git
     # repository as the key.
     module Committing
+      include Gitlab::Git::Committing::Merge
+
       class Error < StandardError; end
       class InvalidPathError < Error; end
 
       # This error is thrown when attempting to commit on a branch whose HEAD has
       # changed.
       class HeadChangedError < Error
-        attr_reader :options
-        def initialize(message, options)
+        attr_reader :conflicts, :options
+        def initialize(message, conflicts, options)
           super(message)
+          @conflicts = conflicts
           @options = options
         end
       end
@@ -243,15 +248,6 @@ module Gitlab
 
       protected
 
-      # TODO: Instead of comparing the HEAD with the previous commit_sha,
-      # actually try merging and only raise if there is a conflict. Add the
-      # merge conflict to the Error.
-      # See issue https://github.com/ontohub/ontohub-backend/issues/97.
-      def prevent_overwriting_previous_changes(options, previous_head_sha)
-        return unless conflict?(options, previous_head_sha)
-        raise HeadChangedError.new('The branch has changed since editing.',
-                                   options)
-      end
 
       # Converts the options from a single change commit to a multi change
       # commit.
@@ -260,11 +256,6 @@ module Gitlab
         converted.delete(:file)
         converted[:files] = [options[:file].merge(action: action)]
         converted
-      end
-
-      def conflict?(options, previous_head_sha)
-        !previous_head_sha.nil? &&
-          branch_sha(options[:commit][:branch]) != previous_head_sha
       end
 
       def insert_defaults(options)
@@ -302,14 +293,15 @@ module Gitlab
         # rubocop:enable Metrics/PerceivedComplexity
         # rubocop:enable Metrics/MethodLength
         insert_defaults(options)
-        prevent_overwriting_previous_changes(options, previous_head_sha)
+        action, commit_sha = merge_if_needed(options, previous_head_sha)
+        return commit_sha if action == :merge_commit_created
 
         index = Gitlab::Git::Index.new(gitlab)
         parents, last_commit = parents_and_last_commit(options)
         index.read_tree(last_commit.tree) if last_commit
 
         yield(index)
-        create_commit(index, options, parents)
+        create_commit(index, index.write_tree, options, parents)
       end
 
       def parents_and_last_commit(options)
@@ -326,9 +318,9 @@ module Gitlab
         [parents, last_commit]
       end
 
-      def create_commit(index, options, parents)
+      def create_commit(index, tree, options, parents)
         opts = {}
-        opts[:tree] = index.write_tree
+        opts[:tree] = tree
         opts[:author] = options[:author]
         opts[:committer] = options[:committer]
         opts[:message] = options[:commit][:message]
