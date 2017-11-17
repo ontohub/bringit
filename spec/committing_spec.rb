@@ -469,7 +469,8 @@ CONTENT
           expect(e.conflicts).
             to match([{ancestor: expected_conflict_ancestor,
                        ours: expected_conflict_ours,
-                       theirs: expected_conflict_theirs}])
+                       theirs: expected_conflict_theirs,
+                       merge_info: expected_conflict_merge_info}])
         end
       end
 
@@ -516,6 +517,12 @@ CONTENT
         let(:expected_conflict_ancestor) { be_present }
         let(:expected_conflict_ours) { be_present }
         let(:expected_conflict_theirs) { be_present }
+        let(:expected_conflict_merge_info) do
+          match(automergeable: false,
+                path: updated_file,
+                filemode: be_present,
+                data: match(/<{7}.*={7}.*>{7}/m))
+        end
       end
     end
 
@@ -539,6 +546,7 @@ CONTENT
         let(:expected_conflict_ancestor) { be_present }
         let(:expected_conflict_ours) { be_present }
         let(:expected_conflict_theirs) { be(nil) }
+        let(:expected_conflict_merge_info) { be(nil) }
       end
     end
 
@@ -556,6 +564,7 @@ CONTENT
         let(:expected_conflict_ancestor) { be_present }
         let(:expected_conflict_ours) { be_present }
         let(:expected_conflict_theirs) { be(nil) }
+        let(:expected_conflict_merge_info) { be(nil) }
       end
     end
 
@@ -574,6 +583,7 @@ CONTENT
         let(:expected_conflict_ancestor) { be_present }
         let(:expected_conflict_ours) { be(nil) }
         let(:expected_conflict_theirs) { be_present }
+        let(:expected_conflict_merge_info) { be(nil) }
       end
     end
   end

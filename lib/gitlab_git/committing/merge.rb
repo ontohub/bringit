@@ -24,13 +24,32 @@ module Gitlab
 
           index = rugged.merge_commits(base_commit, user_commit)
 
-          raise_head_changed_error(index.conflicts, options) if index.conflicts?
+          if index.conflicts?
+            enriched_conflicts = add_merge_data(options, index)
+            raise_head_changed_error(enriched_conflicts, options)
+          end
           tree_id = index.write_tree(rugged)
           found_conflicts = conflicts(options, base_commit, user_commit)
           if found_conflicts.any?
             raise_head_changed_error(found_conflicts, options)
           end
           create_merging_commit(base_commit, index, tree_id, options)
+        end
+
+        def add_merge_data(options, index)
+          our_label = options[:commit][:branch].sub(%r{\Arefs/heads/}, '')
+          index.conflicts.map do |conflict|
+            if conflict[:ancestor] && conflict[:ours] && conflict[:theirs]
+              conflict[:merge_info] =
+                index.merge_file(conflict[:ours][:path],
+                                 ancestor_label: 'parent',
+                                 our_label: our_label,
+                                 their_label: options[:commit][:message])
+            else
+              conflict[:merge_info] = nil
+            end
+            conflict
+          end
         end
 
         def conflicts(options, base_commit, user_commit)
@@ -50,9 +69,8 @@ module Gitlab
 
           ancestor_blob = blob(base_commit.parents.first.oid, path)
           user_blob = blob(user_commit.oid, path)
-          result = {}
+          result = {merge_info: nil, ours: nil}
           result[:ancestor] = conflict_hash(ancestor_blob, 1) if ancestor_blob
-          result[:ours] = nil
           result[:theirs] = conflict_hash(user_blob, 3) if user_blob
           result
         end
