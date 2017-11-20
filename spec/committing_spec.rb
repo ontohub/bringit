@@ -316,100 +316,274 @@ RSpec.describe(Gitlab::Git::Committing) do
   context 'when the branch has changed in the meantime' do
     subject { create(:git) }
     let(:branch) { 'master' }
-    let(:invalid_sha) { '0' * 40 }
+    let(:existing_file_unchanged) { generate(:filepath) }
+    let(:existing_file_changed) { generate(:filepath) }
+    let(:existing_file_added) { generate(:filepath) }
+    let(:existing_file_removed) { generate(:filepath) }
+    let(:existing_content) do
+      <<CONTENT
+line 1
+line 2
+line 3
+line 4
+line 5
+line 6
+line 7
+line 8
+line 9
+line 10
+CONTENT
+    end
+    let(:commit_before1) do
+      subject.create_file(create(:git_commit_info,
+                                 filepath: existing_file_unchanged,
+                                 content: existing_content,
+                                 branch: branch))
+    end
+    let(:commit_before2) do
+      subject.create_file(create(:git_commit_info,
+                                 filepath: existing_file_removed,
+                                 content: existing_content,
+                                 branch: branch))
+    end
+    let(:commit_base) do
+      subject.create_file(create(:git_commit_info,
+                                 filepath: existing_file_changed,
+                                 content: existing_content,
+                                 branch: branch))
+    end
+    let(:commit_after1) do
+      subject.create_file(create(:git_commit_info,
+                                 filepath: existing_file_added,
+                                 content: existing_content,
+                                 branch: branch))
+    end
+    let(:commit_after2) do
+      subject.update_file(create(:git_commit_info,
+                                 filepath: existing_file_changed,
+                                 content: existing_content.upcase,
+                                 branch: branch))
+    end
+    let(:commit_after3) do
+      subject.remove_file(create(:git_commit_info,
+                                 filepath: existing_file_removed,
+                                 branch: branch))
+    end
+    let(:commit_latest) { commit_after3 }
 
-    context 'adding a file' do
+    # create the commits in order
+    before do
+      commit_before1
+      commit_before2
+      commit_base
+      commit_after1
+      commit_after2
+      commit_after3
+    end
+
+    let(:previous_head_sha) { commit_base }
+
+    context 'creating a new file' do
+      let(:new_file) { generate(:filepath) }
+      let(:new_content) { generate(:content) }
+      let(:new_commit) do
+        subject.create_file(create(:git_commit_info,
+                                   filepath: new_file,
+                                   content: new_content,
+                                   branch: branch),
+                            previous_head_sha)
+      end
+
       before do
-        subject.create_file(create(:git_commit_info,
-                                   filepath: 'first_file',
-                                   branch: branch))
+        new_commit
       end
 
-      let(:filepath) { generate(:filepath) }
-
-      it 'raises an error' do
-        expect do
-          subject.create_file(create(:git_commit_info,
-                                     filepath: filepath,
-                                     branch: branch),
-                              invalid_sha)
-        end.to raise_error(Gitlab::Git::Committing::HeadChangedError)
-      end
-    end
-
-    context 'updating a file' do
-      let(:filepath) { generate(:filepath) }
-      let!(:sha) do
-        subject.create_file(create(:git_commit_info,
-                                   filepath: filepath,
-                                   branch: branch))
+      it 'sets the HEAD of the branch to the latest commit' do
+        expect(subject.branch_sha(branch)).to eq(new_commit)
       end
 
-      it 'raises an error' do
-        expect do
-          subject.update_file(create(:git_commit_info,
-                                     filepath: filepath,
-                                     branch: branch),
-                              invalid_sha)
-        end.to raise_error(Gitlab::Git::Committing::HeadChangedError)
+      it 'sets the content of the new file' do
+        expect(subject.blob(branch, new_file).data).to eq(new_content)
+      end
+
+      it 'keeps the content of the existing_file_unchanged' do
+        expect(subject.blob(branch, existing_file_unchanged).data).
+          to eq(existing_content)
+      end
+
+      it 'keeps the content of the existing_file_changed' do
+        expect(subject.blob(branch, existing_file_changed).data).
+          to eq(existing_content.upcase)
+      end
+
+      it 'keeps the content of the existing_file_added' do
+        expect(subject.blob(branch, existing_file_added).data).
+          to eq(existing_content)
       end
     end
 
-    context 'renaming a file' do
-      let(:filepath1) { generate(:filepath) }
-      let(:filepath2) { generate(:filepath) }
-      let!(:sha) do
-        subject.create_file(create(:git_commit_info,
-                                   filepath: filepath1,
-                                   branch: branch))
+    context 'updating an unchanged file' do
+      let(:updated_file) { existing_file_unchanged }
+      let(:new_content) { generate(:content) }
+      let(:new_commit) do
+        subject.update_file(create(:git_commit_info,
+                                   filepath: updated_file,
+                                   content: new_content,
+                                   branch: branch),
+                            previous_head_sha)
       end
-      let!(:content1) { subject.blob(branch, filepath1).data }
 
-      it 'raises an error' do
-        expect do
-          commit_info = create(:git_commit_info,
-                               filepath: filepath2,
-                               branch: branch)
-          commit_info[:file].merge!(previous_path: filepath1,
-                                    content: content1)
-          subject.rename_file(commit_info, invalid_sha)
-        end.to raise_error(Gitlab::Git::Committing::HeadChangedError)
-      end
-    end
-
-    context 'deleting a file' do
-      let(:filepath) { generate(:filepath) }
-      let!(:sha) do
-        subject.create_file(create(:git_commit_info,
-                                   filepath: filepath,
-                                   branch: branch))
-      end
-      it 'raises an error' do
-        expect do
-          commit_info = create(:git_commit_info,
-                               filepath: filepath,
-                               branch: branch)
-          commit_info[:file].delete(:content)
-          subject.remove_file(commit_info, invalid_sha)
-        end.to raise_error(Gitlab::Git::Committing::HeadChangedError)
-      end
-    end
-
-    context 'creating a directory' do
       before do
-        subject.create_file(create(:git_commit_info,
-                                   filepath: 'first_file',
-                                   branch: branch))
+        new_commit
       end
 
-      let!(:path) { 'dir/with/subdir' }
+      it 'sets the HEAD of the branch to the latest commit' do
+        expect(subject.branch_sha(branch)).to eq(new_commit)
+      end
 
+      it 'sets the content of the upated file' do
+        expect(subject.blob(branch, updated_file).data).to eq(new_content)
+      end
+
+      it 'keeps the content of the existing_file_changed' do
+        expect(subject.blob(branch, existing_file_changed).data).
+          to eq(existing_content.upcase)
+      end
+
+      it 'keeps the content of the existing_file_added' do
+        expect(subject.blob(branch, existing_file_added).data).
+          to eq(existing_content)
+      end
+    end
+
+    shared_examples 'failing to commit' do
       it 'raises an error' do
-        expect do
-          options = create(:git_commit_info, branch: branch)
-          options.delete(:file)
-          subject.mkdir(path, options, invalid_sha)
-        end.to raise_error(Gitlab::Git::Committing::HeadChangedError)
+        expect { new_commit }.
+          to raise_error(Gitlab::Git::Committing::HeadChangedError)
+      end
+
+      it 'raises an error with the correct conflicts' do
+        begin
+          new_commit
+        rescue Gitlab::Git::Committing::HeadChangedError => e
+          expect(e.conflicts).
+            to match([{ancestor: expected_conflict_ancestor,
+                       ours: expected_conflict_ours,
+                       theirs: expected_conflict_theirs,
+                       merge_info: expected_conflict_merge_info}])
+        end
+      end
+
+      context 'trying to commit' do
+        before do
+          begin
+            new_commit
+          rescue Gitlab::Git::Committing::HeadChangedError
+          end
+        end
+
+        it 'keeps the HEAD of the branch' do
+          expect(subject.branch_sha(branch)).to eq(commit_latest)
+        end
+
+        it 'keeps the content of the existing_file_unchanged' do
+          expect(subject.blob(branch, existing_file_unchanged).data).
+            to eq(existing_content)
+        end
+
+        it 'keeps the content of the existing_file_changed' do
+          expect(subject.blob(branch, existing_file_changed).data).
+            to eq(existing_content.upcase)
+        end
+
+        it 'keeps the content of the existing_file_added' do
+          expect(subject.blob(branch, existing_file_added).data).
+            to eq(existing_content)
+        end
+      end
+    end
+
+    context 'updating a changed file' do
+      let(:updated_file) { existing_file_changed }
+      let(:new_content) { generate(:content) }
+      let(:new_commit) do
+        subject.update_file(create(:git_commit_info,
+                                   filepath: updated_file,
+                                   content: new_content,
+                                   branch: branch),
+                            previous_head_sha)
+      end
+      include_examples 'failing to commit' do
+        let(:expected_conflict_ancestor) { be_present }
+        let(:expected_conflict_ours) { be_present }
+        let(:expected_conflict_theirs) { be_present }
+        let(:expected_conflict_merge_info) do
+          match(automergeable: false,
+                path: updated_file,
+                filemode: be_present,
+                data: match(/<{7}.*={7}.*>{7}/m))
+        end
+      end
+    end
+
+    context 'renaming and updating a changed file' do
+      let(:updated_file) { existing_file_changed }
+      let(:new_file) { generate(:filepath) }
+      let(:new_content) { generate(:content) }
+      let(:commit_info) do
+        info = create(:git_commit_info,
+                      filepath: updated_file,
+                      content: new_content,
+                      branch: branch)
+        info[:file][:previous_path] = info[:file][:path]
+        info[:file][:path] = new_file
+        info
+      end
+      let(:new_commit) do
+        subject.rename_and_update_file(commit_info, previous_head_sha)
+      end
+      include_examples 'failing to commit' do
+        let(:expected_conflict_ancestor) { be_present }
+        let(:expected_conflict_ours) { be_present }
+        let(:expected_conflict_theirs) { be(nil) }
+        let(:expected_conflict_merge_info) { be(nil) }
+      end
+    end
+
+    context 'removing a changed file' do
+      let(:updated_file) { existing_file_changed }
+      let(:new_content) { generate(:content) }
+      let(:new_commit) do
+        subject.remove_file(create(:git_commit_info,
+                                   filepath: updated_file,
+                                   content: new_content,
+                                   branch: branch),
+                            previous_head_sha)
+      end
+      include_examples 'failing to commit' do
+        let(:expected_conflict_ancestor) { be_present }
+        let(:expected_conflict_ours) { be_present }
+        let(:expected_conflict_theirs) { be(nil) }
+        let(:expected_conflict_merge_info) { be(nil) }
+      end
+    end
+
+    context 'updating a removed file' do
+      let(:updated_file) { existing_file_removed }
+      let(:new_content) { generate(:content) }
+      let(:new_commit) do
+        subject.update_file(create(:git_commit_info,
+                                   filepath: updated_file,
+                                   content: new_content,
+                                   branch: branch),
+                            previous_head_sha)
+      end
+
+      include_examples 'failing to commit' do
+        let(:expected_conflict_ancestor) { be_present }
+        let(:expected_conflict_ours) { be(nil) }
+        let(:expected_conflict_theirs) { be_present }
+        let(:expected_conflict_merge_info) { be(nil) }
       end
     end
   end
