@@ -3,20 +3,20 @@
 $LOAD_PATH.push File.expand_path('../lib', __FILE__)
 
 # Maintain your gem's version:
-require 'gitlab_git/version'
+require 'bringit/version'
 
 Gem::Specification.new do |s|
-  s.name        = 'gitlab_git'
+  s.name        = 'bringit'
   s.version     = Gitlab::Git::VERSION
   s.date        = Time.now.strftime("%Y-%m-%d")
-  s.summary     = "Gitlab::Git library"
-  s.description = "GitLab wrapper around git objects"
+  s.summary     = "Bringit library"
+  s.description = "Bringit wrapper around git objects"
   s.authors     = ['Dmitriy Zaporozhets']
   s.email       = 'dmitriy.zaporozhets@gmail.com'
   s.license     = 'MIT'
   s.files       = `git ls-files lib/`.split("\n")
   s.homepage    =
-    'https://gitlab.com/gitlab-org/gitlab_git'
+    'https://gitlab.com/ontohub/bringit'
 
   s.add_dependency('github-linguist', '>= 5.1', '< 5.4')
   s.add_dependency('activesupport', '>= 4.0')
