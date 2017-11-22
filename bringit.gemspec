@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.license     = 'MIT'
   s.files       = `git ls-files lib/`.split("\n")
   s.homepage    =
-    'https://gitlab.com/ontohub/bringit'
+    'https://github.com/ontohub/bringit'
 
   s.add_dependency('github-linguist', '>= 5.1', '< 5.4')
   s.add_dependency('activesupport', '>= 4.0')

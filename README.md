@@ -1,22 +1,18 @@
-# GitLab Git
-[![Build Status](https://travis-ci.org/ontohub/gitlab_git.svg?branch=master)](https://travis-ci.org/ontohub/gitlab_git)
+# Bringit
+[![Build Status](https://travis-ci.org/ontohub/bringit.svg?branch=master)](https://travis-ci.org/ontohub/bringit)
 
-GitLab wrapper around git objects.
+Bringit wrapper around git objects.
 
-This is the Ontohub-fork of [gitlab_git](https://gitlab.com/gitlab-org/gitlab_git).
-Since `Bringit` has been absorbed into the [main GitLab project](https://gitlab-com/gitlab-org/gitlab-ce), the original `gitlab_git` gem has been deprecated. See the [gitlab-ce issue](https://gitlab.com/gitlab-org/gitlab-ce/issues/24374) and [merge request](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/8447) for more information.
+This is a fork of [gitlab_git](https://gitlab.com/gitlab-org/gitlab_git).
+Since `gitlab_git` has been absorbed into the [main GitLab project](https://gitlab-com/gitlab-org/gitlab-ce), the original `gitlab_git` gem has been deprecated. See the [gitlab-ce issue](https://gitlab.com/gitlab-org/gitlab-ce/issues/24374) and [merge request](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/8447) for more information.
 
-In this fork, some updates to gitlab_git from the integrated gitlab-git are copied over and adjusted to work as a gem.
+In this fork, some updates to `gitlab_git` from the integrated gitlab-git are copied over and adjusted to work as a gem.
 However, newer changes to the git layer of Gitlab are so tightly intergrated with Gitlab that pulling them back into this gem is impossible.
 Even though this will not receive any more changes introduced by Gitlab, this fork is still maintained by the Ontohub team.
 
-This fork of the original gem adds a wrapper `Bringit::Wrapper` around the original Bringit objects to allow for easier handling.
+This fork of the original gem adds a wrapper `Bringit::Wrapper` around the original Gitlab::Git objects to allow for easier handling.
 
 # Documentation
-
-## Moved from Grit to Rugged
-
-GitLab Git used grit as main library in past. Now it uses rugged
 
 ## How to use
 
@@ -162,7 +158,7 @@ wrapper.log(ref: '322ba8d..master', unsafe_range: true) # => [#<Bringit::Commit:
 #     unsafe_range: false, # Allow commit ranges in the ref option
 
 # Get the Bringit::Repository instance
-wrapper.gitlab
+wrapper.bringit
 
 # Get the Rugged::Repository instance
 wrapper.rugged

@@ -1,7 +1,7 @@
 # Performance tests for gitlab_git
 
 These tests are meant to help developers judge whether code changes improve or
-worsen gitlab_git performance. The tests operate on the repository at
+worsen bringit performance. The tests operate on the repository at
 https://gitlab.com/gitlab-org/git-memory-test .
 
 ## Run all available tests
@@ -21,7 +21,7 @@ bundle exec rake -T
 Create a `.rb` file in the `test/` directory. Example:
 
 ```
-require 'gitlab_git'
+require 'bringit'
 require 'memory_benchmark'
 
 memory_benchmark do

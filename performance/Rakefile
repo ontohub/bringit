@@ -1,6 +1,6 @@
-GITLAB_GIT_ROOT = File.expand_path('../..', __FILE__)
+BRINGIT_GIT_ROOT = File.expand_path('../..', __FILE__)
 PERFORMANCE_TEST_REPO_SOURCE = 'https://gitlab.com/gitlab-org/git-memory-test.git'
-PERFORMANCE_TEST_REPO_PATH = File.join(GITLAB_GIT_ROOT, 'support/git-memory-test.git')
+PERFORMANCE_TEST_REPO_PATH = File.join(BRINGIT_GIT_ROOT, 'support/git-memory-test.git')
 
 desc "Clone the test repo from #{PERFORMANCE_TEST_REPO_SOURCE}"
 task :clone do
