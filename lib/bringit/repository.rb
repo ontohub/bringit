@@ -482,8 +482,8 @@ module Bringit
       offset = actual_options[:skip]
       limit = actual_options[:max_count]
       walker.each(offset: offset, limit: limit) do |commit|
-        gitlab_commit = Bringit::Commit.decorate(commit, self)
-        commits.push(gitlab_commit)
+        bringit_commit = Bringit::Commit.decorate(commit, self)
+        commits.push(bringit_commit)
       end
 
       walker.reset

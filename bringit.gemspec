@@ -7,7 +7,7 @@ require 'bringit/version'
 
 Gem::Specification.new do |s|
   s.name        = 'bringit'
-  s.version     = Gitlab::Git::VERSION
+  s.version     = Bringit::VERSION
   s.date        = Time.now.strftime("%Y-%m-%d")
   s.summary     = "Bringit library"
   s.description = "Bringit wrapper around git objects"

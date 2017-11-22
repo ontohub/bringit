@@ -25,7 +25,7 @@ require 'gitlab_git'
 require 'memory_benchmark'
 
 memory_benchmark do
-  repo = Gitlab::Git::Repository.new(ARGV.first)
+  repo = Bringit::Repository.new(ARGV.first)
   repo.do_interesting_stuff
 end
 ```

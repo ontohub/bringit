@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe Gitlab::Git::RevList, seed_helper: true do
-  let(:repository) { Gitlab::Git::Repository.new(TEST_REPO_PATH) }
+describe Bringit::RevList, seed_helper: true do
+  let(:repository) { Bringit::Repository.new(TEST_REPO_PATH) }
 
   context "validations" do
     described_class::ALLOWED_VARIABLES.each do |var|
@@ -39,7 +39,7 @@ describe Gitlab::Git::RevList, seed_helper: true do
 
   context "#execute" do
     let(:env) { { "GIT_OBJECT_DIRECTORY" => repository.path } }
-    let(:rev_list) { Gitlab::Git::RevList.new('oldrev', 'newrev', repository: repository, env: env) }
+    let(:rev_list) { Bringit::RevList.new('oldrev', 'newrev', repository: repository, env: env) }
 
     it "calls out to `popen` without environment variables if the record is invalid" do
       allow(rev_list).to receive(:valid?).and_return(false)

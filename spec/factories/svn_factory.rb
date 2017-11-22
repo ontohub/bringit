@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 def exec_silently(cmd, working_directory = nil)
-  out, status = ::Gitlab::Git::Popen.popen(['bash', '-c', cmd], working_directory)
+  out, status = ::Bringit::Popen.popen(['bash', '-c', cmd], working_directory)
   return if status.zero?
   # :nocov:
   raise "Command failed!\n#{cmd}\nExit status: #{status}\nOutput:\n#{out}\n"

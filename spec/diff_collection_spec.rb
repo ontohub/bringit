@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe Gitlab::Git::DiffCollection, seed_helper: true do
+describe Bringit::DiffCollection, seed_helper: true do
   subject do
-    Gitlab::Git::DiffCollection.new(
+    Bringit::DiffCollection.new(
       iterator,
       max_files: max_files,
       max_lines: max_lines,
@@ -279,7 +279,7 @@ describe Gitlab::Git::DiffCollection, seed_helper: true do
   end
 
   describe 'empty collection' do
-    subject { Gitlab::Git::DiffCollection.new([]) }
+    subject { Bringit::DiffCollection.new([]) }
 
     describe '#overflow?' do
       subject { super().overflow? }
@@ -305,12 +305,12 @@ describe Gitlab::Git::DiffCollection, seed_helper: true do
   describe :each do
     context 'when diff are too large' do
       let(:collection) do
-        Gitlab::Git::DiffCollection.new([{ diff: 'a' * 204800 }])
+        Bringit::DiffCollection.new([{ diff: 'a' * 204800 }])
       end
 
       it 'yields Diff instances even when they are too large' do
         expect { |b| collection.each(&b) }.
-          to yield_with_args(an_instance_of(Gitlab::Git::Diff))
+          to yield_with_args(an_instance_of(Bringit::Diff))
       end
 
       it 'prunes diffs that are too large' do
@@ -332,7 +332,7 @@ describe Gitlab::Git::DiffCollection, seed_helper: true do
 
         it 'yields Diff instances even when they are quite big' do
           expect { |b| subject.each(&b) }.
-            to yield_with_args(an_instance_of(Gitlab::Git::Diff))
+            to yield_with_args(an_instance_of(Bringit::Diff))
         end
 
         it 'does not prune diffs' do
@@ -351,7 +351,7 @@ describe Gitlab::Git::DiffCollection, seed_helper: true do
 
         it 'yields Diff instances even when they are quite big' do
           expect { |b| subject.each(&b) }.
-            to yield_with_args(an_instance_of(Gitlab::Git::Diff))
+            to yield_with_args(an_instance_of(Bringit::Diff))
         end
 
         it 'prunes diffs that are quite big' do
@@ -368,7 +368,7 @@ describe Gitlab::Git::DiffCollection, seed_helper: true do
           let(:iterator) { [fake_diff(1, 1)] * 4 }
 
           before(:each) do
-            stub_const('Gitlab::Git::DiffCollection::DEFAULT_LIMITS', { max_files: 2, max_lines: max_lines })
+            stub_const('Bringit::DiffCollection::DEFAULT_LIMITS', { max_files: 2, max_lines: max_lines })
           end
 
           it 'prunes diffs by default even little ones' do
@@ -393,7 +393,7 @@ describe Gitlab::Git::DiffCollection, seed_helper: true do
           end
 
           before(:each) do
-            stub_const('Gitlab::Git::DiffCollection::DEFAULT_LIMITS', { max_files: max_files, max_lines: 80 })
+            stub_const('Bringit::DiffCollection::DEFAULT_LIMITS', { max_files: max_files, max_lines: 80 })
           end
 
           it 'prunes diffs by default even little ones' do
@@ -418,7 +418,7 @@ describe Gitlab::Git::DiffCollection, seed_helper: true do
           end
 
           before(:each) do
-            stub_const('Gitlab::Git::DiffCollection::DEFAULT_LIMITS', { max_files: max_files, max_lines: 80 })
+            stub_const('Bringit::DiffCollection::DEFAULT_LIMITS', { max_files: max_files, max_lines: 80 })
           end
 
           it 'prunes diffs by default even little ones' do
@@ -438,7 +438,7 @@ describe Gitlab::Git::DiffCollection, seed_helper: true do
 
         it 'yields Diff instances even when they are quite big' do
           expect { |b| subject.each(&b) }.
-            to yield_with_args(an_instance_of(Gitlab::Git::Diff))
+            to yield_with_args(an_instance_of(Bringit::Diff))
         end
 
         it 'does not prune diffs' do

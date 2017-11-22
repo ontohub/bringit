@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Gitlab::Git::Attributes, seed_helper: true do
+describe Bringit::Attributes, seed_helper: true do
   let(:path) do
     File.join(SEED_REPOSITORY_PATH, 'with-git-attributes.git')
   end
@@ -15,12 +15,12 @@ describe Gitlab::Git::Attributes, seed_helper: true do
 
       it 'returns a Hash containing multiple attributes' do
         expect(subject.attributes('test.sh')).
-          to eq({ 'eol' => 'lf', 'gitlab-language' => 'shell' })
+          to eq({ 'eol' => 'lf', 'bringit-language' => 'shell' })
       end
 
       it 'returns a Hash containing attributes for a file with multiple extensions' do
         expect(subject.attributes('test.haml.html')).
-          to eq({ 'gitlab-language' => 'haml' })
+          to eq({ 'bringit-language' => 'haml' })
       end
 
       it 'returns a Hash containing attributes for a file in a directory' do
@@ -40,10 +40,10 @@ describe Gitlab::Git::Attributes, seed_helper: true do
         # When a path is given without a leading slash it should still match
         # patterns defined with a leading slash.
         expect(subject.attributes('foo.png')).
-          to eq({ 'gitlab-language' => 'png' })
+          to eq({ 'bringit-language' => 'png' })
 
         expect(subject.attributes('/foo.png')).
-          to eq({ 'gitlab-language' => 'png' })
+          to eq({ 'bringit-language' => 'png' })
       end
 
       it 'returns an empty Hash for a defined path without attributes' do
@@ -75,7 +75,7 @@ describe Gitlab::Git::Attributes, seed_helper: true do
 
     it 'parses an entry that uses a tab to separate the pattern and attributes' do
       expect(subject.patterns[File.join(path, '*.md')]).
-        to eq({ 'gitlab-language' => 'markdown' })
+        to eq({ 'bringit-language' => 'markdown' })
     end
 
     it 'stores patterns in reverse order' do

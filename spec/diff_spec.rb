@@ -1,7 +1,7 @@
 require "spec_helper"
 
-describe Gitlab::Git::Diff, seed_helper: true do
-  let(:repository) { Gitlab::Git::Repository.new(TEST_REPO_PATH) }
+describe Bringit::Diff, seed_helper: true do
+  let(:repository) { Bringit::Repository.new(TEST_REPO_PATH) }
 
   before do
     @raw_diff_hash = {
@@ -70,8 +70,8 @@ EOT
 
       context 'using a diff that is too large' do
         it 'prunes the diff' do
-          stub_const("Gitlab::Git::Diff::DIFF_SIZE_LIMIT", 2)
-          stub_const("Gitlab::Git::Diff::DIFF_COLLAPSE_LIMIT", 1)
+          stub_const("Bringit::Diff::DIFF_SIZE_LIMIT", 2)
+          stub_const("Bringit::Diff::DIFF_COLLAPSE_LIMIT", 1)
 
           diff = described_class.new(@rugged_diff)
 
@@ -138,7 +138,7 @@ EOT
     let(:diffs) { described_class.between(repository, 'feature', 'master') }
     subject { diffs }
 
-    it { is_expected.to be_kind_of Gitlab::Git::DiffCollection }
+    it { is_expected.to be_kind_of Bringit::DiffCollection }
 
     describe '#size' do
       subject { super().size }

@@ -13,7 +13,7 @@ module Bringit
     attr_reader :bringit
     delegate :bare?, :branches, :branch_count, :branch_exists?, :branch_names,
               :commit_count, :diff, :find_commits, :empty?, :ls_files,
-              :rugged, :tag_names, :tags, to: :gitlab
+              :rugged, :tag_names, :tags, to: :bringit
 
     def self.create(path)
       raise Error, "Path #{path} already exists." if Pathname.new(path).exist?
@@ -23,37 +23,37 @@ module Bringit
     end
 
     def self.destroy(path)
-      new(path.to_s).gitlab.repo_exists? && FileUtils.rm_rf(path)
+      new(path.to_s).bringit.repo_exists? && FileUtils.rm_rf(path)
     end
 
     def initialize(path)
-      @gitlab = Bringit::Repository.new(path.to_s)
+      @bringit = Bringit::Repository.new(path.to_s)
     end
 
     def repo_exists?
-      gitlab.repo_exists?
+      bringit.repo_exists?
     rescue Bringit::Repository::NoRepository
       false
     end
 
     def path
-      Pathname.new(gitlab.
+      Pathname.new(bringit.
                     instance_variable_get(:@attributes).
                     instance_variable_get(:@path))
     end
 
     # Query for a blob
     def blob(ref, path)
-      Bringit::Blob.find(gitlab, ref, path)
+      Bringit::Blob.find(bringit, ref, path)
     end
 
     # Query for a tree
     def tree(ref, path)
-      Bringit::Tree.where(gitlab, ref, path)
+      Bringit::Tree.where(bringit, ref, path)
     end
 
     def commit(ref)
-      Bringit::Commit.find(gitlab, ref)
+      Bringit::Commit.find(bringit, ref)
     end
 
     # Query for a tree
@@ -62,11 +62,11 @@ module Bringit
     end
 
     def branch_sha(name)
-      gitlab.find_branch(name)&.dereferenced_target&.sha
+      bringit.find_branch(name)&.dereferenced_target&.sha
     end
 
     def default_branch
-      gitlab.discover_default_branch
+      bringit.discover_default_branch
     end
 
     def default_branch=(name)
@@ -77,7 +77,7 @@ module Bringit
     # Create a branch with name +name+ at the reference +ref+.
     def create_branch(name, revision)
       raise_invalid_name_error(name) unless Ref.name_valid?(name)
-      gitlab.create_branch(name, revision)
+      bringit.create_branch(name, revision)
     end
 
     def find_branch(name)
@@ -114,14 +114,14 @@ module Bringit
     end
 
     def diff_from_parent(ref = default_branch, options = {})
-      Commit.find(gitlab, ref).diffs(options)
+      Commit.find(bringit, ref).diffs(options)
     end
 
     def log(options)
-      result = gitlab.log(options)
+      result = bringit.log(options)
       return result if options[:only_commit_sha]
       result.map do |commit|
-        Bringit::Commit.new(commit, gitlab)
+        Bringit::Commit.new(commit, bringit)
       end
     end
 
@@ -133,5 +133,4 @@ module Bringit
         %(Name "#{name}" is invalid. See #{url} for a valid format.)
     end
   end
-end
 end

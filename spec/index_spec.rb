@@ -1,8 +1,8 @@
 require "base64"
 require 'spec_helper'
 
-describe Gitlab::Git::Index, seed_helper: true do
-  let(:repository) { Gitlab::Git::Repository.new(TEST_REPO_PATH) }
+describe Bringit::Index, seed_helper: true do
+  let(:repository) { Bringit::Repository.new(TEST_REPO_PATH) }
   let(:index) { described_class.new(repository) }
 
   before do

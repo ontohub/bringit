@@ -102,4 +102,3 @@ module Bringit
     end
   end
 end
-end

@@ -295,7 +295,7 @@ module Bringit
       action, commit_sha = merge_if_needed(options, previous_head_sha)
       return commit_sha if action == :merge_commit_created
 
-      index = Bringit::Index.new(gitlab)
+      index = Bringit::Index.new(bringit)
       parents, last_commit = parents_and_last_commit(options)
       index.read_tree(last_commit.tree) if last_commit
 

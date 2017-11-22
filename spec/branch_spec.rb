@@ -1,7 +1,7 @@
 require "spec_helper"
 
-describe Gitlab::Git::Branch, seed_helper: true do
-  let(:repository) { Gitlab::Git::Repository.new(TEST_REPO_PATH) }
+describe Bringit::Branch, seed_helper: true do
+  let(:repository) { Bringit::Repository.new(TEST_REPO_PATH) }
 
   subject { repository.branches }
 
@@ -41,18 +41,18 @@ describe Gitlab::Git::Branch, seed_helper: true do
 
     context 'finds the first branch' do
       let(:base_branch) { repository.branches.first }
-      let(:found_branch) { Gitlab::Git::Branch.find(repository, base_branch.name) }
+      let(:found_branch) { Bringit::Branch.find(repository, base_branch.name) }
       it_behaves_like 'the correctly found branch'
     end
 
     context 'finds the last branch' do
       let(:base_branch) { repository.branches.last }
-      let(:found_branch) { Gitlab::Git::Branch.find(repository, base_branch.name) }
+      let(:found_branch) { Bringit::Branch.find(repository, base_branch.name) }
       it_behaves_like 'the correctly found branch'
     end
 
     it 'returns nil on a non-existant branch' do
-      expect(Gitlab::Git::Branch.find(repository, 'non existant branch.')).
+      expect(Bringit::Branch.find(repository, 'non existant branch.')).
         to be(nil)
     end
   end
