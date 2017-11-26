@@ -11,8 +11,8 @@ Gem::Specification.new do |s|
   s.date        = Time.now.strftime("%Y-%m-%d")
   s.summary     = "Bringit library"
   s.description = "Bringit wrapper around git objects"
-  s.authors     = ['Dmitriy Zaporozhets']
-  s.email       = 'dmitriy.zaporozhets@gmail.com'
+  s.authors     = ['Ontohub Core Developers', 'Dmitriy Zaporozhets']
+  s.email       = ['ontohub-dev-l@ovgu.de', 'dmitriy.zaporozhets@gmail.com']
   s.license     = 'MIT'
   s.files       = `git ls-files lib/`.split("\n")
   s.homepage    =
