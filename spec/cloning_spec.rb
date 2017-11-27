@@ -27,13 +27,22 @@ RSpec.describe(Bringit::Cloning) do
       expect { Bringit::Wrapper.clone(@path, "file://#{tempdir}") }.
         to raise_error(Bringit::Cloning::InvalidRemoteError)
     end
+
+    it 'is not a valid remote' do
+      expect(Bringit::Wrapper.valid_remote?("file://#{tempdir}")).to be(false)
+    end
   end
 
   context 'git clone' do
     context 'on an empty remote', :git_repository do
       git_subject do
-        remote = create(:git)
-        Bringit::Wrapper.clone(@path, "file://#{remote.path}")
+        @remote = create(:git)
+        Bringit::Wrapper.clone(@path, "file://#{@remote.path}")
+      end
+
+      it 'is a valid remote' do
+        expect(Bringit::Wrapper.valid_remote?("file://#{@remote.path}")).
+          to be(true)
       end
 
       it_behaves_like 'a valid clone'
@@ -52,6 +61,11 @@ RSpec.describe(Bringit::Cloning) do
       end
 
       let(:remote) { @remote }
+
+      it 'is a valid remote' do
+        expect(Bringit::Wrapper.valid_remote?("file://#{@remote.path}")).
+          to be(true)
+      end
 
       it_behaves_like 'a valid clone'
 
@@ -72,8 +86,13 @@ RSpec.describe(Bringit::Cloning) do
   context 'git svn clone', :svn do
     context 'on an empty remote', :git_repository do
       git_subject do
-        remote_paths = create(:svn_repository)
-        Bringit::Wrapper.clone(@path, "file://#{remote_paths.first}")
+        @remote_paths = create(:svn_repository)
+        Bringit::Wrapper.clone(@path, "file://#{@remote_paths.first}")
+      end
+
+      it 'is a valid remote' do
+        expect(Bringit::Wrapper.valid_remote?("file://#{@remote_paths.first}")).
+          to be(true)
       end
 
       it_behaves_like 'a valid clone'
@@ -87,8 +106,14 @@ RSpec.describe(Bringit::Cloning) do
       context 'on a remote without branches and no additional commits',
         :git_repository do
         git_subject do
-          remote_paths = create(:svn_repository, :with_svn_standard_layout)
-          Bringit::Wrapper.clone(@path, "file://#{remote_paths.first}")
+          @remote_paths = create(:svn_repository, :with_svn_standard_layout)
+          Bringit::Wrapper.clone(@path, "file://#{@remote_paths.first}")
+        end
+
+        it 'is a valid remote' do
+          expect(Bringit::Wrapper.
+                   valid_remote?("file://#{@remote_paths.first}")).
+            to be(true)
         end
 
         it_behaves_like 'a valid clone'
@@ -107,10 +132,16 @@ RSpec.describe(Bringit::Cloning) do
       context 'on a remote with branches, but no additional commits',
         :git_repository do
         git_subject do
-          remote_paths =
+          @remote_paths =
             create(:svn_repository, :with_svn_standard_layout,
                    :with_svn_branches, branch_count: @branch_count)
-          Bringit::Wrapper.clone(@path, "file://#{remote_paths.first}")
+          Bringit::Wrapper.clone(@path, "file://#{@remote_paths.first}")
+        end
+
+        it 'is a valid remote' do
+          expect(Bringit::Wrapper.
+                   valid_remote?("file://#{@remote_paths.first}")).
+            to be(true)
         end
 
         it_behaves_like 'a valid clone'
@@ -138,14 +169,20 @@ RSpec.describe(Bringit::Cloning) do
         git_subject do
           @dir = Dir.mktmpdir
           Dir.chdir(@dir) do
-            remote_paths =
+            @remote_paths =
               create(:svn_repository, :with_svn_standard_layout,
                      :with_svn_branches,
                      :with_svn_commits,
                      branch_count: @branch_count,
                      commit_count: @commit_count)
-            Bringit::Wrapper.clone(@path, "file://#{remote_paths.first}")
+            Bringit::Wrapper.clone(@path, "file://#{@remote_paths.first}")
           end
+        end
+
+        it 'is a valid remote' do
+          expect(Bringit::Wrapper.
+                   valid_remote?("file://#{@remote_paths.first}")).
+            to be(true)
         end
 
         it_behaves_like 'a valid clone'
@@ -173,10 +210,15 @@ RSpec.describe(Bringit::Cloning) do
     context 'without an svn-standard layout but with commits',
       :git_repository do
       git_subject do
-        remote_paths =
+        @remote_paths =
           create(:svn_repository, :with_svn_commits,
                  commit_count: @commit_count)
-        Bringit::Wrapper.clone(@path, "file://#{remote_paths.first}")
+        Bringit::Wrapper.clone(@path, "file://#{@remote_paths.first}")
+      end
+
+      it 'is a valid remote' do
+        expect(Bringit::Wrapper.valid_remote?("file://#{@remote_paths.first}")).
+          to be(true)
       end
 
       it_behaves_like 'a valid clone'

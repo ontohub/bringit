@@ -167,10 +167,11 @@ wrapper.rugged
 ### Clone
 
 Allows you to clone a remote git or svn repository.
-Note that `git` must be in the `PATH` and that `git-svn` must be installed if svn functionality is needed.
+Note that `git` must be in the `PATH` and that `git-svn` as well as `svn` must be installed if svn functionality is needed.
 
 ```ruby
-Bringit::Wrapper.clone(path, remote_address)
+Bringit::Wrapper.valid_remote?(remote_address) # => true / false. Tests if the remote repository is of a supported type.
+Bringit::Wrapper.clone(path, remote_address) # => #<Bringit::Wrapper:0x00007fa91fa1e440 ...>
 ```
 
 ### Pull

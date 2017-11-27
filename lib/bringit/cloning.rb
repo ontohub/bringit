@@ -20,6 +20,10 @@ module Bringit
         new(path)
       end
 
+      def valid_remote?(remote)
+        remote_git?(remote) || !!remote_svn_layout(remote)
+      end
+
       protected
 
       def clone_git(path, remote)
