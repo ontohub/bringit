@@ -1,7 +1,7 @@
 require "spec_helper"
 
-describe Gitlab::Git::EncodingHelper do
-  let(:ext_class) { Class.new { extend Gitlab::Git::EncodingHelper } }
+describe Bringit::EncodingHelper do
+  let(:ext_class) { Class.new { extend Bringit::EncodingHelper } }
   let(:binary_string) { File.join(SEED_REPOSITORY_PATH, 'gitlab_logo.png') }
 
   describe '#encode!' do

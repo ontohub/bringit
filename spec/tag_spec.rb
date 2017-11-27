@@ -1,7 +1,7 @@
 require "spec_helper"
 
-describe Gitlab::Git::Tag, seed_helper: true do
-  let(:repository) { Gitlab::Git::Repository.new(TEST_REPO_PATH) }
+describe Bringit::Tag, seed_helper: true do
+  let(:repository) { Bringit::Repository.new(TEST_REPO_PATH) }
 
   describe 'first tag' do
     let(:tag) { repository.tags.first }
@@ -39,13 +39,13 @@ describe Gitlab::Git::Tag, seed_helper: true do
 
     context 'finds the first tag' do
       let(:base_tag) { repository.tags.first }
-      let(:found_tag) { Gitlab::Git::Tag.find(repository, base_tag.name) }
+      let(:found_tag) { Bringit::Tag.find(repository, base_tag.name) }
       it_behaves_like 'the correctly found tag'
     end
 
     context 'finds the last tag' do
       let(:base_tag) { repository.tags.last }
-      let(:found_tag) { Gitlab::Git::Tag.find(repository, base_tag.name) }
+      let(:found_tag) { Bringit::Tag.find(repository, base_tag.name) }
       it_behaves_like 'the correctly found tag'
     end
 
@@ -53,7 +53,7 @@ describe Gitlab::Git::Tag, seed_helper: true do
       # This name cannot be a tag. See
       # https://git-scm.com/docs/git-check-ref-format:
       # 7. They cannot end with a dot `.`.
-      expect(Gitlab::Git::Tag.find(repository, 'non existant tag.')).to be(nil)
+      expect(Bringit::Tag.find(repository, 'non existant tag.')).to be(nil)
     end
   end
 

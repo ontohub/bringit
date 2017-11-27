@@ -1,9 +1,9 @@
 require "spec_helper"
 
-describe Gitlab::Git::Compare, seed_helper: true do
-  let(:repository) { Gitlab::Git::Repository.new(TEST_REPO_PATH) }
-  let(:compare) { Gitlab::Git::Compare.new(repository, SeedRepo::BigCommit::ID, SeedRepo::Commit::ID, false) }
-  let(:compare_straight) { Gitlab::Git::Compare.new(repository, SeedRepo::BigCommit::ID, SeedRepo::Commit::ID, true) }
+describe Bringit::Compare, seed_helper: true do
+  let(:repository) { Bringit::Repository.new(TEST_REPO_PATH) }
+  let(:compare) { Bringit::Compare.new(repository, SeedRepo::BigCommit::ID, SeedRepo::Commit::ID, false) }
+  let(:compare_straight) { Bringit::Compare.new(repository, SeedRepo::BigCommit::ID, SeedRepo::Commit::ID, true) }
 
   describe :commits do
     subject do
@@ -18,25 +18,25 @@ describe Gitlab::Git::Compare, seed_helper: true do
     it { is_expected.not_to include(SeedRepo::BigCommit::PARENT_ID) }
 
     context 'non-existing base ref' do
-      let(:compare) { Gitlab::Git::Compare.new(repository, 'no-such-branch', SeedRepo::Commit::ID) }
+      let(:compare) { Bringit::Compare.new(repository, 'no-such-branch', SeedRepo::Commit::ID) }
 
       it { is_expected.to be_empty }
     end
 
     context 'non-existing head ref' do
-      let(:compare) { Gitlab::Git::Compare.new(repository, SeedRepo::BigCommit::ID, '1234567890') }
+      let(:compare) { Bringit::Compare.new(repository, SeedRepo::BigCommit::ID, '1234567890') }
 
       it { is_expected.to be_empty }
     end
 
     context 'base ref is equal to head ref' do
-      let(:compare) { Gitlab::Git::Compare.new(repository, SeedRepo::BigCommit::ID, SeedRepo::BigCommit::ID) }
+      let(:compare) { Bringit::Compare.new(repository, SeedRepo::BigCommit::ID, SeedRepo::BigCommit::ID) }
 
       it { is_expected.to be_empty }
     end
 
     context 'providing nil as base ref or head ref' do
-      let(:compare) { Gitlab::Git::Compare.new(repository, nil, nil) }
+      let(:compare) { Bringit::Compare.new(repository, nil, nil) }
 
       it { is_expected.to be_empty }
     end
@@ -55,13 +55,13 @@ describe Gitlab::Git::Compare, seed_helper: true do
     it { is_expected.not_to include('LICENSE') }
 
     context 'non-existing base ref' do
-      let(:compare) { Gitlab::Git::Compare.new(repository, 'no-such-branch', SeedRepo::Commit::ID) }
+      let(:compare) { Bringit::Compare.new(repository, 'no-such-branch', SeedRepo::Commit::ID) }
 
       it { is_expected.to be_empty }
     end
 
     context 'non-existing head ref' do
-      let(:compare) { Gitlab::Git::Compare.new(repository, SeedRepo::BigCommit::ID, '1234567890') }
+      let(:compare) { Bringit::Compare.new(repository, SeedRepo::BigCommit::ID, '1234567890') }
 
       it { is_expected.to be_empty }
     end
@@ -75,7 +75,7 @@ describe Gitlab::Git::Compare, seed_helper: true do
     it { is_expected.to eq(false) }
 
     context 'base ref is equal to head ref' do
-      let(:compare) { Gitlab::Git::Compare.new(repository, SeedRepo::BigCommit::ID, SeedRepo::BigCommit::ID) }
+      let(:compare) { Bringit::Compare.new(repository, SeedRepo::BigCommit::ID, SeedRepo::BigCommit::ID) }
 
       it { is_expected.to eq(true) }
     end

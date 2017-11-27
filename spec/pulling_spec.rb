@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe(Gitlab::Git::Pulling) do
+RSpec.describe(Bringit::Pulling) do
   before(:all) do
     @path = 'clone.git'
     @commit_count = 3
@@ -17,7 +17,7 @@ RSpec.describe(Gitlab::Git::Pulling) do
       @remote = create(:git)
 
       # clone the repository
-      @subject = Gitlab::Git::Wrapper.clone(@path, "file://#{@remote.path}")
+      @subject = Bringit::Wrapper.clone(@path, "file://#{@remote.path}")
 
       # create commits
       @commit_count.times { @remote.create_file(create(:git_commit_info)) }
@@ -55,7 +55,7 @@ RSpec.describe(Gitlab::Git::Pulling) do
         @svn_work_path = remote_paths.last
 
         # clone the repository
-        @subject = Gitlab::Git::Wrapper.clone(@path, "file://#{remote_paths.first}")
+        @subject = Bringit::Wrapper.clone(@path, "file://#{remote_paths.first}")
 
         # create branches
         @branch_count.times do
@@ -108,7 +108,7 @@ RSpec.describe(Gitlab::Git::Pulling) do
         @svn_work_path = remote_paths.last
 
         # clone the repository
-        @subject = Gitlab::Git::Wrapper.clone(@path, "file://#{remote_paths.first}")
+        @subject = Bringit::Wrapper.clone(@path, "file://#{remote_paths.first}")
 
         # create commits
         @commit_count.times do

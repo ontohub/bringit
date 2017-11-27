@@ -1,9 +1,9 @@
 require "spec_helper"
 
-describe Gitlab::Git::Repository, seed_helper: true do
-  include Gitlab::Git::EncodingHelper
+describe Bringit::Repository, seed_helper: true do
+  include Bringit::EncodingHelper
 
-  let(:repository) { Gitlab::Git::Repository.new(TEST_REPO_PATH) }
+  let(:repository) { Bringit::Repository.new(TEST_REPO_PATH) }
 
   describe "Respond to" do
     subject { repository }
@@ -192,7 +192,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
 
     describe '#first' do
       subject { super().first }
-      it { is_expected.to be_kind_of Gitlab::Git::BlobSnippet }
+      it { is_expected.to be_kind_of Bringit::BlobSnippet }
     end
 
     context 'blob result' do
@@ -221,7 +221,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
   end
 
   context '#submodules' do
-    let(:repository) { Gitlab::Git::Repository.new(TEST_REPO_PATH) }
+    let(:repository) { Bringit::Repository.new(TEST_REPO_PATH) }
 
     context 'where repo has submodules' do
       let(:submodules) { repository.submodules('master') }
@@ -311,7 +311,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
           f.write(untracked_text)
         end
 
-        @normal_repo = Gitlab::Git::Repository.new(TEST_NORMAL_REPO_PATH)
+        @normal_repo = Bringit::Repository.new(TEST_NORMAL_REPO_PATH)
         @normal_repo.reset("HEAD", :hard)
       end
 
@@ -354,7 +354,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
 
     context "-b" do
       before(:all) do
-        @normal_repo = Gitlab::Git::Repository.new(TEST_NORMAL_REPO_PATH)
+        @normal_repo = Bringit::Repository.new(TEST_NORMAL_REPO_PATH)
         @normal_repo.checkout(new_branch, { b: true }, "origin/feature")
       end
 
@@ -382,7 +382,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
     context "without -b" do
       context "and specifying a nonexistent branch" do
         it "should not do anything" do
-          normal_repo = Gitlab::Git::Repository.new(TEST_NORMAL_REPO_PATH)
+          normal_repo = Bringit::Repository.new(TEST_NORMAL_REPO_PATH)
 
           expect { normal_repo.checkout(new_branch) }.to raise_error(Rugged::ReferenceError)
           expect(normal_repo.rugged.branches[new_branch]).to be_nil
@@ -402,7 +402,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
 
       context "and with a valid branch" do
         before(:all) do
-          @normal_repo = Gitlab::Git::Repository.new(TEST_NORMAL_REPO_PATH)
+          @normal_repo = Bringit::Repository.new(TEST_NORMAL_REPO_PATH)
           @normal_repo.rugged.branches.create("feature", "origin/feature")
           @normal_repo.checkout("feature")
         end
@@ -429,7 +429,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
 
   describe "#delete_branch" do
     before(:all) do
-      @repo = Gitlab::Git::Repository.new(TEST_MUTABLE_REPO_PATH)
+      @repo = Bringit::Repository.new(TEST_MUTABLE_REPO_PATH)
       @repo.delete_branch("feature")
     end
 
@@ -449,7 +449,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
 
   describe "#create_branch" do
     before(:all) do
-      @repo = Gitlab::Git::Repository.new(TEST_MUTABLE_REPO_PATH)
+      @repo = Bringit::Repository.new(TEST_MUTABLE_REPO_PATH)
     end
 
     it "should create a new branch" do
@@ -496,7 +496,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
 
   describe "#remote_delete" do
     before(:all) do
-      @repo = Gitlab::Git::Repository.new(TEST_MUTABLE_REPO_PATH)
+      @repo = Bringit::Repository.new(TEST_MUTABLE_REPO_PATH)
       @repo.remote_delete("expendable")
     end
 
@@ -512,7 +512,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
 
   describe "#remote_add" do
     before(:all) do
-      @repo = Gitlab::Git::Repository.new(TEST_MUTABLE_REPO_PATH)
+      @repo = Bringit::Repository.new(TEST_MUTABLE_REPO_PATH)
       @repo.remote_add("new_remote", SeedHelper::GITLAB_URL)
     end
 
@@ -528,7 +528,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
 
   describe "#remote_update" do
     before(:all) do
-      @repo = Gitlab::Git::Repository.new(TEST_MUTABLE_REPO_PATH)
+      @repo = Bringit::Repository.new(TEST_MUTABLE_REPO_PATH)
       @repo.remote_update("expendable", url: TEST_NORMAL_REPO_PATH)
     end
 
@@ -551,7 +551,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
 
     before(:context) do
       # Add new commits so that there's a renamed file in the commit history
-      repo = Gitlab::Git::Repository.new(TEST_REPO_PATH).rugged
+      repo = Bringit::Repository.new(TEST_REPO_PATH).rugged
 
       commit_with_old_name = new_commit_edit_old_file(repo)
       rename_commit = new_commit_move_file(repo)
@@ -560,7 +560,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
 
     after(:context) do
       # Erase our commits so other tests get the original repo
-      repo = Gitlab::Git::Repository.new(TEST_REPO_PATH).rugged
+      repo = Bringit::Repository.new(TEST_REPO_PATH).rugged
       repo.references.update("refs/heads/master", SeedRepo::LastCommit::ID)
     end
 
@@ -900,7 +900,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
 
   describe '#autocrlf' do
     before(:all) do
-      @repo = Gitlab::Git::Repository.new(TEST_MUTABLE_REPO_PATH)
+      @repo = Bringit::Repository.new(TEST_MUTABLE_REPO_PATH)
       @repo.rugged.config['core.autocrlf'] = true
     end
 
@@ -915,7 +915,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
 
   describe '#autocrlf=' do
     before(:all) do
-      @repo = Gitlab::Git::Repository.new(TEST_MUTABLE_REPO_PATH)
+      @repo = Bringit::Repository.new(TEST_MUTABLE_REPO_PATH)
       @repo.rugged.config['core.autocrlf'] = false
     end
 
@@ -936,7 +936,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
     it 'should return a Branch for master' do
       branch = repository.find_branch('master')
 
-      expect(branch).to be_a_kind_of(Gitlab::Git::Branch)
+      expect(branch).to be_a_kind_of(Bringit::Branch)
       expect(branch.name).to eq('master')
     end
 
@@ -952,7 +952,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
       repository.find_branch('master')
       branch = repository.find_branch('master', force_reload: true)
 
-      expect(branch).to be_a_kind_of(Gitlab::Git::Branch)
+      expect(branch).to be_a_kind_of(Bringit::Branch)
       expect(branch.name).to eq('master')
     end
   end
@@ -1017,7 +1017,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
     let(:attributes_path) { File.join(TEST_REPO_PATH, 'info/attributes') }
 
     it "raises an error with invalid ref" do
-      expect { repository.copy_gitattributes("invalid") }.to raise_error(Gitlab::Git::Repository::InvalidRef)
+      expect { repository.copy_gitattributes("invalid") }.to raise_error(Bringit::Repository::InvalidRef)
     end
 
     context "with no .gitattrbutes" do
@@ -1099,7 +1099,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
     end
 
     it "should return true for files which are text and do not have attributes" do
-      blob = Gitlab::Git::Blob.find(
+      blob = Bringit::Blob.find(
         repository,
         '33bcff41c232a11727ac6d660bd4b0c2ba86d63d',
         'LICENSE'
@@ -1108,7 +1108,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
     end
 
     it "should return false for binary files which do not have attributes" do
-      blob = Gitlab::Git::Blob.find(
+      blob = Bringit::Blob.find(
         repository,
         '33bcff41c232a11727ac6d660bd4b0c2ba86d63d',
         'files/images/logo-white.png'
@@ -1117,7 +1117,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
     end
 
     it "should return false for text files which have been marked as not being diffable in attributes" do
-      blob = Gitlab::Git::Blob.find(
+      blob = Bringit::Blob.find(
         repository,
         '33bcff41c232a11727ac6d660bd4b0c2ba86d63d',
         'README.md'
@@ -1158,7 +1158,7 @@ describe Gitlab::Git::Repository, seed_helper: true do
 
   describe '#local_branches' do
     before(:all) do
-      @repo = Gitlab::Git::Repository.new(TEST_MUTABLE_REPO_PATH)
+      @repo = Bringit::Repository.new(TEST_MUTABLE_REPO_PATH)
     end
 
     after(:all) do

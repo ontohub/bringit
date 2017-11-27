@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe(Gitlab::Git::Wrapper) do
+RSpec.describe(Bringit::Wrapper) do
   subject { FactoryBot.create(:git) }
   let(:branch) { 'master' }
   let(:invalid_sha) { '0' * 40 }
@@ -11,13 +11,13 @@ RSpec.describe(Gitlab::Git::Wrapper) do
     it 'fails if the path already exists' do
       path = tempdir.join('repo')
       path.mkpath
-      expect { Gitlab::Git::Wrapper.create(path) }.to raise_error(Gitlab::Git::Error, /already exists/)
+      expect { Bringit::Wrapper.create(path) }.to raise_error(Bringit::Error, /already exists/)
     end
 
-    let!(:git) { Gitlab::Git::Wrapper.create('my_repo') }
+    let!(:git) { Bringit::Wrapper.create('my_repo') }
 
-    it 'is a Gitlab::Git::Wrapper' do
-      expect(git).to be_a(Gitlab::Git::Wrapper)
+    it 'is a Bringit::Wrapper' do
+      expect(git).to be_a(Bringit::Wrapper)
     end
 
     it 'creates an existing git repository' do
@@ -46,7 +46,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
       # create the subject
       subject
       # and destroy it
-      Gitlab::Git::Wrapper.destroy(subject.path)
+      Bringit::Wrapper.destroy(subject.path)
     end
 
     it 'removes the directory of the git repository' do
@@ -66,7 +66,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
 
   context 'repo_exists?' do
     context 'when the repository exists' do
-      let!(:git) { Gitlab::Git::Wrapper.create('my_repo') }
+      let!(:git) { Bringit::Wrapper.create('my_repo') }
 
       it 'is true' do
         expect(git.repo_exists?).to be(true)
@@ -74,7 +74,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
     end
 
     context 'when the repository does not exist' do
-      let!(:git) { Gitlab::Git::Wrapper.new('my_repo') }
+      let!(:git) { Bringit::Wrapper.new('my_repo') }
 
       it 'is true' do
         expect(git.repo_exists?).to be(false)
@@ -210,7 +210,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
     let!(:sha) { subject.create_file(commit_info) }
 
     it 'finds a commit by branch' do
-      expect(subject.commit(branch)).to be_a(Gitlab::Git::Commit)
+      expect(subject.commit(branch)).to be_a(Bringit::Commit)
     end
 
     it 'finds the same commit by sha/branch' do
@@ -426,14 +426,14 @@ RSpec.describe(Gitlab::Git::Wrapper) do
       context 'invalid name' do
         it 'fails' do
           expect { subject.create_branch("#{name}.", branch) }.
-            to raise_error(Gitlab::Git::InvalidRefName)
+            to raise_error(Bringit::InvalidRefName)
         end
 
         it 'has the correct number of branches' do
           expect do
             begin
               subject.create_branch("#{name}.", branch)
-            rescue Gitlab::Git::InvalidRefName
+            rescue Bringit::InvalidRefName
             end
           end.not_to(change { subject.branches.size })
         end
@@ -446,7 +446,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
 
         it 'fails' do
           expect { subject.create_branch(name, sha2) }.
-            to raise_error(Gitlab::Git::Repository::InvalidRef,
+            to raise_error(Bringit::Repository::InvalidRef,
                            /branch new_branch already exists/i)
         end
 
@@ -472,7 +472,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
         subject.create_branch(name, sha2)
       end
 
-      let(:base_branch) { Gitlab::Git::Branch.find(subject, name) }
+      let(:base_branch) { Bringit::Branch.find(subject, name) }
       let(:found_branch) { subject.find_branch(name) }
 
       it 'points to the correct commit' do
@@ -495,11 +495,11 @@ RSpec.describe(Gitlab::Git::Wrapper) do
         before { subject.rm_branch(name) }
 
         it 'the deleted branch cannot be found' do
-          expect(Gitlab::Git::Branch.find(subject, name)).to be(nil)
+          expect(Bringit::Branch.find(subject, name)).to be(nil)
         end
 
         it 'the other tag can still be found' do
-          expect(Gitlab::Git::Branch.find(subject, "pre_#{name}")).
+          expect(Bringit::Branch.find(subject, "pre_#{name}")).
             not_to be(nil)
         end
 
@@ -589,14 +589,14 @@ RSpec.describe(Gitlab::Git::Wrapper) do
       context 'invalid name' do
         it 'fails' do
           expect { subject.create_tag("#{name}.", branch) }.
-            to raise_error(Gitlab::Git::InvalidRefName)
+            to raise_error(Bringit::InvalidRefName)
         end
 
         it 'has the correct number of tags' do
           expect do
             begin
               subject.create_tag("#{name}.", branch)
-            rescue Gitlab::Git::InvalidRefName
+            rescue Bringit::InvalidRefName
             end
           end.not_to(change { subject.tags.size })
         end
@@ -609,7 +609,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
 
         it 'fails' do
           expect { subject.create_tag(name, branch) }.
-            to raise_error(Gitlab::Git::Repository::InvalidRef,
+            to raise_error(Bringit::Repository::InvalidRef,
                            /tag already exists/i)
         end
 
@@ -652,7 +652,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
         subject.create_tag(name, sha2)
       end
 
-      let(:base_tag) { Gitlab::Git::Tag.find(subject, name) }
+      let(:base_tag) { Bringit::Tag.find(subject, name) }
       let(:found_tag) { subject.find_tag(name) }
 
       it 'points to the correct commit' do
@@ -679,11 +679,11 @@ RSpec.describe(Gitlab::Git::Wrapper) do
         before { subject.rm_tag(name) }
 
         it 'the deleted tag cannot be found' do
-          expect(Gitlab::Git::Tag.find(subject, name)).to be(nil)
+          expect(Bringit::Tag.find(subject, name)).to be(nil)
         end
 
         it 'the other tag can still be found' do
-          expect(Gitlab::Git::Tag.find(subject, "pre_#{name}")).
+          expect(Bringit::Tag.find(subject, "pre_#{name}")).
             not_to be(nil)
         end
 
@@ -795,11 +795,11 @@ RSpec.describe(Gitlab::Git::Wrapper) do
         let(:diffs) { subject.diff(setup_commits.first, setup_commits.last) }
 
         it 'is of the correct class' do
-          expect(diffs).to be_a(Gitlab::Git::DiffCollection)
+          expect(diffs).to be_a(Bringit::DiffCollection)
         end
 
         it 'has elements of the correct class' do
-          expect(diffs.first).to be_a(Gitlab::Git::Diff)
+          expect(diffs.first).to be_a(Bringit::Diff)
         end
 
         it 'has the correct number of diffs (changed files)' do
@@ -814,11 +814,11 @@ RSpec.describe(Gitlab::Git::Wrapper) do
           end
 
           it 'is of the correct class' do
-            expect(diffs).to be_a(Gitlab::Git::DiffCollection)
+            expect(diffs).to be_a(Bringit::DiffCollection)
           end
 
           it 'has elements of the correct class' do
-            expect(diffs.first).to be_a(Gitlab::Git::Diff)
+            expect(diffs.first).to be_a(Bringit::Diff)
           end
 
           it 'has the correct number of diffs (changed files)' do
@@ -835,11 +835,11 @@ RSpec.describe(Gitlab::Git::Wrapper) do
           end
 
           it 'is of the correct class' do
-            expect(diffs).to be_a(Gitlab::Git::DiffCollection)
+            expect(diffs).to be_a(Bringit::DiffCollection)
           end
 
           it 'has elements of the correct class' do
-            expect(diffs.first).to be_a(Gitlab::Git::Diff)
+            expect(diffs.first).to be_a(Bringit::Diff)
           end
 
           it 'has the correct number of diffs (changed files)' do
@@ -856,11 +856,11 @@ RSpec.describe(Gitlab::Git::Wrapper) do
         let(:diffs) { subject.diff_from_parent }
 
         it 'is of the correct class' do
-          expect(diffs).to be_a(Gitlab::Git::DiffCollection)
+          expect(diffs).to be_a(Bringit::DiffCollection)
         end
 
         it 'has elements of the correct class' do
-          expect(diffs.first).to be_a(Gitlab::Git::Diff)
+          expect(diffs.first).to be_a(Bringit::Diff)
         end
 
         it 'has the correct number of diffs (changed files)' do
@@ -875,11 +875,11 @@ RSpec.describe(Gitlab::Git::Wrapper) do
         let(:diffs) { subject.diff_from_parent(ref) }
 
         it 'is of the correct class' do
-          expect(diffs).to be_a(Gitlab::Git::DiffCollection)
+          expect(diffs).to be_a(Bringit::DiffCollection)
         end
 
         it 'has elements of the correct class' do
-          expect(diffs.first).to be_a(Gitlab::Git::Diff)
+          expect(diffs.first).to be_a(Bringit::Diff)
         end
 
         it 'has the correct number of diffs (changed files)' do
@@ -910,7 +910,7 @@ RSpec.describe(Gitlab::Git::Wrapper) do
 
     it 'contains objects of the correct class' do
       expect(subject.log(ref: branch).map(&:class).uniq).
-        to eq([Gitlab::Git::Commit])
+        to eq([Bringit::Commit])
     end
 
     it 'allows to specify ranges' do

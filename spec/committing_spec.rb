@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe(Gitlab::Git::Committing) do
+RSpec.describe(Bringit::Committing) do
   context 'without errors' do
     subject { create(:git) }
 
@@ -459,13 +459,13 @@ CONTENT
     shared_examples 'failing to commit' do
       it 'raises an error' do
         expect { new_commit }.
-          to raise_error(Gitlab::Git::Committing::HeadChangedError)
+          to raise_error(Bringit::Committing::HeadChangedError)
       end
 
       it 'raises an error with the correct conflicts' do
         begin
           new_commit
-        rescue Gitlab::Git::Committing::HeadChangedError => e
+        rescue Bringit::Committing::HeadChangedError => e
           expect(e.conflicts).
             to match([{ancestor: expected_conflict_ancestor,
                        ours: expected_conflict_ours,
@@ -478,7 +478,7 @@ CONTENT
         before do
           begin
             new_commit
-          rescue Gitlab::Git::Committing::HeadChangedError
+          rescue Bringit::Committing::HeadChangedError
           end
         end
 
@@ -605,7 +605,7 @@ CONTENT
           options = create(:git_commit_info, branch: branch)
           options.delete(:file)
           subject.mkdir(path, options)
-        end.to raise_error(Gitlab::Git::Repository::InvalidBlobName,
+        end.to raise_error(Bringit::Repository::InvalidBlobName,
                            /Directory already exists as a file/)
       end
     end
@@ -628,7 +628,7 @@ CONTENT
           options = create(:git_commit_info, branch: branch)
           options.delete(:file)
           subject.mkdir(path, options)
-        end.to raise_error(Gitlab::Git::Repository::InvalidBlobName,
+        end.to raise_error(Bringit::Repository::InvalidBlobName,
                            /Directory already exists/)
       end
     end

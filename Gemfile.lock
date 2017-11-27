@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    gitlab_git (11.0.0)
+    bringit (1.0.0)
       activesupport (>= 4.0)
       charlock_holmes (~> 0.7.3)
       github-linguist (>= 5.1, < 5.4)
@@ -82,15 +82,15 @@ PLATFORMS
 
 DEPENDENCIES
   appraisal
+  bringit!
   bundler-audit (~> 0.6.0)
   factory_bot (~> 4.8.2)
   faker (~> 1.8.4)
   fuubar (~> 2.2.0)
-  gitlab_git!
   pry
   rake
   rspec (~> 3.7.0)
   simplecov
 
 BUNDLED WITH
-   1.15.4
+   1.16.0

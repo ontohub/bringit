@@ -13,18 +13,18 @@ module GitRepositoryExampleGroup
         Dir.chdir(@dir) do
           git_subject_block = git_subject_proc.call
           git = instance_eval(&git_subject_block)
-          raise 'Block did not return a Wrapper instance!' unless git.is_a?(Gitlab::Git::Wrapper)
+          raise 'Block did not return a Wrapper instance!' unless git.is_a?(Bringit::Wrapper)
           @git_path = git.path
         end
       end
       after(:all) { Pathname.new(@dir).rmtree }
-      subject { Gitlab::Git::Wrapper.new(@git_path) }
+      subject { Bringit::Wrapper.new(@git_path) }
     end
   end
 
   module ExampleGroupMethods
-    # This method sets the subject to a new instance of Gitlab::Git::Wrapper that is created with
-    # the block. The given block must return an instance of Gitlab::Git::Wrapper.
+    # This method sets the subject to a new instance of Bringit::Wrapper that is created with
+    # the block. The given block must return an instance of Bringit::Wrapper.
     def git_subject(&block)
       @git_subject_block = block
     end

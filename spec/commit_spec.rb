@@ -1,15 +1,15 @@
 require "spec_helper"
 
-describe Gitlab::Git::Commit, seed_helper: true do
-  let(:repository) { Gitlab::Git::Repository.new(TEST_REPO_PATH) }
-  let(:commit) { Gitlab::Git::Commit.find(repository, SeedRepo::Commit::ID) }
+describe Bringit::Commit, seed_helper: true do
+  let(:repository) { Bringit::Repository.new(TEST_REPO_PATH) }
+  let(:commit) { Bringit::Commit.find(repository, SeedRepo::Commit::ID) }
   let(:rugged_commit) do
     repository.rugged.lookup(SeedRepo::Commit::ID)
   end
 
   describe "Commit info" do
     before do
-      repo = Gitlab::Git::Repository.new(TEST_REPO_PATH).rugged
+      repo = Bringit::Repository.new(TEST_REPO_PATH).rugged
 
       @committer = {
         email: 'mike@smith.com',
@@ -24,8 +24,8 @@ describe Gitlab::Git::Commit, seed_helper: true do
       }
 
       @parents = [repo.head.target]
-      @gitlab_parents =
-        @parents.map { |c| Gitlab::Git::Commit.decorate(c, repo) }
+      @bringit_parents =
+        @parents.map { |c| Bringit::Commit.decorate(c, repo) }
       @tree = @parents.first.tree
 
       sha = Rugged::Commit.create(
@@ -39,7 +39,7 @@ describe Gitlab::Git::Commit, seed_helper: true do
       )
 
       @raw_commit = repo.lookup(sha)
-      @commit = Gitlab::Git::Commit.new(@raw_commit, repo)
+      @commit = Bringit::Commit.new(@raw_commit, repo)
     end
 
     it { expect(@commit.short_id).to eq(@raw_commit.oid[0..10]) }
@@ -53,14 +53,14 @@ describe Gitlab::Git::Commit, seed_helper: true do
     it { expect(@commit.committer_name).to eq(@committer[:name]) }
     it { expect(@commit.committer_email).to eq(@committer[:email]) }
     it { expect(@commit.different_committer?).to be_truthy }
-    it { expect(@commit.parents).to eq(@gitlab_parents) }
+    it { expect(@commit.parents).to eq(@bringit_parents) }
     it { expect(@commit.parent_id).to eq(@parents.first.oid) }
     it { expect(@commit.no_commit_message).to eq("--no commit message") }
     it { expect(@commit.tree).to eq(@tree) }
 
     after do
       # Erase the new commit so other tests get the original repo
-      repo = Gitlab::Git::Repository.new(TEST_REPO_PATH).rugged
+      repo = Bringit::Repository.new(TEST_REPO_PATH).rugged
       repo.references.update("refs/heads/master", SeedRepo::LastCommit::ID)
     end
   end
@@ -68,45 +68,45 @@ describe Gitlab::Git::Commit, seed_helper: true do
   context 'Class methods' do
     describe :find do
       it "should return first head commit if without params" do
-        expect(Gitlab::Git::Commit.last(repository).id).to eq(
+        expect(Bringit::Commit.last(repository).id).to eq(
           repository.raw.head.target.oid
         )
       end
 
       it "should return valid commit" do
-        expect(Gitlab::Git::Commit.find(repository, SeedRepo::Commit::ID)).to be_valid_commit
+        expect(Bringit::Commit.find(repository, SeedRepo::Commit::ID)).to be_valid_commit
       end
 
       it "should return valid commit for tag" do
-        expect(Gitlab::Git::Commit.find(repository, 'v1.0.0').id).to eq('6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9')
+        expect(Bringit::Commit.find(repository, 'v1.0.0').id).to eq('6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9')
       end
 
       it "should return nil for non-commit ids" do
-        blob = Gitlab::Git::Blob.find(repository, SeedRepo::Commit::ID, "files/ruby/popen.rb")
-        expect(Gitlab::Git::Commit.find(repository, blob.id)).to be_nil
+        blob = Bringit::Blob.find(repository, SeedRepo::Commit::ID, "files/ruby/popen.rb")
+        expect(Bringit::Commit.find(repository, blob.id)).to be_nil
       end
 
       it "should return nil for parent of non-commit object" do
-        blob = Gitlab::Git::Blob.find(repository, SeedRepo::Commit::ID, "files/ruby/popen.rb")
-        expect(Gitlab::Git::Commit.find(repository, "#{blob.id}^")).to be_nil
+        blob = Bringit::Blob.find(repository, SeedRepo::Commit::ID, "files/ruby/popen.rb")
+        expect(Bringit::Commit.find(repository, "#{blob.id}^")).to be_nil
       end
 
       it "should return nil for nonexisting ids" do
-        expect(Gitlab::Git::Commit.find(repository, "+123_4532530XYZ")).to be_nil
+        expect(Bringit::Commit.find(repository, "+123_4532530XYZ")).to be_nil
       end
 
       context 'with broken repo' do
-        let(:repository) { Gitlab::Git::Repository.new(TEST_BROKEN_REPO_PATH) }
+        let(:repository) { Bringit::Repository.new(TEST_BROKEN_REPO_PATH) }
 
         it 'returns nil' do
-          expect(Gitlab::Git::Commit.find(repository, SeedRepo::Commit::ID)).to be_nil
+          expect(Bringit::Commit.find(repository, SeedRepo::Commit::ID)).to be_nil
         end
       end
     end
 
     describe :last_for_path do
       context 'no path' do
-        subject { Gitlab::Git::Commit.last_for_path(repository, 'master') }
+        subject { Bringit::Commit.last_for_path(repository, 'master') }
 
         describe '#id' do
           subject { super().id }
@@ -115,7 +115,7 @@ describe Gitlab::Git::Commit, seed_helper: true do
       end
 
       context 'path' do
-        subject { Gitlab::Git::Commit.last_for_path(repository, 'master', 'files/ruby') }
+        subject { Bringit::Commit.last_for_path(repository, 'master', 'files/ruby') }
 
         describe '#id' do
           subject { super().id }
@@ -124,7 +124,7 @@ describe Gitlab::Git::Commit, seed_helper: true do
       end
 
       context 'ref + path' do
-        subject { Gitlab::Git::Commit.last_for_path(repository, SeedRepo::Commit::ID, 'encoding') }
+        subject { Bringit::Commit.last_for_path(repository, SeedRepo::Commit::ID, 'encoding') }
 
         describe '#id' do
           subject { super().id }
@@ -136,7 +136,7 @@ describe Gitlab::Git::Commit, seed_helper: true do
     describe "where" do
       context 'path is empty string' do
         subject do
-          commits = Gitlab::Git::Commit.where(
+          commits = Bringit::Commit.where(
             repo: repository,
             ref: 'master',
             path: '',
@@ -154,7 +154,7 @@ describe Gitlab::Git::Commit, seed_helper: true do
 
       context 'path is nil' do
         subject do
-          commits = Gitlab::Git::Commit.where(
+          commits = Bringit::Commit.where(
             repo: repository,
             ref: 'master',
             path: nil,
@@ -172,7 +172,7 @@ describe Gitlab::Git::Commit, seed_helper: true do
 
       context 'ref is branch name' do
         subject do
-          commits = Gitlab::Git::Commit.where(
+          commits = Bringit::Commit.where(
             repo: repository,
             ref: 'master',
             path: 'files',
@@ -192,7 +192,7 @@ describe Gitlab::Git::Commit, seed_helper: true do
 
       context 'ref is commit id' do
         subject do
-          commits = Gitlab::Git::Commit.where(
+          commits = Bringit::Commit.where(
             repo: repository,
             ref: "874797c3a73b60d2187ed6e2fcabd289ff75171e",
             path: 'files',
@@ -212,7 +212,7 @@ describe Gitlab::Git::Commit, seed_helper: true do
 
       context 'ref is tag' do
         subject do
-          commits = Gitlab::Git::Commit.where(
+          commits = Bringit::Commit.where(
             repo: repository,
             ref: 'v1.0.0',
             path: 'files',
@@ -233,7 +233,7 @@ describe Gitlab::Git::Commit, seed_helper: true do
 
     describe :between do
       subject do
-        commits = Gitlab::Git::Commit.between(repository, SeedRepo::Commit::PARENT_ID, SeedRepo::Commit::ID)
+        commits = Bringit::Commit.between(repository, SeedRepo::Commit::PARENT_ID, SeedRepo::Commit::ID)
         commits.map { |c| c.id }
       end
 
@@ -247,7 +247,7 @@ describe Gitlab::Git::Commit, seed_helper: true do
     describe :find_all do
       context 'max_count' do
         subject do
-          commits = Gitlab::Git::Commit.find_all(
+          commits = Bringit::Commit.find_all(
             repository,
             max_count: 50
           )
@@ -265,7 +265,7 @@ describe Gitlab::Git::Commit, seed_helper: true do
 
       context 'ref + max_count + skip' do
         subject do
-          commits = Gitlab::Git::Commit.find_all(
+          commits = Bringit::Commit.find_all(
             repository,
             ref: 'master',
             max_count: 50,
@@ -285,7 +285,7 @@ describe Gitlab::Git::Commit, seed_helper: true do
 
       context 'contains feature + max_count' do
         subject do
-          commits = Gitlab::Git::Commit.find_all(
+          commits = Bringit::Commit.find_all(
             repository,
             contains: 'feature',
             max_count: 7
@@ -306,8 +306,8 @@ describe Gitlab::Git::Commit, seed_helper: true do
   end
 
   describe :init_from_rugged do
-    let(:gitlab_commit) { Gitlab::Git::Commit.new(rugged_commit, repository) }
-    subject { gitlab_commit }
+    let(:bringit_commit) { Bringit::Commit.new(rugged_commit, repository) }
+    subject { bringit_commit }
 
     describe '#id' do
       subject { super().id }
@@ -316,7 +316,7 @@ describe Gitlab::Git::Commit, seed_helper: true do
   end
 
   describe :init_from_hash do
-    let(:commit) { Gitlab::Git::Commit.new(sample_commit_hash, repository) }
+    let(:commit) { Bringit::Commit.new(sample_commit_hash, repository) }
     subject { commit }
 
     describe '#id' do
@@ -377,13 +377,13 @@ describe Gitlab::Git::Commit, seed_helper: true do
   describe :diffs do
     subject { commit.diffs }
 
-    it { is_expected.to be_kind_of Gitlab::Git::DiffCollection }
+    it { is_expected.to be_kind_of Bringit::DiffCollection }
     it { expect(subject.count).to eq(2) }
-    it { expect(subject.first).to be_kind_of Gitlab::Git::Diff }
+    it { expect(subject.first).to be_kind_of Bringit::Diff }
   end
 
   describe :ref_names do
-    let(:commit) { Gitlab::Git::Commit.find(repository, 'master') }
+    let(:commit) { Bringit::Commit.find(repository, 'master') }
     subject { commit.ref_names }
 
     it 'has 1 element' do
@@ -394,7 +394,7 @@ describe Gitlab::Git::Commit, seed_helper: true do
   end
 
   describe :references do
-    let(:commit) { Gitlab::Git::Commit.find(repository, 'master') }
+    let(:commit) { Bringit::Commit.find(repository, 'master') }
     before do
       repository.rugged.tags.create('tag_with_annotation', commit.id,
                                     message: 'my tag message',
@@ -422,7 +422,7 @@ describe Gitlab::Git::Commit, seed_helper: true do
 
     it 'the tag with the annotation is a tag' do
       expect(subject.find { |r| r.name == 'tag_with_annotation' }).
-        to be_a(Gitlab::Git::Tag)
+        to be_a(Bringit::Tag)
     end
 
     it 'the tag without the annotation has the correct annotation' do
@@ -432,12 +432,12 @@ describe Gitlab::Git::Commit, seed_helper: true do
 
     it 'the tag without the annotation is a tag' do
       expect(subject.find { |r| r.name == 'tag_without_annotation' }).
-        to be_a(Gitlab::Git::Tag)
+        to be_a(Bringit::Tag)
     end
 
     it 'the branch is a branch' do
       expect(subject.find { |r| r.name == 'master' }).
-        to be_a(Gitlab::Git::Branch)
+        to be_a(Bringit::Branch)
     end
   end
 

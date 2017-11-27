@@ -1,9 +1,9 @@
 require 'spec_helper'
 require 'fileutils'
 
-describe Gitlab::Git::Hook, lib: true do
+describe Bringit::Hook, lib: true do
   describe "#trigger" do
-    let(:repository) { Gitlab::Git::Repository.new(TEST_REPO_PATH) }
+    let(:repository) { Bringit::Repository.new(TEST_REPO_PATH) }
     let(:user_id) { 'user-1' }
 
     def create_hook(name)
@@ -29,9 +29,9 @@ describe Gitlab::Git::Hook, lib: true do
         context "when the hook is successful" do
           it "returns success with no errors" do
             create_hook(hook_name)
-            hook = Gitlab::Git::Hook.new(hook_name, repository.path)
-            blank = Gitlab::Git::BLANK_SHA
-            ref = Gitlab::Git::BRANCH_REF_PREFIX + 'new_branch'
+            hook = Bringit::Hook.new(hook_name, repository.path)
+            blank = Bringit::BLANK_SHA
+            ref = Bringit::BRANCH_REF_PREFIX + 'new_branch'
 
             status, errors = hook.trigger(user_id, blank, blank, ref)
             expect(status).to be true
@@ -42,9 +42,9 @@ describe Gitlab::Git::Hook, lib: true do
         context "when the hook is unsuccessful" do
           it "returns failure with errors" do
             create_failing_hook(hook_name)
-            hook = Gitlab::Git::Hook.new(hook_name, repository.path)
-            blank = Gitlab::Git::BLANK_SHA
-            ref = Gitlab::Git::BRANCH_REF_PREFIX + 'new_branch'
+            hook = Bringit::Hook.new(hook_name, repository.path)
+            blank = Bringit::BLANK_SHA
+            ref = Bringit::BRANCH_REF_PREFIX + 'new_branch'
 
             status, errors = hook.trigger(user_id, blank, blank, ref)
             expect(status).to be false
@@ -56,9 +56,9 @@ describe Gitlab::Git::Hook, lib: true do
 
     context "when the hook doesn't exist" do
       it "returns success with no errors" do
-        hook = Gitlab::Git::Hook.new('unknown_hook', repository.path)
-        blank = Gitlab::Git::BLANK_SHA
-        ref = Gitlab::Git::BRANCH_REF_PREFIX + 'new_branch'
+        hook = Bringit::Hook.new('unknown_hook', repository.path)
+        blank = Bringit::BLANK_SHA
+        ref = Bringit::BRANCH_REF_PREFIX + 'new_branch'
 
         status, errors = hook.trigger(user_id, blank, blank, ref)
         expect(status).to be true

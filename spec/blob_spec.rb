@@ -2,11 +2,11 @@
 
 require "spec_helper"
 
-describe Gitlab::Git::Blob, seed_helper: true do
-  let(:repository) { Gitlab::Git::Repository.new(TEST_REPO_PATH) }
+describe Bringit::Blob, seed_helper: true do
+  let(:repository) { Bringit::Repository.new(TEST_REPO_PATH) }
 
   describe :initialize do
-    let(:blob) { Gitlab::Git::Blob.new(repository, name: 'test') }
+    let(:blob) { Bringit::Blob.new(repository, name: 'test') }
 
     it 'handles nil data' do
       expect(blob.name).to eq('test')
@@ -17,7 +17,7 @@ describe Gitlab::Git::Blob, seed_helper: true do
 
   describe :find do
     context 'file in subdir' do
-      let(:blob) { Gitlab::Git::Blob.find(repository, SeedRepo::Commit::ID, "files/ruby/popen.rb") }
+      let(:blob) { Bringit::Blob.find(repository, SeedRepo::Commit::ID, "files/ruby/popen.rb") }
 
       it { expect(blob.id).to eq(SeedRepo::RubyBlob::ID) }
       it { expect(blob.name).to eq(SeedRepo::RubyBlob::NAME) }
@@ -29,7 +29,7 @@ describe Gitlab::Git::Blob, seed_helper: true do
     end
 
     context 'file in root' do
-      let(:blob) { Gitlab::Git::Blob.find(repository, SeedRepo::Commit::ID, ".gitignore") }
+      let(:blob) { Bringit::Blob.find(repository, SeedRepo::Commit::ID, ".gitignore") }
 
       it { expect(blob.id).to eq("dfaa3f97ca337e20154a98ac9d0be76ddd1fcc82") }
       it { expect(blob.name).to eq(".gitignore") }
@@ -42,7 +42,7 @@ describe Gitlab::Git::Blob, seed_helper: true do
     end
 
     context 'file in root with leading slash' do
-      let(:blob) { Gitlab::Git::Blob.find(repository, SeedRepo::Commit::ID, "/.gitignore") }
+      let(:blob) { Bringit::Blob.find(repository, SeedRepo::Commit::ID, "/.gitignore") }
 
       it { expect(blob.id).to eq("dfaa3f97ca337e20154a98ac9d0be76ddd1fcc82") }
       it { expect(blob.name).to eq(".gitignore") }
@@ -54,13 +54,13 @@ describe Gitlab::Git::Blob, seed_helper: true do
     end
 
     context 'non-exist file' do
-      let(:blob) { Gitlab::Git::Blob.find(repository, SeedRepo::Commit::ID, "missing.rb") }
+      let(:blob) { Bringit::Blob.find(repository, SeedRepo::Commit::ID, "missing.rb") }
 
       it { expect(blob).to be_nil }
     end
 
     context 'six submodule' do
-      let(:blob) { Gitlab::Git::Blob.find(repository, SeedRepo::Commit::ID, 'six') }
+      let(:blob) { Bringit::Blob.find(repository, SeedRepo::Commit::ID, 'six') }
 
       it { expect(blob.id).to eq('409f37c4f05865e4fb208c771485f211a22c4c2d') }
       it { expect(blob.data).to eq('') }
@@ -76,14 +76,14 @@ describe Gitlab::Git::Blob, seed_helper: true do
     end
 
     context 'large file' do
-      let(:blob) { Gitlab::Git::Blob.find(repository, SeedRepo::Commit::ID, 'files/images/6049019_460s.jpg') }
+      let(:blob) { Bringit::Blob.find(repository, SeedRepo::Commit::ID, 'files/images/6049019_460s.jpg') }
       let(:blob_size) { 111803 }
 
       it { expect(blob.size).to eq(blob_size) }
       it { expect(blob.data.length).to eq(blob_size) }
 
       it 'check that this test is sane' do
-        expect(blob.size).to be <= Gitlab::Git::Blob::MAX_DATA_DISPLAY_SIZE
+        expect(blob.size).to be <= Bringit::Blob::MAX_DATA_DISPLAY_SIZE
       end
 
       it 'can load all data' do
@@ -92,7 +92,7 @@ describe Gitlab::Git::Blob, seed_helper: true do
       end
 
       it 'marks the blob as binary' do
-        expect(Gitlab::Git::Blob).to receive(:new).
+        expect(Bringit::Blob).to receive(:new).
           with(repository, hash_including(binary: true)).
           and_call_original
 
@@ -102,7 +102,7 @@ describe Gitlab::Git::Blob, seed_helper: true do
   end
 
   describe :raw do
-    let(:raw_blob) { Gitlab::Git::Blob.raw(repository, SeedRepo::RubyBlob::ID) }
+    let(:raw_blob) { Bringit::Blob.raw(repository, SeedRepo::RubyBlob::ID) }
     it { expect(raw_blob.id).to eq(SeedRepo::RubyBlob::ID) }
     it { expect(raw_blob.data[0..10]).to eq("require \'fi") }
     it { expect(raw_blob.size).to eq(669) }
@@ -110,14 +110,14 @@ describe Gitlab::Git::Blob, seed_helper: true do
 
     context 'large file' do
       it 'limits the size of a large file' do
-        blob_size = Gitlab::Git::Blob::MAX_DATA_DISPLAY_SIZE + 1
+        blob_size = Bringit::Blob::MAX_DATA_DISPLAY_SIZE + 1
         buffer = Array.new(blob_size, 0)
         rugged_blob = Rugged::Blob.from_buffer(repository.rugged, buffer.join(''))
-        blob = Gitlab::Git::Blob.raw(repository, rugged_blob)
+        blob = Bringit::Blob.raw(repository, rugged_blob)
 
         expect(blob.size).to eq(blob_size)
-        expect(blob.loaded_size).to eq(Gitlab::Git::Blob::MAX_DATA_DISPLAY_SIZE)
-        expect(blob.data.length).to eq(Gitlab::Git::Blob::MAX_DATA_DISPLAY_SIZE)
+        expect(blob.loaded_size).to eq(Bringit::Blob::MAX_DATA_DISPLAY_SIZE)
+        expect(blob.data.length).to eq(Bringit::Blob::MAX_DATA_DISPLAY_SIZE)
         expect(blob.truncated?).to be_truthy
 
         blob.load_all_data!
@@ -128,7 +128,7 @@ describe Gitlab::Git::Blob, seed_helper: true do
 
   describe 'encoding' do
     context 'file with russian text' do
-      let(:blob) { Gitlab::Git::Blob.find(repository, SeedRepo::Commit::ID, "encoding/russian.rb") }
+      let(:blob) { Bringit::Blob.find(repository, SeedRepo::Commit::ID, "encoding/russian.rb") }
 
       it { expect(blob.name).to eq("russian.rb") }
       it { expect(blob.data.lines.first).to eq("Хороший файл") }
@@ -140,7 +140,7 @@ describe Gitlab::Git::Blob, seed_helper: true do
     end
 
     context 'file with Chinese text' do
-      let(:blob) { Gitlab::Git::Blob.find(repository, SeedRepo::Commit::ID, "encoding/テスト.txt") }
+      let(:blob) { Bringit::Blob.find(repository, SeedRepo::Commit::ID, "encoding/テスト.txt") }
 
       it { expect(blob.name).to eq("テスト.txt") }
       it { expect(blob.data).to include("これはテスト") }
@@ -150,7 +150,7 @@ describe Gitlab::Git::Blob, seed_helper: true do
     end
 
     context 'file with ISO-8859 text' do
-      let(:blob) { Gitlab::Git::Blob.find(repository, SeedRepo::LastCommit::ID, "encoding/iso8859.txt") }
+      let(:blob) { Bringit::Blob.find(repository, SeedRepo::LastCommit::ID, "encoding/iso8859.txt") }
 
       it { expect(blob.name).to eq("iso8859.txt") }
       it { expect(blob.loaded_size).to eq(4) }
@@ -163,7 +163,7 @@ describe Gitlab::Git::Blob, seed_helper: true do
   describe 'mode' do
     context 'file regular' do
       let(:blob) do
-        Gitlab::Git::Blob.find(
+        Bringit::Blob.find(
           repository,
           'fa1b1e6c004a68b7d8763b86455da9e6b23e36d6',
           'files/ruby/regex.rb'
@@ -178,7 +178,7 @@ describe Gitlab::Git::Blob, seed_helper: true do
 
     context 'file binary' do
       let(:blob) do
-        Gitlab::Git::Blob.find(
+        Bringit::Blob.find(
           repository,
           'fa1b1e6c004a68b7d8763b86455da9e6b23e36d6',
           'files/executables/ls'
@@ -193,7 +193,7 @@ describe Gitlab::Git::Blob, seed_helper: true do
 
     context 'file symlink to regular' do
       let(:blob) do
-        Gitlab::Git::Blob.find(
+        Bringit::Blob.find(
           repository,
           'fa1b1e6c004a68b7d8763b86455da9e6b23e36d6',
           'files/links/ruby-style-guide.md'
@@ -208,7 +208,7 @@ describe Gitlab::Git::Blob, seed_helper: true do
 
     context 'file symlink to binary' do
       let(:blob) do
-        Gitlab::Git::Blob.find(
+        Bringit::Blob.find(
           repository,
           'fa1b1e6c004a68b7d8763b86455da9e6b23e36d6',
           'files/links/touch'
@@ -225,7 +225,7 @@ describe Gitlab::Git::Blob, seed_helper: true do
   describe :lfs_pointers do
     context 'file a valid lfs pointer' do
       let(:blob) do
-        Gitlab::Git::Blob.find(
+        Bringit::Blob.find(
           repository,
           '33bcff41c232a11727ac6d660bd4b0c2ba86d63d',
           'files/lfs/image.jpg'
@@ -245,7 +245,7 @@ describe Gitlab::Git::Blob, seed_helper: true do
     describe 'file an invalid lfs pointer' do
       context 'with correct version header but incorrect size and oid' do
         let(:blob) do
-          Gitlab::Git::Blob.find(
+          Bringit::Blob.find(
             repository,
             '33bcff41c232a11727ac6d660bd4b0c2ba86d63d',
             'files/lfs/archive-invalid.tar'
@@ -264,7 +264,7 @@ describe Gitlab::Git::Blob, seed_helper: true do
 
       context 'with correct version header and size but incorrect size and oid' do
         let(:blob) do
-          Gitlab::Git::Blob.find(
+          Bringit::Blob.find(
             repository,
             '33bcff41c232a11727ac6d660bd4b0c2ba86d63d',
             'files/lfs/picture-invalid.png'
@@ -283,7 +283,7 @@ describe Gitlab::Git::Blob, seed_helper: true do
 
       context 'with correct version header and size but invalid size and oid' do
         let(:blob) do
-          Gitlab::Git::Blob.find(
+          Bringit::Blob.find(
             repository,
             '33bcff41c232a11727ac6d660bd4b0c2ba86d63d',
             'files/lfs/file-invalid.zip'

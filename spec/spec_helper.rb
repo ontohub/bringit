@@ -5,7 +5,7 @@ end
 
 require 'faker'
 require 'factory_bot'
-require 'gitlab_git'
+require 'bringit'
 require 'pry'
 require 'fuubar'
 

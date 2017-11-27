@@ -70,15 +70,15 @@ module SeedHelper
 
 *.txt     text
 *.jpg     -text
-*.sh      eol=lf gitlab-language=shell
-*.haml.*  gitlab-language=haml
+*.sh      eol=lf bringit-language=shell
+*.haml.*  bringit-language=haml
 foo/bar.* foo
 *.cgi     key=value?p1=v1&p2=v2
-/*.png    gitlab-language=png
+/*.png    bringit-language=png
 *.binary  binary
 
 # This uses a tab instead of spaces to ensure the parser also supports this.
-*.md\tgitlab-language=markdown
+*.md\tbringit-language=markdown
 bla/bla.txt
       EOF
     end

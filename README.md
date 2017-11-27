@@ -1,38 +1,34 @@
-# GitLab Git
-[![Build Status](https://travis-ci.org/ontohub/gitlab_git.svg?branch=master)](https://travis-ci.org/ontohub/gitlab_git)
+# Bringit
+[![Build Status](https://travis-ci.org/ontohub/bringit.svg?branch=master)](https://travis-ci.org/ontohub/bringit)
 
-GitLab wrapper around git objects.
+Bringit wrapper around git objects.
 
-This is the Ontohub-fork of [gitlab_git](https://gitlab.com/gitlab-org/gitlab_git).
-Since `Gitlab::Git` has been absorbed into the [main GitLab project](https://gitlab-com/gitlab-org/gitlab-ce), the original `gitlab_git` gem has been deprecated. See the [gitlab-ce issue](https://gitlab.com/gitlab-org/gitlab-ce/issues/24374) and [merge request](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/8447) for more information.
+This is a fork of [gitlab_git](https://gitlab.com/gitlab-org/gitlab_git).
+Since `gitlab_git` has been absorbed into the [main GitLab project](https://gitlab-com/gitlab-org/gitlab-ce), the original `gitlab_git` gem has been deprecated. See the [gitlab-ce issue](https://gitlab.com/gitlab-org/gitlab-ce/issues/24374) and [merge request](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/8447) for more information.
 
-In this fork, some updates to gitlab_git from the integrated gitlab-git are copied over and adjusted to work as a gem.
+In this fork, some updates to `gitlab_git` from the integrated gitlab-git are copied over and adjusted to work as a gem.
 However, newer changes to the git layer of Gitlab are so tightly intergrated with Gitlab that pulling them back into this gem is impossible.
 Even though this will not receive any more changes introduced by Gitlab, this fork is still maintained by the Ontohub team.
 
-This fork of the original gem adds a wrapper `Gitlab::Git::Wrapper` around the original Gitlab::Git objects to allow for easier handling.
+This fork of the original gem adds a wrapper `Bringit::Wrapper` around the original Gitlab::Git objects to allow for easier handling.
 
 # Documentation
-
-## Moved from Grit to Rugged
-
-GitLab Git used grit as main library in past. Now it uses rugged
 
 ## How to use
 
 ### Wrapper
 
-The Wrapper is an object encapsulating the Gitlab::Git functionality to provide a more convenient interface.
+The Wrapper is an object encapsulating the Bringit functionality to provide a more convenient interface.
 
 ```ruby
 # Create a new bare git repository
-wrapper = Gitlab::Git::Wrapper.create('/path/to/the/new/repository.git') # => #<Gitlab::Git::Wrapper:0x00007fa91fa1e440 ...>
+wrapper = Bringit::Wrapper.create('/path/to/the/new/repository.git') # => #<Bringit::Wrapper:0x00007fa91fa1e440 ...>
 
 # Delete an existing git repository
-Gitlab::Git::Wrapper.destroy('/path/to/the/repository.git')
+Bringit::Wrapper.destroy('/path/to/the/repository.git')
 
 # Initialize a Wrapper object on an existing repository
-wrapper = Gitlab::Git::Wrapper.new('/path/to/the/repository.git') # => #<Gitlab::Git::Wrapper:0x00007fa91fa1e440 ...>
+wrapper = Bringit::Wrapper.new('/path/to/the/repository.git') # => #<Bringit::Wrapper:0x00007fa91fa1e440 ...>
 
 # Check if a git repository exists in the given path
 wrapper.repo_exists? # => true
@@ -50,13 +46,13 @@ wrapper.path # => #<Pathname:/path/to/the/repository>
 wrapper.ls_files('master') # => ['path/to/my_file.txt', 'another_file.txt']
 
 # Find a blob (file)
-wrapper.blob('master~3', 'path/to/my_file.txt') # => #<Gitlab::Git::Blob:0x00007fa91fe3dcb0 ...>
+wrapper.blob('master~3', 'path/to/my_file.txt') # => #<Bringit::Blob:0x00007fa91fe3dcb0 ...>
 
 # Find a tree (directory)
-wrapper.tree('master~3', 'path/to/my_directory') # => [#<Gitlab::Git::Tree:0x00007fa92005e968 ...>, ...]
+wrapper.tree('master~3', 'path/to/my_directory') # => [#<Bringit::Tree:0x00007fa92005e968 ...>, ...]
 
 # Find a commit
-wrapper.commit('master~3') # => #<Gitlab::Git::Commit:0x00007fa91cef58e0 ...>
+wrapper.commit('master~3') # => #<Bringit::Commit:0x00007fa91cef58e0 ...>
 
 # The the number of commits up to a revision
 wrapper.commit_count('master') # => 17
@@ -74,10 +70,10 @@ wrapper.default_branch # => "master"
 wrapper.default_branch = "staging" # => "staging"
 
 # Create a new branch at revision 322ba8d
-wrapper.create_branch('my_feature', '322ba8d') # => #<Gitlab::Git::Branch:0x00007fa91507f178 ...>
+wrapper.create_branch('my_feature', '322ba8d') # => #<Bringit::Branch:0x00007fa91507f178 ...>
 
 # Get a list of all branches
-wrapper.branches # => [#<Gitlab::Git::Branch:0x00007fa920372488 ...>, ...]
+wrapper.branches # => [#<Bringit::Branch:0x00007fa920372488 ...>, ...]
 
 # Get a list of all branch names
 wrapper.branch_names # => ["master", "my_feature"]
@@ -89,41 +85,41 @@ wrapper.branch_count => 2
 wrapper.branch_exists?('my_feature') # => true
 
 # Find a branch by its name
-wrapper.find_branch('my_feature') # => #<Gitlab::Git::Branch:0x00007fa920606b18 ...>
+wrapper.find_branch('my_feature') # => #<Bringit::Branch:0x00007fa920606b18 ...>
 
 # Delete a branch
 wrapper.rm_branch('my_feature') # => nil
 
 # Create a new tag at revision 322ba8d
-wrapper.create_tag('v1.0.0', '322ba8d') # => => #<Gitlab::Git::Tag:0x00007fa921828440 ...>
+wrapper.create_tag('v1.0.0', '322ba8d') # => => #<Bringit::Tag:0x00007fa921828440 ...>
 
 # Create a new tag with an annotation at revision 322ba8d
 wrapper.create_tag('v1.0.1', '22ba8d3',
                    message: 'My tag message',
                    tagger: {name: 'Tagger',
                             email: 'tagger@example.com',
-                            time: Time.now}) # => #<Gitlab::Git::Tag:0x00007fa91ed669a0 ...>
+                            time: Time.now}) # => #<Bringit::Tag:0x00007fa91ed669a0 ...>
 
 # Get a list of all tags
-wrapper.tags # => [#<Gitlab::Git::Tag:0x00007fa91b25c990 ...>, ...]
+wrapper.tags # => [#<Bringit::Tag:0x00007fa91b25c990 ...>, ...]
 
 # Get a list of all tag names
 wrapper.tag_names # => ['v1.0', 'v1.1']
 
 # Find a tag by its name
-wrapper.find_tag('v1.0') # => #<Gitlab::Git::Tag:0x00007fa91cd52998 ...>
+wrapper.find_tag('v1.0') # => #<Bringit::Tag:0x00007fa91cd52998 ...>
 
 # Delete a tag
 wrapper.rm_tag('v1.0') # => nil
 
 # Diff of a single commit (compared to its parent commit)
-wrapper.diff_from_parent('322ba8d') # => => #<Gitlab::Git::DiffCollection:0x00007fa91fb603d0 ...>
+wrapper.diff_from_parent('322ba8d') # => => #<Bringit::DiffCollection:0x00007fa91fb603d0 ...>
 
 # Diff of a commit range
-wrapper.diff('322ba8d', 'master') # => #<Gitlab::Git::DiffCollection:0x00007fa91d341840 ...>
+wrapper.diff('322ba8d', 'master') # => #<Bringit::DiffCollection:0x00007fa91d341840 ...>
 
 # Diff of a commit range at some paths (the empty hash argument is for options)
-wrapper.diff('322ba8d', 'master', {}, 'src/lib/', 'assets/javascript/application.js') # => #<Gitlab::Git::DiffCollection:0x00007fa91d341840 ...>
+wrapper.diff('322ba8d', 'master', {}, 'src/lib/', 'assets/javascript/application.js') # => #<Bringit::DiffCollection:0x00007fa91d341840 ...>
 
 # Diff: Please see the lib/gitlab_git/diff.rb (filter_diff_options) for documentation of the options.
 # The allowed options are:
@@ -140,7 +136,7 @@ wrapper.diff('322ba8d', 'master', {}, 'src/lib/', 'assets/javascript/application
 #   :max_files, :max_lines, :all_diffs, :no_collapse
 
 # Log
-wrapper.log(ref: 'master') # => [#<Gitlab::Git::Commit:0x00007fa91f971588 ...>, ...]
+wrapper.log(ref: 'master') # => [#<Bringit::Commit:0x00007fa91f971588 ...>, ...]
 
 # Log that returns only the commit hashes (a lot faster)
 wrapper.log(ref: 'master', only_commit_sha: true) # => ["98cf6fcfb912fb733bd3ed7480fc75ba5a762d35", ...]
@@ -148,7 +144,7 @@ wrapper.log(ref: 'master', only_commit_sha: true) # => ["98cf6fcfb912fb733bd3ed7
 # Log of a commit range. This is unsafe because the end commit might not
 # have the start commit as a parent. In this case, the result is empty and a
 # warning is printed on the console.
-wrapper.log(ref: '322ba8d..master', unsafe_range: true) # => [#<Gitlab::Git::Commit:0x00007fa91e4334a0 ...>, ...]
+wrapper.log(ref: '322ba8d..master', unsafe_range: true) # => [#<Bringit::Commit:0x00007fa91e4334a0 ...>, ...]
 
 # Log: The options and their defaults are:
 #     limit: 10,           # How many commits should be retrieved
@@ -161,8 +157,8 @@ wrapper.log(ref: '322ba8d..master', unsafe_range: true) # => [#<Gitlab::Git::Com
 #     before: nil,         # Show commits older than a specific date
 #     unsafe_range: false, # Allow commit ranges in the ref option
 
-# Get the Gitlab::Git::Repository instance
-wrapper.gitlab
+# Get the Bringit::Repository instance
+wrapper.bringit
 
 # Get the Rugged::Repository instance
 wrapper.rugged
@@ -174,7 +170,7 @@ Allows you to clone a remote git or svn repository.
 Note that `git` must be in the `PATH` and that `git-svn` must be installed if svn functionality is needed.
 
 ```ruby
-Gitlab::Git::Wrapper.clone(path, remote_address)
+Bringit::Wrapper.clone(path, remote_address)
 ```
 
 ### Pull
@@ -183,16 +179,16 @@ Allows you to pull from a remote git or svn repository.
 Note that `git` must be in the `PATH` and that `git-svn` must be installed if svn functionality is needed.
 
 ```ruby
-Gitlab::Git::Wrapper.new(path).pull
+Bringit::Wrapper.new(path).pull
 ```
 
 ### Creating a commit
 
-The `Gitlab::Git::Wrapper` adds convenience-methods to create commits.
+The `Bringit::Wrapper` adds convenience-methods to create commits.
 All of these need a committer and an author object as well as some commit options.
 
-If the optional parameter `previous_head_sha` is supplied to any of the following methods, and the HEAD of the branch is different from that parameter (i.e. the branch has changed since authoring the commit-changes) Gitlab::Git::Wrapper attempts to merge the new commit on top of the current HEAD.
-If merging is not possible, a `Gitlab::Git::Committing::HeadChangedError` is raised that contains data about the conflicts in its `conflicts` attribute.
+If the optional parameter `previous_head_sha` is supplied to any of the following methods, and the HEAD of the branch is different from that parameter (i.e. the branch has changed since authoring the commit-changes) Bringit::Wrapper attempts to merge the new commit on top of the current HEAD.
+If merging is not possible, a `Bringit::Committing::HeadChangedError` is raised that contains data about the conflicts in its `conflicts` attribute.
 If the parameter `previous_head_sha` is not set (`nil`), then the new commit overwrites possible changes to the branch that occurred in the meantime.
 
 ```ruby
@@ -282,7 +278,7 @@ wrapper.commit_multichange({files: files,
 
 ```ruby
 # Init repo with full path
-repo = Gitlab::Git::Repository.new('/home/git/repositories/gitlab/gitlab-ci.git')
+repo = Bringit::Repository.new('/home/git/repositories/gitlab/gitlab-ci.git')
 
 repo.path
 # "/home/git/repositories/gitlab/gitlab-ci.git"
@@ -307,7 +303,7 @@ repo.size
 
 # Search for code
 repo.search_files('rspec', 'master')
-# [ <Gitlab::Git::BlobSnippet:0x000..>, <Gitlab::Git::BlobSnippet:0x000..>]
+# [ <Bringit::BlobSnippet:0x000..>, <Bringit::BlobSnippet:0x000..>]
 
 # Access to rugged repo object
 repo.rugged
@@ -321,14 +317,14 @@ In case it's needed to update https://gitlab.com/gitlab-org/gitlab-git-test with
 
 ```ruby
 # Tree objects for root dir
-tree = Gitlab::Git::Tree.where(repo, '893ade32')
+tree = Bringit::Tree.where(repo, '893ade32')
 
 # Tree objects for sub dir
-tree = Gitlab::Git::Tree.where(repo, '893ade32', 'app/models/')
+tree = Bringit::Tree.where(repo, '893ade32', 'app/models/')
 
 # [
-#   #<Gitlab::Git::Tree:0x00000002b2ed80 @id="38f45392ae61f0effa84048f208a81019cc306bb", @name="lib", @path="projects/lib", @type=:tree, @mode="040000", @commit_id="8470d70da67355c9c009e4401746b1d5410af2e3">
-#   #<Gitlab::Git::Tree:0x00000002b2ed80 @id="32a45392ae61f0effa84048f208a81019cc306bb", @name="sample.rb", @path="projects/sample.rb", @type=:blob, @mode="040000", @commit_id="8470d70da67355c9c009e4401746b1d5410af2e3">
+#   #<Bringit::Tree:0x00000002b2ed80 @id="38f45392ae61f0effa84048f208a81019cc306bb", @name="lib", @path="projects/lib", @type=:tree, @mode="040000", @commit_id="8470d70da67355c9c009e4401746b1d5410af2e3">
+#   #<Bringit::Tree:0x00000002b2ed80 @id="32a45392ae61f0effa84048f208a81019cc306bb", @name="sample.rb", @path="projects/sample.rb", @type=:blob, @mode="040000", @commit_id="8470d70da67355c9c009e4401746b1d5410af2e3">
 # ]
 
 dir = tree.first
@@ -354,7 +350,7 @@ tree.find(&:readme?)
 
 ```ruby
 # Blob object for Commit sha 893ade32
-blob = Gitlab::Git::Blob.find(repo, '893ade32', 'Gemfile')
+blob = Bringit::Blob.find(repo, '893ade32', 'Gemfile')
 
 # Attributes
 blob.id
@@ -369,7 +365,7 @@ blob.commit_id
 blob.load_all_data!(repo)
 
 # Blob object with sha 8a3f8ddcf3536628c9670d41e67a785383eded1d
-raw_blob = Gitlab::Git::Blob.raw(repo, '8a3f8ddcf3536628c9670d41e67a785383eded1d')
+raw_blob = Bringit::Blob.raw(repo, '8a3f8ddcf3536628c9670d41e67a785383eded1d')
 
 # Attributes for raw blobs are more limited
 raw_blob.id
@@ -403,7 +399,7 @@ options = {
 
 # Create a file in the repository.
 # Returns sha of commit that did a change
-Gitlab::Git::Wrapper.new('path/to/repository.git').create_file(options)
+Bringit::Wrapper.new('path/to/repository.git').create_file(options)
 
 
 options = {
@@ -431,7 +427,7 @@ options = {
 
 # Update a file in the repository.
 # Returns sha of commit that did a change
-Gitlab::Git::Wrapper.new('path/to/repository.git').update_file(options)
+Bringit::Wrapper.new('path/to/repository.git').update_file(options)
 
 
 options = {
@@ -456,7 +452,7 @@ options = {
 
 # Delete a file from the repository.
 # Returns sha of commit that did a change
-Gitlab::Git::Wrapper.new('path/to/repository.git').remove_file(options)
+Bringit::Wrapper.new('path/to/repository.git').remove_file(options)
 
 options = {
   file: {
@@ -481,7 +477,7 @@ options = {
 
 # Rename a file in the repository. This does not change the file content.
 # Returns sha of commit that did a change
-Gitlab::Git::Wrapper.new('path/to/repository.git').rename_file(options)
+Bringit::Wrapper.new('path/to/repository.git').rename_file(options)
 
 
 
@@ -505,7 +501,7 @@ options = {
 
 # Create a directory (via .gitkeep) in the repository.
 # Returns sha of commit that did a change
-Gitlab::Git::Wrapper.new('path/to/repository.git').mkdir(path, options)
+Bringit::Wrapper.new('path/to/repository.git').mkdir(path, options)
 
 
 
@@ -547,7 +543,7 @@ options = {
 
 # Apply multiple file changes to the repository
 # Returns sha of commit that did a change
-Gitlab::Git::Wrapper.new('path/to/repository.git').commit_multichange(options)
+Bringit::Wrapper.new('path/to/repository.git').commit_multichange(options)
 ```
 
 
@@ -557,7 +553,7 @@ Gitlab::Git::Wrapper.new('path/to/repository.git').commit_multichange(options)
 
 ```ruby
 # Get commits collection with pagination
-Gitlab::Git::Commit.where(
+Bringit::Commit.where(
   repo: repo,
   ref: 'master',
   path: 'app/models',
@@ -566,18 +562,18 @@ Gitlab::Git::Commit.where(
 )
 
 # Find single commit
-Gitlab::Git::Commit.find(repo, '29eda46b')
-Gitlab::Git::Commit.find(repo, 'v2.4.6')
+Bringit::Commit.find(repo, '29eda46b')
+Bringit::Commit.find(repo, 'v2.4.6')
 
 # Get last commit for HEAD
-commit = Gitlab::Git::Commit.last(repo)
+commit = Bringit::Commit.last(repo)
 
 # Get last commit for specified file/directory
-Gitlab::Git::Commit.last_for_path(repo, '29eda46b', 'app/models')
+Bringit::Commit.last_for_path(repo, '29eda46b', 'app/models')
 
 # Commits between branches
-Gitlab::Git::Commit.between(repo, 'dev', 'master')
-# [ <Gitlab::Git::Commit:0x000..>, <Gitlab::Git::Commit:0x000..>]
+Bringit::Commit.between(repo, 'dev', 'master')
+# [ <Bringit::Commit:0x000..>, <Bringit::Commit:0x000..>]
 ```
 
 #### Commit object
@@ -599,7 +595,7 @@ commit.parent_id
 # ba8812a2de5e5ea191da6930a8ee1965873286e3
 
 commit.diffs
-# [ <Gitlab::Git::Diff:0x000..>, <Gitlab::Git::Diff:0x000..>]
+# [ <Bringit::Diff:0x000..>, <Bringit::Diff:0x000..>]
 
 commit.created_at
 commit.authored_date
@@ -620,11 +616,11 @@ commit.author_email
 ```ruby
 # From commit
 commit.diffs
-# [ <Gitlab::Git::Diff:0x000..>, <Gitlab::Git::Diff:0x000..>]
+# [ <Bringit::Diff:0x000..>, <Bringit::Diff:0x000..>]
 
 # Diff between several commits
-Gitlab::Git::Diff.between(repo, 'dev', 'master')
-# [ <Gitlab::Git::Diff:0x000..>, <Gitlab::Git::Diff:0x000..>]
+Bringit::Diff.between(repo, 'dev', 'master')
+# [ <Bringit::Diff:0x000..>, <Bringit::Diff:0x000..>]
 
 # Diff object
 diff = commit.diffs.first
@@ -643,9 +639,9 @@ diff.deleted_file # => false
 
 ```ruby
 # Git blame for file
-blame = Gitlab::Git::Blame.new(repo, 'master, 'app/models/project.rb')
+blame = Bringit::Blame.new(repo, 'master, 'app/models/project.rb')
 blame.each do |commit, lines|
-  commit # <Gitlab::Git::Commit:0x000..>
+  commit # <Bringit::Commit:0x000..>
   lines # ['class Project', 'def initialize']
 end
 ```
@@ -655,11 +651,11 @@ end
 Allows you to get difference (commits, diffs) between two SHA/branch/tag:
 
 ```ruby
-compare = Gitlab::Git::Compare.new(repo, 'v4.3.2', 'master')
+compare = Bringit::Compare.new(repo, 'v4.3.2', 'master')
 
 compare.commits
-# [ <Gitlab::Git::Commit:0x000..>, <Gitlab::Git::Commit:0x000..>]
+# [ <Bringit::Commit:0x000..>, <Bringit::Commit:0x000..>]
 
 compare.diffs
-# [ <Gitlab::Git::Diff:0x000..>, <Gitlab::Git::Diff:0x000..>]
+# [ <Bringit::Diff:0x000..>, <Bringit::Diff:0x000..>]
 ```
