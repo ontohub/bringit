@@ -10,7 +10,7 @@ end
 
 group :test do
   gem 'factory_bot', '~> 4.8.2'
-  gem 'faker', '~> 1.8.4'
+  gem 'faker', '~> 1.8.5'
   gem 'fuubar', '~> 2.2.0'
   gem 'simplecov', require: false
 end
