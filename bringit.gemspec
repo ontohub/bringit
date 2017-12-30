@@ -22,4 +22,20 @@ Gem::Specification.new do |s|
   s.add_dependency('activesupport', '>= 4.0')
   s.add_dependency('rugged', '~> 0.26.0')
   s.add_dependency('charlock_holmes', '~> 0.7.3')
+
+  s.add_development_dependency 'appraisal'
+  s.add_development_dependency 'bundler', '~> 1.14'
+  s.add_development_dependency 'bundler-audit', '~> 0.6.0'
+  s.add_development_dependency 'codecov', '~> 0.1.10'
+  s.add_development_dependency 'factory_bot', '~> 4.8.2'
+  s.add_development_dependency 'faker', '~> 1.8.5'
+  s.add_development_dependency 'fuubar', '~> 2.2.0'
+  s.add_development_dependency 'pry', '~> 0.11.0'
+  s.add_development_dependency 'pry-byebug', '~> 3.5.0'
+  s.add_development_dependency 'pry-rescue', '~> 1.4.4'
+  s.add_development_dependency 'pry-stack_explorer', '~> 0.4.9.2'
+  s.add_development_dependency 'rake', '~> 12.0'
+  s.add_development_dependency 'rspec', '~> 3.7'
+  s.add_development_dependency 'rubocop', '~> 0.51.0'
+  s.add_development_dependency 'simplecov', '~> 0.15.1'
 end
