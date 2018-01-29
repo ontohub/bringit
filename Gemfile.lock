@@ -44,7 +44,7 @@ GEM
     fuubar (2.3.1)
       rspec-core (~> 3.0)
       ruby-progressbar (~> 1.4)
-    github-linguist (5.3.2)
+    github-linguist (5.3.3)
       charlock_holmes (~> 0.7.5)
       escape_utils (~> 1.1.0)
       mime-types (>= 1.19)
