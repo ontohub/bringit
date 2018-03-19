@@ -1,18 +1,20 @@
+# frozen_string_literal: true
+
 module Bringit
   class RevList
     attr_reader :repository, :env
 
-    ALLOWED_VARIABLES = %w[GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES].freeze
+    ALLOWED_VARIABLES = %w(GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES).freeze
 
     def initialize(oldrev, newrev, repository:, env: nil)
       @repository = repository
       @env = env.presence || {}
-      @args = ["git",
-                "--git-dir=#{repository.path}",
-                "rev-list",
-                "--max-count=1",
-                oldrev,
-                "^#{newrev}"]
+      @args = ['git',
+               "--git-dir=#{repository.path}",
+               'rev-list',
+               '--max-count=1',
+               oldrev,
+               "^#{newrev}"]
     end
 
     def execute
@@ -20,7 +22,7 @@ module Bringit
     end
 
     def valid?
-      environment_variables.all? do |(name, value)|
+      environment_variables.all? do |(_name, value)|
         value.to_s.start_with?(repository.path)
       end
     end

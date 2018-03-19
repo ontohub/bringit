@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 module Bringit
   module EncodingHelper
-    extend self
+    module_function
 
     # This threshold is carefully tweaked to prevent usage of encodings detected
     # by CharlockHolmes with low confidence. If CharlockHolmes confidence is low,
@@ -17,12 +19,12 @@ module Bringit
       return nil unless message.respond_to? :force_encoding
 
       # if message is utf-8 encoding, just return it
-      message.force_encoding("UTF-8")
+      message.force_encoding('UTF-8')
       return message if message.valid_encoding?
 
       # return message if message type is binary
       detect = CharlockHolmes::EncodingDetector.detect(message)
-      return message.force_encoding("BINARY") if detect && detect[:type] == :binary
+      return message.force_encoding('BINARY') if detect && detect[:type] == :binary
 
       # force detected encoding if we have sufficient confidence.
       if detect && detect[:encoding] && detect[:confidence] > ENCODING_CONFIDENCE_THRESHOLD
@@ -31,8 +33,8 @@ module Bringit
 
       # encode and clean the bad chars
       message.replace clean(message)
-    rescue
-      encoding = detect ? detect[:encoding] : "unknown"
+    rescue StandardError
+      encoding = detect ? detect[:encoding] : 'unknown'
       "--broken encoding: #{encoding}"
     end
 
@@ -48,9 +50,9 @@ module Bringit
     private
 
     def clean(message)
-      message.encode("UTF-16BE", undef: :replace, invalid: :replace, replace: "")
-        .encode("UTF-8")
-        .gsub("\0".encode("UTF-8"), "")
+      message.encode('UTF-16BE', undef: :replace, invalid: :replace, replace: '').
+        encode('UTF-8').
+        gsub("\0".encode('UTF-8'), '')
     end
   end
 end

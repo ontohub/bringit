@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Bringit::CommitStats counts the additions, deletions, and total changes
 # in a commit.
 module Bringit

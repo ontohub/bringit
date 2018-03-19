@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Bringit
   class Blob
     include Linguist::BlobHelper
@@ -36,8 +38,7 @@ module Bringit
               mode: blob_entry[:filemode].to_s(8),
               path: Bringit::PathHelper.normalize_path(path).to_s,
               commit_id: sha,
-              binary: blob.binary?
-            )
+              binary: blob.binary?)
           end
         end
       end
@@ -49,8 +50,7 @@ module Bringit
           id: blob.oid,
           size: blob.size,
           data: blob.content(MAX_DATA_DISPLAY_SIZE),
-          binary: blob.binary?
-        )
+          binary: blob.binary?)
       end
 
       # Recursive search of blob id by path
@@ -81,7 +81,7 @@ module Bringit
           path_arr.shift
           find_entry_by_path(repository, entry[:oid], path_arr.join('/'))
         else
-          [:blob, :commit].include?(entry[:type]) ? entry : nil
+          %i(blob commit).include?(entry[:type]) ? entry : nil
         end
       end
 
@@ -92,15 +92,14 @@ module Bringit
           name: blob_entry[:name],
           data: '',
           path: path,
-          commit_id: sha,
-        )
+          commit_id: sha)
       end
     end
 
     def initialize(repository, options)
       @repository = repository
       %w(id name path size data mode commit_id binary).each do |key|
-        self.send("#{key}=", options[key.to_sym])
+        send("#{key}=", options[key.to_sym])
       end
 
       @loaded_all_data = false
@@ -169,7 +168,7 @@ module Bringit
     private
 
     def has_lfs_version_key?
-      !empty? && text? && data.start_with?("version https://git-lfs.github.com/spec")
+      !empty? && text? && data.start_with?('version https://git-lfs.github.com/spec')
     end
   end
 end

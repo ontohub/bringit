@@ -1,34 +1,36 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Bringit::RevList, seed_helper: true do
   let(:repository) { Bringit::Repository.new(TEST_REPO_PATH) }
 
-  context "validations" do
+  context 'validations' do
     described_class::ALLOWED_VARIABLES.each do |var|
       context var do
-        it "accepts values starting with the repository path" do
-          env = { var => "#{repository.path}/objects" }
+        it 'accepts values starting with the repository path' do
+          env = {var => "#{repository.path}/objects"}
           rev_list = described_class.new('oldrev', 'newrev', repository: repository, env: env)
 
           expect(rev_list).to be_valid
         end
 
-        it "rejects values starting not with the repository repo path" do
-          env = { var => "/some/other/path" }
+        it 'rejects values starting not with the repository repo path' do
+          env = {var => '/some/other/path'}
           rev_list = described_class.new('oldrev', 'newrev', repository: repository, env: env)
 
           expect(rev_list).not_to be_valid
         end
 
-        it "rejects values containing the  repository path but not starting with it" do
-          env = { var => "/some/other/path/#{repository.path}" }
+        it 'rejects values containing the  repository path but not starting with it' do
+          env = {var => "/some/other/path/#{repository.path}"}
           rev_list = described_class.new('oldrev', 'newrev', repository: repository, env: env)
 
           expect(rev_list).not_to be_valid
         end
 
-        it "ignores nil values" do
-          env = { var => nil }
+        it 'ignores nil values' do
+          env = {var => nil}
           rev_list = described_class.new('oldrev', 'newrev', repository: repository, env: env)
 
           expect(rev_list).to be_valid
@@ -37,11 +39,11 @@ describe Bringit::RevList, seed_helper: true do
     end
   end
 
-  context "#execute" do
-    let(:env) { { "GIT_OBJECT_DIRECTORY" => repository.path } }
+  context '#execute' do
+    let(:env) { {'GIT_OBJECT_DIRECTORY' => repository.path} }
     let(:rev_list) { Bringit::RevList.new('oldrev', 'newrev', repository: repository, env: env) }
 
-    it "calls out to `popen` without environment variables if the record is invalid" do
+    it 'calls out to `popen` without environment variables if the record is invalid' do
       allow(rev_list).to receive(:valid?).and_return(false)
 
       expect(Open3).to receive(:popen3).with(hash_excluding(env), any_args)
@@ -49,7 +51,7 @@ describe Bringit::RevList, seed_helper: true do
       rev_list.execute
     end
 
-    it "calls out to `popen` with environment variables if the record is valid" do
+    it 'calls out to `popen` with environment variables if the record is valid' do
       allow(rev_list).to receive(:valid?).and_return(true)
 
       expect(Open3).to receive(:popen3).with(hash_including(env), any_args)

@@ -1,18 +1,18 @@
+# frozen_string_literal: true
+
 # This file is specific to specs in spec/lib/gitlab/git/
 
 SEED_REPOSITORY_PATH   = File.expand_path('../../tmp/repositories', __dir__)
 TEST_REPO_PATH         = File.join(SEED_REPOSITORY_PATH, 'gitlab-git-test.git')
-TEST_NORMAL_REPO_PATH  = File.join(SEED_REPOSITORY_PATH, "not-bare-repo.git")
-TEST_MUTABLE_REPO_PATH = File.join(SEED_REPOSITORY_PATH, "mutable-repo.git")
-TEST_BROKEN_REPO_PATH  = File.join(SEED_REPOSITORY_PATH, "broken-repo.git")
+TEST_NORMAL_REPO_PATH  = File.join(SEED_REPOSITORY_PATH, 'not-bare-repo.git')
+TEST_MUTABLE_REPO_PATH = File.join(SEED_REPOSITORY_PATH, 'mutable-repo.git')
+TEST_BROKEN_REPO_PATH  = File.join(SEED_REPOSITORY_PATH, 'broken-repo.git')
 
 module SeedHelper
-  GITLAB_URL = "https://gitlab.com/gitlab-org/gitlab-git-test.git"
+  GITLAB_URL = 'https://gitlab.com/gitlab-org/gitlab-git-test.git'
 
   def ensure_seeds
-    if File.exist?(SEED_REPOSITORY_PATH)
-      FileUtils.rm_r(SEED_REPOSITORY_PATH)
-    end
+    FileUtils.rm_r(SEED_REPOSITORY_PATH) if File.exist?(SEED_REPOSITORY_PATH)
 
     FileUtils.mkdir_p(SEED_REPOSITORY_PATH)
 
@@ -25,32 +25,32 @@ module SeedHelper
   end
 
   def create_bare_seeds
-    system(git_env, *%W(git clone --bare #{GITLAB_URL}),
+    system(git_env, 'git', 'clone', '--bare', GITLAB_URL.to_s,
            chdir: SEED_REPOSITORY_PATH,
            out:   '/dev/null',
            err:   '/dev/null')
   end
 
   def create_normal_seeds
-    system(git_env, *%W(git clone #{TEST_REPO_PATH} #{TEST_NORMAL_REPO_PATH}),
+    system(git_env, 'git', 'clone', TEST_REPO_PATH.to_s, TEST_NORMAL_REPO_PATH.to_s,
            out: '/dev/null',
            err: '/dev/null')
   end
 
   def create_mutable_seeds
-    system(git_env, *%W(git clone #{TEST_REPO_PATH} #{TEST_MUTABLE_REPO_PATH}),
+    system(git_env, 'git', 'clone', TEST_REPO_PATH.to_s, TEST_MUTABLE_REPO_PATH.to_s,
            out: '/dev/null',
            err: '/dev/null')
 
-    system(git_env, *%w(git branch -t feature origin/feature),
+    system(git_env, 'git', 'branch', '-t', 'feature', 'origin/feature',
            chdir: TEST_MUTABLE_REPO_PATH, out: '/dev/null', err: '/dev/null')
 
-    system(git_env, *%W(git remote add expendable #{GITLAB_URL}),
+    system(git_env, 'git', 'remote', 'add', 'expendable', GITLAB_URL.to_s,
            chdir: TEST_MUTABLE_REPO_PATH, out: '/dev/null', err: '/dev/null')
   end
 
   def create_broken_seeds
-    system(git_env, *%W(git clone --bare #{TEST_REPO_PATH} #{TEST_BROKEN_REPO_PATH}),
+    system(git_env, 'git', 'clone', '--bare', TEST_REPO_PATH.to_s, TEST_BROKEN_REPO_PATH.to_s,
            out: '/dev/null',
            err: '/dev/null')
 
@@ -65,21 +65,21 @@ module SeedHelper
     FileUtils.mkdir_p(dir)
 
     File.open(File.join(dir, 'attributes'), 'w') do |handle|
-      handle.write <<-EOF.strip
-# This is a comment, it should be ignored.
+      handle.write <<~EOF.strip
+        # This is a comment, it should be ignored.
 
-*.txt     text
-*.jpg     -text
-*.sh      eol=lf bringit-language=shell
-*.haml.*  bringit-language=haml
-foo/bar.* foo
-*.cgi     key=value?p1=v1&p2=v2
-/*.png    bringit-language=png
-*.binary  binary
+        *.txt     text
+        *.jpg     -text
+        *.sh      eol=lf bringit-language=shell
+        *.haml.*  bringit-language=haml
+        foo/bar.* foo
+        *.cgi     key=value?p1=v1&p2=v2
+        /*.png    bringit-language=png
+        *.binary  binary
 
-# This uses a tab instead of spaces to ensure the parser also supports this.
-*.md\tbringit-language=markdown
-bla/bla.txt
+        # This uses a tab instead of spaces to ensure the parser also supports this.
+        *.md\tbringit-language=markdown
+        bla/bla.txt
       EOF
     end
   end
@@ -99,7 +99,7 @@ bla/bla.txt
   # Prevent developer git configurations from being persisted to test
   # repositories
   def git_env
-    { 'GIT_TEMPLATE_DIR' => '' }
+    {'GIT_TEMPLATE_DIR' => ''}
   end
 end
 

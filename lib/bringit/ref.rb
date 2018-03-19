@@ -1,15 +1,14 @@
+# frozen_string_literal: true
+
 module Bringit
   class Ref
     include Bringit::EncodingHelper
 
     def self.name_valid?(name)
-      if name.start_with?('refs/heads/') || name.start_with?('refs/remotes/')
-        return false
-      end
+      return false if name.start_with?('refs/heads/', 'refs/remotes/')
 
       Popen.popen(%W(git check-ref-format refs/#{name})).last == 0
     end
-
 
     # Branch or tag name
     # without "refs/tags|heads" prefix
@@ -48,8 +47,6 @@ module Bringit
                   target.name
                 elsif target.is_a? String
                   target
-                else
-                  nil
                 end
     end
   end

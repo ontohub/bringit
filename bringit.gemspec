@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-$LOAD_PATH.push File.expand_path('../lib', __FILE__)
+$LOAD_PATH.push File.expand_path('lib', __dir__)
 
 # Maintain your gem's version:
 require 'bringit/version'
@@ -8,9 +8,9 @@ require 'bringit/version'
 Gem::Specification.new do |s|
   s.name        = 'bringit'
   s.version     = Bringit::VERSION
-  s.date        = Time.now.strftime("%Y-%m-%d")
-  s.summary     = "Bringit library"
-  s.description = "Bringit wrapper around git objects"
+  s.date        = Time.now.strftime('%Y-%m-%d')
+  s.summary     = 'Bringit library'
+  s.description = 'Bringit wrapper around git objects'
   s.authors     = ['Ontohub Core Developers', 'Dmitriy Zaporozhets']
   s.email       = ['ontohub-dev-l@ovgu.de', 'dmitriy.zaporozhets@gmail.com']
   s.license     = 'MIT'
@@ -18,10 +18,10 @@ Gem::Specification.new do |s|
   s.homepage    =
     'https://github.com/ontohub/bringit'
 
-  s.add_dependency('github-linguist', '>= 5.1', '< 5.4')
   s.add_dependency('activesupport', '>= 4.0')
-  s.add_dependency('rugged', '~> 0.26.0')
   s.add_dependency('charlock_holmes', '~> 0.7.3')
+  s.add_dependency('github-linguist', '>= 5.1', '< 5.4')
+  s.add_dependency('rugged', '~> 0.26.0')
 
   s.add_development_dependency 'appraisal'
   s.add_development_dependency 'bundler', '~> 1.14'
@@ -36,6 +36,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'pry-stack_explorer', '~> 0.4.9.2'
   s.add_development_dependency 'rake', '~> 12.0'
   s.add_development_dependency 'rspec', '~> 3.7'
-  s.add_development_dependency 'rubocop', '~> 0.52.1'
+  s.add_development_dependency 'rubocop', '~> 0.53.0'
+  s.add_development_dependency 'rubocop-rspec', '~> 1.24.0'
   s.add_development_dependency 'simplecov', '~> 0.15.1'
 end

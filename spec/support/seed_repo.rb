@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Seed repo:
 # 0e50ec4d3c7ce42ab74dda1d422cb2cbffe1e326 Merge branch 'lfs_pointers' into 'master'
 # 33bcff41c232a11727ac6d660bd4b0c2ba86d63d Add valid and invalid lfs pointers
@@ -25,65 +27,65 @@
 
 module SeedRepo
   module BigCommit
-    ID               = "913c66a37b4a45b9769037c55c2d238bd0942d2e"
-    PARENT_ID        = "cfe32cf61b73a0d5e9f13e774abde7ff789b1660"
-    MESSAGE          = "Files, encoding and much more"
-    AUTHOR_FULL_NAME = "Dmitriy Zaporozhets"
+    ID               = '913c66a37b4a45b9769037c55c2d238bd0942d2e'
+    PARENT_ID        = 'cfe32cf61b73a0d5e9f13e774abde7ff789b1660'
+    MESSAGE          = 'Files, encoding and much more'
+    AUTHOR_FULL_NAME = 'Dmitriy Zaporozhets'
     FILES_COUNT      = 2
   end
 
   module Commit
-    ID               = "570e7b2abdd848b95f2f578043fc23bd6f6fd24d"
-    PARENT_ID        = "6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9"
+    ID               = '570e7b2abdd848b95f2f578043fc23bd6f6fd24d'
+    PARENT_ID        = '6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9'
     MESSAGE          = "Change some files\n\nSigned-off-by: Dmitriy Zaporozhets <dmitriy.zaporozhets@gmail.com>\n"
-    AUTHOR_FULL_NAME = "Dmitriy Zaporozhets"
-    FILES            = ["files/ruby/popen.rb", "files/ruby/regex.rb"]
+    AUTHOR_FULL_NAME = 'Dmitriy Zaporozhets'
+    FILES            = ['files/ruby/popen.rb', 'files/ruby/regex.rb'].freeze
     FILES_COUNT      = 2
-    C_FILE_PATH      = "files/ruby"
-    C_FILES          = ["popen.rb", "regex.rb", "version_info.rb"]
-    BLOB_FILE        = %{%h3= @key.title\n%hr\n%pre= @key.key\n.actions\n  = link_to 'Remove', @key, :confirm => 'Are you sure?', :method => :delete, :class => \"btn danger delete-key\"\n\n\n}
-    BLOB_FILE_PATH   = "app/views/keys/show.html.haml"
+    C_FILE_PATH      = 'files/ruby'
+    C_FILES          = ['popen.rb', 'regex.rb', 'version_info.rb'].freeze
+    BLOB_FILE        = %(%h3= @key.title\n%hr\n%pre= @key.key\n.actions\n  = link_to 'Remove', @key, :confirm => 'Are you sure?', :method => :delete, :class => \"btn danger delete-key\"\n\n\n)
+    BLOB_FILE_PATH   = 'app/views/keys/show.html.haml'
   end
 
   module EmptyCommit
-    ID               = "b0e52af38d7ea43cf41d8a6f2471351ac036d6c9"
-    PARENT_ID        = "40f4a7a617393735a95a0bb67b08385bc1e7c66d"
-    MESSAGE          = "Empty commit"
-    AUTHOR_FULL_NAME = "Rémy Coutable"
-    FILES            = []
+    ID               = 'b0e52af38d7ea43cf41d8a6f2471351ac036d6c9'
+    PARENT_ID        = '40f4a7a617393735a95a0bb67b08385bc1e7c66d'
+    MESSAGE          = 'Empty commit'
+    AUTHOR_FULL_NAME = 'Rémy Coutable'
+    FILES            = [].freeze
     FILES_COUNT      = FILES.count
   end
 
   module EncodingCommit
-    ID               = "40f4a7a617393735a95a0bb67b08385bc1e7c66d"
-    PARENT_ID        = "66028349a123e695b589e09a36634d976edcc5e8"
-    MESSAGE          = "Add ISO-8859-encoded file"
-    AUTHOR_FULL_NAME = "Stan Hu"
-    FILES            = ["encoding/iso8859.txt"]
+    ID               = '40f4a7a617393735a95a0bb67b08385bc1e7c66d'
+    PARENT_ID        = '66028349a123e695b589e09a36634d976edcc5e8'
+    MESSAGE          = 'Add ISO-8859-encoded file'
+    AUTHOR_FULL_NAME = 'Stan Hu'
+    FILES            = ['encoding/iso8859.txt'].freeze
     FILES_COUNT      = FILES.count
   end
 
   module FirstCommit
-    ID               = "1a0b36b3cdad1d2ee32457c102a8c0b7056fa863"
+    ID               = '1a0b36b3cdad1d2ee32457c102a8c0b7056fa863'
     PARENT_ID        = nil
-    MESSAGE          = "Initial commit"
-    AUTHOR_FULL_NAME = "Dmitriy Zaporozhets"
-    FILES            = ["LICENSE", ".gitignore", "README.md"]
+    MESSAGE          = 'Initial commit'
+    AUTHOR_FULL_NAME = 'Dmitriy Zaporozhets'
+    FILES            = ['LICENSE', '.gitignore', 'README.md'].freeze
     FILES_COUNT      = 3
   end
 
   module LastCommit
-    ID               = "4b4918a572fa86f9771e5ba40fbd48e1eb03e2c6"
-    PARENT_ID        = "0e1b353b348f8477bdbec1ef47087171c5032cd9"
+    ID               = '4b4918a572fa86f9771e5ba40fbd48e1eb03e2c6'
+    PARENT_ID        = '0e1b353b348f8477bdbec1ef47087171c5032cd9'
     MESSAGE          = "Merge branch 'master' into 'master'"
-    AUTHOR_FULL_NAME = "Stan Hu"
-    FILES            = ["bin/executable"]
+    AUTHOR_FULL_NAME = 'Stan Hu'
+    FILES            = ['bin/executable'].freeze
     FILES_COUNT      = FILES.count
   end
 
   module Repo
-    HEAD = "master"
-    BRANCHES = %w[
+    HEAD = 'master'
+    BRANCHES = %w(
       feature
       fix
       fix-blob-path
@@ -93,51 +95,51 @@ module SeedRepo
       gitattributes-updated
       master
       merge-test
-    ]
-    TAGS = %w[v1.0.0 v1.1.0 v1.2.0 v1.2.1]
+    ).freeze
+    TAGS = %w(v1.0.0 v1.1.0 v1.2.0 v1.2.1).freeze
   end
 
   module RubyBlob
-    ID = "7e3e39ebb9b2bf433b4ad17313770fbe4051649c"
-    NAME = "popen.rb"
-    CONTENT = <<-eos
-require 'fileutils'
-require 'open3'
+    ID = '7e3e39ebb9b2bf433b4ad17313770fbe4051649c'
+    NAME = 'popen.rb'
+    CONTENT = <<~eos
+      require 'fileutils'
+      require 'open3'
 
-module Popen
-  extend self
+      module Popen
+        extend self
 
-  def popen(cmd, path=nil)
-    unless cmd.is_a?(Array)
-      raise RuntimeError, "System commands must be given as an array of strings"
-    end
+        def popen(cmd, path=nil)
+          unless cmd.is_a?(Array)
+            raise RuntimeError, "System commands must be given as an array of strings"
+          end
 
-    path ||= Dir.pwd
+          path ||= Dir.pwd
 
-    vars = {
-      "PWD" => path
-    }
+          vars = {
+            "PWD" => path
+          }
 
-    options = {
-      chdir: path
-    }
+          options = {
+            chdir: path
+          }
 
-    unless File.directory?(path)
-      FileUtils.mkdir_p(path)
-    end
+          unless File.directory?(path)
+            FileUtils.mkdir_p(path)
+          end
 
-    @cmd_output = ""
-    @cmd_status = 0
+          @cmd_output = ""
+          @cmd_status = 0
 
-    Open3.popen3(vars, *cmd, options) do |stdin, stdout, stderr, wait_thr|
-      @cmd_output << stdout.read
-      @cmd_output << stderr.read
-      @cmd_status = wait_thr.value.exitstatus
-    end
+          Open3.popen3(vars, *cmd, options) do |stdin, stdout, stderr, wait_thr|
+            @cmd_output << stdout.read
+            @cmd_output << stderr.read
+            @cmd_status = wait_thr.value.exitstatus
+          end
 
-    return @cmd_output, @cmd_status
-  end
-end
+          return @cmd_output, @cmd_status
+        end
+      end
     eos
   end
 end

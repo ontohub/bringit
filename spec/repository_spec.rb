@@ -1,11 +1,13 @@
-require "spec_helper"
+# frozen_string_literal: true
+
+require 'spec_helper'
 
 describe Bringit::Repository, seed_helper: true do
   include Bringit::EncodingHelper
 
   let(:repository) { Bringit::Repository.new(TEST_REPO_PATH) }
 
-  describe "Respond to" do
+  describe 'Respond to' do
     subject { repository }
 
     it { is_expected.to respond_to(:raw) }
@@ -14,7 +16,7 @@ describe Bringit::Repository, seed_helper: true do
     it { is_expected.to respond_to(:tags) }
   end
 
-  describe "#discover_default_branch" do
+  describe '#discover_default_branch' do
     let(:master) { 'master' }
     let(:feature) { 'feature' }
     let(:feature2) { 'feature2' }
@@ -24,24 +26,24 @@ describe Bringit::Repository, seed_helper: true do
       expect(repository.discover_default_branch).to eq('master')
     end
 
-    it "returns non-master when master exists but default branch is set to something else" do
+    it 'returns non-master when master exists but default branch is set to something else' do
       File.write(File.join(repository.path, 'HEAD'), 'ref: refs/heads/feature')
       expect(repository).to receive(:branch_names).at_least(:once).and_return([feature, master])
       expect(repository.discover_default_branch).to eq('feature')
       File.write(File.join(repository.path, 'HEAD'), 'ref: refs/heads/master')
     end
 
-    it "returns a non-master branch when only one exists" do
+    it 'returns a non-master branch when only one exists' do
       expect(repository).to receive(:branch_names).at_least(:once).and_return([feature])
       expect(repository.discover_default_branch).to eq('feature')
     end
 
-    it "returns a non-master branch when more than one exists and master does not" do
+    it 'returns a non-master branch when more than one exists and master does not' do
       expect(repository).to receive(:branch_names).at_least(:once).and_return([feature, feature2])
       expect(repository.discover_default_branch).to eq('feature')
     end
 
-    it "returns nil when no branch exists" do
+    it 'returns nil when no branch exists' do
       expect(repository).to receive(:branch_names).at_least(:once).and_return([])
       expect(repository.discover_default_branch).to be_nil
     end
@@ -53,8 +55,8 @@ describe Bringit::Repository, seed_helper: true do
     it 'has SeedRepo::Repo::BRANCHES.size elements' do
       expect(subject.size).to eq(SeedRepo::Repo::BRANCHES.size)
     end
-    it { is_expected.to include("master") }
-    it { is_expected.not_to include("branch-from-space") }
+    it { is_expected.to include('master') }
+    it { is_expected.not_to include('branch-from-space') }
   end
 
   describe '#tag_names' do
@@ -67,10 +69,10 @@ describe Bringit::Repository, seed_helper: true do
 
     describe '#last' do
       subject { super().last }
-      it { is_expected.to eq("v1.2.1") }
+      it { is_expected.to eq('v1.2.1') }
     end
-    it { is_expected.to include("v1.0.0") }
-    it { is_expected.not_to include("v5.0.0") }
+    it { is_expected.to include('v1.0.0') }
+    it { is_expected.not_to include('v5.0.0') }
   end
 
   shared_examples 'archive check' do |extenstion|
@@ -79,7 +81,7 @@ describe Bringit::Repository, seed_helper: true do
   end
 
   describe '#archive_prefix' do
-    let(:project_name) { 'project-name'}
+    let(:project_name) { 'project-name' }
 
     before do
       expect(repository).to receive(:name).once.and_return(project_name)
@@ -156,13 +158,13 @@ describe Bringit::Repository, seed_helper: true do
 
       describe '#name' do
         subject { super().name }
-        it { is_expected.to eq("feature") }
+        it { is_expected.to eq('feature') }
       end
 
       context :commit do
         subject { heads.first.dereferenced_target.sha }
 
-        it { is_expected.to eq("0b4bc9a49b562e85de7cc9e834518ea6828729b9") }
+        it { is_expected.to eq('0b4bc9a49b562e85de7cc9e834518ea6828729b9') }
       end
     end
   end
@@ -215,7 +217,7 @@ describe Bringit::Repository, seed_helper: true do
 
       describe '#data' do
         subject { super().data }
-        it { is_expected.to include "Ability to filter by multiple labels" }
+        it { is_expected.to include 'Ability to filter by multiple labels' }
       end
     end
   end
@@ -232,12 +234,12 @@ describe Bringit::Repository, seed_helper: true do
 
       it 'should have valid data' do
         expect(submodule).to eq([
-          "six", {
-            "id" => "409f37c4f05865e4fb208c771485f211a22c4c2d",
-            "path" => "six",
-            "url" => "git://github.com/randx/six.git"
-          }
-        ])
+                                  'six', {
+                                    'id' => '409f37c4f05865e4fb208c771485f211a22c4c2d',
+                                    'path' => 'six',
+                                    'url' => 'git://github.com/randx/six.git',
+                                  }
+                                ])
       end
 
       it 'should handle nested submodules correctly' do
@@ -267,12 +269,12 @@ describe Bringit::Repository, seed_helper: true do
         submodules = repository.submodules('v1.2.1')
 
         expect(submodules.first).to eq([
-          "six", {
-            "id" => "409f37c4f05865e4fb208c771485f211a22c4c2d",
-            "path" => "six",
-            "url" => "git://github.com/randx/six.git"
-          }
-        ])
+                                         'six', {
+                                           'id' => '409f37c4f05865e4fb208c771485f211a22c4c2d',
+                                           'path' => 'six',
+                                           'url' => 'git://github.com/randx/six.git',
+                                         }
+                                       ])
       end
     end
 
@@ -285,57 +287,57 @@ describe Bringit::Repository, seed_helper: true do
   end
 
   describe '#commit_count' do
-    it { expect(repository.commit_count("master")).to eq(25) }
-    it { expect(repository.commit_count("feature")).to eq(9) }
+    it { expect(repository.commit_count('master')).to eq(25) }
+    it { expect(repository.commit_count('feature')).to eq(9) }
   end
 
-  describe "#reset" do
-    change_path = File.join(TEST_NORMAL_REPO_PATH, "CHANGELOG")
-    untracked_path = File.join(TEST_NORMAL_REPO_PATH, "UNTRACKED")
-    tracked_path = File.join(TEST_NORMAL_REPO_PATH, "files", "ruby", "popen.rb")
+  describe '#reset' do
+    change_path = File.join(TEST_NORMAL_REPO_PATH, 'CHANGELOG')
+    untracked_path = File.join(TEST_NORMAL_REPO_PATH, 'UNTRACKED')
+    tracked_path = File.join(TEST_NORMAL_REPO_PATH, 'files', 'ruby', 'popen.rb')
 
-    change_text = "New changelog text"
-    untracked_text = "This file is untracked"
+    change_text = 'New changelog text'
+    untracked_text = 'This file is untracked'
 
     reset_commit = SeedRepo::LastCommit::ID
 
-    context "--hard" do
+    context '--hard' do
       before(:all) do
         # Modify a tracked file
-        File.open(change_path, "w") do |f|
+        File.open(change_path, 'w') do |f|
           f.write(change_text)
         end
 
         # Add an untracked file to the working directory
-        File.open(untracked_path, "w") do |f|
+        File.open(untracked_path, 'w') do |f|
           f.write(untracked_text)
         end
 
         @normal_repo = Bringit::Repository.new(TEST_NORMAL_REPO_PATH)
-        @normal_repo.reset("HEAD", :hard)
+        @normal_repo.reset('HEAD', :hard)
       end
 
-      it "should replace the working directory with the content of the index" do
-        File.open(change_path, "r") do |f|
+      it 'should replace the working directory with the content of the index' do
+        File.open(change_path, 'r') do |f|
           expect(f.each_line.first).not_to eq(change_text)
         end
 
-        File.open(tracked_path, "r") do |f|
+        File.open(tracked_path, 'r') do |f|
           expect(f.each_line.to_a[8]).to include('raise RuntimeError, "System commands')
         end
       end
 
-      it "should not touch untracked files" do
+      it 'should not touch untracked files' do
         expect(File.exist?(untracked_path)).to be_truthy
       end
 
-      it "should move the HEAD to the correct commit" do
+      it 'should move the HEAD to the correct commit' do
         new_head = @normal_repo.rugged.head.target.oid
         expect(new_head).to eq(reset_commit)
       end
 
-      it "should move the tip of the master branch to the correct commit" do
-        new_tip = @normal_repo.rugged.references["refs/heads/master"].
+      it 'should move the tip of the master branch to the correct commit' do
+        new_tip = @normal_repo.rugged.references['refs/heads/master'].
           target.oid
 
         expect(new_tip).to eq(reset_commit)
@@ -349,27 +351,27 @@ describe Bringit::Repository, seed_helper: true do
     end
   end
 
-  describe "#checkout" do
-    new_branch = "foo_branch"
+  describe '#checkout' do
+    new_branch = 'foo_branch'
 
-    context "-b" do
+    context '-b' do
       before(:all) do
         @normal_repo = Bringit::Repository.new(TEST_NORMAL_REPO_PATH)
-        @normal_repo.checkout(new_branch, { b: true }, "origin/feature")
+        @normal_repo.checkout(new_branch, {b: true}, 'origin/feature')
       end
 
-      it "should create a new branch" do
+      it 'should create a new branch' do
         expect(@normal_repo.rugged.branches[new_branch]).not_to be_nil
       end
 
-      it "should move the HEAD to the correct commit" do
+      it 'should move the HEAD to the correct commit' do
         expect(@normal_repo.rugged.head.target.oid).to(
-          eq(@normal_repo.rugged.branches["origin/feature"].target.oid)
+          eq(@normal_repo.rugged.branches['origin/feature'].target.oid)
         )
       end
 
       it "should refresh the repo's #heads collection" do
-        head_names = @normal_repo.heads.map { |h| h.name }
+        head_names = @normal_repo.heads.map(&:name)
         expect(head_names).to include(new_branch)
       end
 
@@ -379,18 +381,18 @@ describe Bringit::Repository, seed_helper: true do
       end
     end
 
-    context "without -b" do
-      context "and specifying a nonexistent branch" do
-        it "should not do anything" do
+    context 'without -b' do
+      context 'and specifying a nonexistent branch' do
+        it 'should not do anything' do
           normal_repo = Bringit::Repository.new(TEST_NORMAL_REPO_PATH)
 
           expect { normal_repo.checkout(new_branch) }.to raise_error(Rugged::ReferenceError)
           expect(normal_repo.rugged.branches[new_branch]).to be_nil
           expect(normal_repo.rugged.head.target.oid).to(
-            eq(normal_repo.rugged.branches["master"].target.oid)
+            eq(normal_repo.rugged.branches['master'].target.oid)
           )
 
-          head_names = normal_repo.heads.map { |h| h.name }
+          head_names = normal_repo.heads.map(&:name)
           expect(head_names).not_to include(new_branch)
         end
 
@@ -400,21 +402,21 @@ describe Bringit::Repository, seed_helper: true do
         end
       end
 
-      context "and with a valid branch" do
+      context 'and with a valid branch' do
         before(:all) do
           @normal_repo = Bringit::Repository.new(TEST_NORMAL_REPO_PATH)
-          @normal_repo.rugged.branches.create("feature", "origin/feature")
-          @normal_repo.checkout("feature")
+          @normal_repo.rugged.branches.create('feature', 'origin/feature')
+          @normal_repo.checkout('feature')
         end
 
-        it "should move the HEAD to the correct commit" do
+        it 'should move the HEAD to the correct commit' do
           expect(@normal_repo.rugged.head.target.oid).to(
-            eq(@normal_repo.rugged.branches["feature"].target.oid)
+            eq(@normal_repo.rugged.branches['feature'].target.oid)
           )
         end
 
-        it "should update the working directory" do
-          File.open(File.join(TEST_NORMAL_REPO_PATH, ".gitignore"), "r") do |f|
+        it 'should update the working directory' do
+          File.open(File.join(TEST_NORMAL_REPO_PATH, '.gitignore'), 'r') do |f|
             expect(f.read.each_line.to_a).not_to include(".DS_Store\n")
           end
         end
@@ -427,18 +429,18 @@ describe Bringit::Repository, seed_helper: true do
     end
   end
 
-  describe "#delete_branch" do
+  describe '#delete_branch' do
     before(:all) do
       @repo = Bringit::Repository.new(TEST_MUTABLE_REPO_PATH)
-      @repo.delete_branch("feature")
+      @repo.delete_branch('feature')
     end
 
-    it "should remove the branch from the repo" do
-      expect(@repo.rugged.branches["feature"]).to be_nil
+    it 'should remove the branch from the repo' do
+      expect(@repo.rugged.branches['feature']).to be_nil
     end
 
     it "should update the repo's #heads collection" do
-      expect(@repo.heads).not_to include("feature")
+      expect(@repo.heads).not_to include('feature')
     end
 
     after(:all) do
@@ -447,26 +449,26 @@ describe Bringit::Repository, seed_helper: true do
     end
   end
 
-  describe "#create_branch" do
+  describe '#create_branch' do
     before(:all) do
       @repo = Bringit::Repository.new(TEST_MUTABLE_REPO_PATH)
     end
 
-    it "should create a new branch" do
+    it 'should create a new branch' do
       expect(@repo.create_branch('new_branch', 'master')).not_to be_nil
     end
 
-    it "should create a new branch with the right name" do
+    it 'should create a new branch with the right name' do
       expect(@repo.create_branch('another_branch', 'master').name).to eq('another_branch')
     end
 
-    it "should fail if we create an existing branch" do
+    it 'should fail if we create an existing branch' do
       @repo.create_branch('duplicated_branch', 'master')
-      expect{@repo.create_branch('duplicated_branch', 'master')}.to raise_error("Branch duplicated_branch already exists")
+      expect { @repo.create_branch('duplicated_branch', 'master') }.to raise_error('Branch duplicated_branch already exists')
     end
 
-    it "should fail if we create a branch from a non existing ref" do
-      expect{@repo.create_branch('branch_based_in_wrong_ref', 'master_2_the_revenge')}.to raise_error("Invalid reference master_2_the_revenge")
+    it 'should fail if we create a branch from a non existing ref' do
+      expect { @repo.create_branch('branch_based_in_wrong_ref', 'master_2_the_revenge') }.to raise_error('Invalid reference master_2_the_revenge')
     end
 
     after(:all) do
@@ -475,33 +477,33 @@ describe Bringit::Repository, seed_helper: true do
     end
   end
 
-  describe "#remote_names" do
+  describe '#remote_names' do
     let(:remotes) { repository.remote_names }
 
     it "should have one entry: 'origin'" do
       expect(remotes.size).to eq(1)
-      expect(remotes.first).to eq("origin")
+      expect(remotes.first).to eq('origin')
     end
   end
 
-  describe "#refs_hash" do
+  describe '#refs_hash' do
     let(:refs) { repository.refs_hash }
 
-    it "should have as many entries as branches and tags" do
+    it 'should have as many entries as branches and tags' do
       expected_refs = SeedRepo::Repo::BRANCHES + SeedRepo::Repo::TAGS
       # We flatten in case a commit is pointed at by more than one branch and/or tag
       expect(refs.values.flatten.size).to eq(expected_refs.size)
     end
   end
 
-  describe "#remote_delete" do
+  describe '#remote_delete' do
     before(:all) do
       @repo = Bringit::Repository.new(TEST_MUTABLE_REPO_PATH)
-      @repo.remote_delete("expendable")
+      @repo.remote_delete('expendable')
     end
 
-    it "should remove the remote" do
-      expect(@repo.rugged.remotes).not_to include("expendable")
+    it 'should remove the remote' do
+      expect(@repo.rugged.remotes).not_to include('expendable')
     end
 
     after(:all) do
@@ -510,14 +512,14 @@ describe Bringit::Repository, seed_helper: true do
     end
   end
 
-  describe "#remote_add" do
+  describe '#remote_add' do
     before(:all) do
       @repo = Bringit::Repository.new(TEST_MUTABLE_REPO_PATH)
-      @repo.remote_add("new_remote", SeedHelper::GITLAB_URL)
+      @repo.remote_add('new_remote', SeedHelper::GITLAB_URL)
     end
 
-    it "should add the remote" do
-      expect(@repo.rugged.remotes.each_name.to_a).to include("new_remote")
+    it 'should add the remote' do
+      expect(@repo.rugged.remotes.each_name.to_a).to include('new_remote')
     end
 
     after(:all) do
@@ -526,14 +528,14 @@ describe Bringit::Repository, seed_helper: true do
     end
   end
 
-  describe "#remote_update" do
+  describe '#remote_update' do
     before(:all) do
       @repo = Bringit::Repository.new(TEST_MUTABLE_REPO_PATH)
-      @repo.remote_update("expendable", url: TEST_NORMAL_REPO_PATH)
+      @repo.remote_update('expendable', url: TEST_NORMAL_REPO_PATH)
     end
 
-    it "should add the remote" do
-      expect(@repo.rugged.remotes["expendable"].url).to(
+    it 'should add the remote' do
+      expect(@repo.rugged.remotes['expendable'].url).to(
         eq(TEST_NORMAL_REPO_PATH)
       )
     end
@@ -544,7 +546,7 @@ describe Bringit::Repository, seed_helper: true do
     end
   end
 
-  describe "#log" do
+  describe '#log' do
     commit_with_old_name = nil
     commit_with_new_name = nil
     rename_commit = nil
@@ -561,15 +563,15 @@ describe Bringit::Repository, seed_helper: true do
     after(:context) do
       # Erase our commits so other tests get the original repo
       repo = Bringit::Repository.new(TEST_REPO_PATH).rugged
-      repo.references.update("refs/heads/master", SeedRepo::LastCommit::ID)
+      repo.references.update('refs/heads/master', SeedRepo::LastCommit::ID)
     end
 
     context "where 'follow' == true" do
-      let(:options) { { ref: "master", follow: true } }
+      let(:options) { {ref: 'master', follow: true} }
 
       context "and 'path' is a directory" do
-        it "does not follow renames" do
-          log_commits = repository.log(options.merge(path: "encoding"))
+        it 'does not follow renames' do
+          log_commits = repository.log(options.merge(path: 'encoding'))
 
           aggregate_failures do
             expect(log_commits).to include(commit_with_new_name)
@@ -581,8 +583,8 @@ describe Bringit::Repository, seed_helper: true do
 
       context "and 'path' is a file that matches the new filename" do
         context 'without offset' do
-          it "follows renames" do
-            log_commits = repository.log(options.merge(path: "encoding/CHANGELOG"))
+          it 'follows renames' do
+            log_commits = repository.log(options.merge(path: 'encoding/CHANGELOG'))
 
             aggregate_failures do
               expect(log_commits).to include(commit_with_new_name)
@@ -593,8 +595,8 @@ describe Bringit::Repository, seed_helper: true do
         end
 
         context 'with offset=1' do
-          it "follows renames and skip the latest commit" do
-            log_commits = repository.log(options.merge(path: "encoding/CHANGELOG", offset: 1))
+          it 'follows renames and skip the latest commit' do
+            log_commits = repository.log(options.merge(path: 'encoding/CHANGELOG', offset: 1))
 
             aggregate_failures do
               expect(log_commits).not_to include(commit_with_new_name)
@@ -605,16 +607,16 @@ describe Bringit::Repository, seed_helper: true do
         end
 
         context 'with offset=1', 'and limit=1' do
-          it "follows renames, skip the latest commit and return only one commit" do
-            log_commits = repository.log(options.merge(path: "encoding/CHANGELOG", offset: 1, limit: 1))
+          it 'follows renames, skip the latest commit and return only one commit' do
+            log_commits = repository.log(options.merge(path: 'encoding/CHANGELOG', offset: 1, limit: 1))
 
             expect(log_commits).to contain_exactly(rename_commit)
           end
         end
 
         context 'with offset=1', 'and limit=2' do
-          it "follows renames, skip the latest commit and return only two commits" do
-            log_commits = repository.log(options.merge(path: "encoding/CHANGELOG", offset: 1, limit: 2))
+          it 'follows renames, skip the latest commit and return only two commits' do
+            log_commits = repository.log(options.merge(path: 'encoding/CHANGELOG', offset: 1, limit: 2))
 
             aggregate_failures do
               expect(log_commits).to contain_exactly(rename_commit, commit_with_old_name)
@@ -623,8 +625,8 @@ describe Bringit::Repository, seed_helper: true do
         end
 
         context 'with offset=2' do
-          it "follows renames and skip the latest commit" do
-            log_commits = repository.log(options.merge(path: "encoding/CHANGELOG", offset: 2))
+          it 'follows renames and skip the latest commit' do
+            log_commits = repository.log(options.merge(path: 'encoding/CHANGELOG', offset: 2))
 
             aggregate_failures do
               expect(log_commits).not_to include(commit_with_new_name)
@@ -635,16 +637,16 @@ describe Bringit::Repository, seed_helper: true do
         end
 
         context 'with offset=2', 'and limit=1' do
-          it "follows renames, skip the two latest commit and return only one commit" do
-            log_commits = repository.log(options.merge(path: "encoding/CHANGELOG", offset: 2, limit: 1))
+          it 'follows renames, skip the two latest commit and return only one commit' do
+            log_commits = repository.log(options.merge(path: 'encoding/CHANGELOG', offset: 2, limit: 1))
 
             expect(log_commits).to contain_exactly(commit_with_old_name)
           end
         end
 
         context 'with offset=2', 'and limit=2' do
-          it "follows renames, skip the two latest commit and return only one commit" do
-            log_commits = repository.log(options.merge(path: "encoding/CHANGELOG", offset: 2, limit: 2))
+          it 'follows renames, skip the two latest commit and return only one commit' do
+            log_commits = repository.log(options.merge(path: 'encoding/CHANGELOG', offset: 2, limit: 2))
 
             aggregate_failures do
               expect(log_commits).not_to include(commit_with_new_name)
@@ -656,8 +658,8 @@ describe Bringit::Repository, seed_helper: true do
       end
 
       context "and 'path' is a file that matches the old filename" do
-        it "does not follow renames" do
-          log_commits = repository.log(options.merge(path: "CHANGELOG"))
+        it 'does not follow renames' do
+          log_commits = repository.log(options.merge(path: 'CHANGELOG'))
 
           aggregate_failures do
             expect(log_commits).not_to include(commit_with_new_name)
@@ -667,8 +669,8 @@ describe Bringit::Repository, seed_helper: true do
         end
       end
 
-      context "unknown ref" do
-        it "returns an empty array" do
+      context 'unknown ref' do
+        it 'returns an empty array' do
           log_commits = repository.log(options.merge(ref: 'unknown'))
 
           expect(log_commits).to eq([])
@@ -677,14 +679,14 @@ describe Bringit::Repository, seed_helper: true do
     end
 
     context "where 'follow' == false" do
-      options = { follow: false }
+      options = {follow: false}
 
       context "and 'path' is a directory" do
         let(:log_commits) do
-          repository.log(options.merge(path: "encoding"))
+          repository.log(options.merge(path: 'encoding'))
         end
 
-        it "should not follow renames" do
+        it 'should not follow renames' do
           expect(log_commits).to include(commit_with_new_name)
           expect(log_commits).to include(rename_commit)
           expect(log_commits).not_to include(commit_with_old_name)
@@ -693,10 +695,10 @@ describe Bringit::Repository, seed_helper: true do
 
       context "and 'path' is a file that matches the new filename" do
         let(:log_commits) do
-          repository.log(options.merge(path: "encoding/CHANGELOG"))
+          repository.log(options.merge(path: 'encoding/CHANGELOG'))
         end
 
-        it "should not follow renames" do
+        it 'should not follow renames' do
           expect(log_commits).to include(commit_with_new_name)
           expect(log_commits).to include(rename_commit)
           expect(log_commits).not_to include(commit_with_old_name)
@@ -705,10 +707,10 @@ describe Bringit::Repository, seed_helper: true do
 
       context "and 'path' is a file that matches the old filename" do
         let(:log_commits) do
-          repository.log(options.merge(path: "CHANGELOG"))
+          repository.log(options.merge(path: 'CHANGELOG'))
         end
 
-        it "should not follow renames" do
+        it 'should not follow renames' do
           expect(log_commits).to include(commit_with_old_name)
           expect(log_commits).to include(rename_commit)
           expect(log_commits).not_to include(commit_with_new_name)
@@ -717,17 +719,17 @@ describe Bringit::Repository, seed_helper: true do
 
       context "and 'path' includes a directory that used to be a file" do
         let(:log_commits) do
-          repository.log(options.merge(ref: "refs/heads/fix-blob-path", path: "files/testdir/file.txt"))
+          repository.log(options.merge(ref: 'refs/heads/fix-blob-path', path: 'files/testdir/file.txt'))
         end
 
-        it "should return a list of commits" do
+        it 'should return a list of commits' do
           expect(log_commits.size).to eq(1)
         end
       end
     end
 
-    context "only_commit_sha" do
-      let(:options) { { ref: "master", only_commit_sha: true } }
+    context 'only_commit_sha' do
+      let(:options) { {ref: 'master', only_commit_sha: true} }
       let(:commits_by_walk) { repository.log(options) }
       let(:commits_by_shell) { repository.log(options.merge(disable_walk: true)) }
 
@@ -736,62 +738,62 @@ describe Bringit::Repository, seed_helper: true do
       it { expect(commits_by_walk.first).to match(/[a-z0-9]{40}/) }
     end
 
-    context "compare results between log_by_walk and log_by_shell" do
-      let(:options) { { ref: "master" } }
+    context 'compare results between log_by_walk and log_by_shell' do
+      let(:options) { {ref: 'master'} }
       let(:commits_by_walk) { repository.log(options).map(&:oid) }
-      let(:commits_by_shell) { repository.log(options.merge({ disable_walk: true })).map(&:oid) }
+      let(:commits_by_shell) { repository.log(options.merge(disable_walk: true)).map(&:oid) }
 
       it { expect(commits_by_walk).to eq(commits_by_shell) }
 
-      context "without path" do
-        context "with limit" do
-          let(:options) { { ref: "master", limit: 1 } }
+      context 'without path' do
+        context 'with limit' do
+          let(:options) { {ref: 'master', limit: 1} }
 
           it { expect(commits_by_walk).to eq(commits_by_shell) }
         end
 
-        context "with offset" do
-          let(:options) { { ref: "master", offset: 1 } }
+        context 'with offset' do
+          let(:options) { {ref: 'master', offset: 1} }
 
           it { expect(commits_by_walk).to eq(commits_by_shell) }
         end
 
-        context "with skip_merges" do
-          let(:options) { { ref: "master", skip_merges: true } }
-
-          it { expect(commits_by_walk).to eq(commits_by_shell) }
-        end
-      end
-
-      context "with root path" do
-        let(:path) { "/" }
-
-        context "with limit" do
-          let(:options) { { ref: "master", limit: 1, path: path } }
-
-          it { expect(commits_by_walk).to eq(commits_by_shell) }
-        end
-
-        context "with offset" do
-          let(:options) { { ref: "master", offset: 1, path: path } }
-
-          it { expect(commits_by_walk).to eq(commits_by_shell) }
-        end
-
-        context "with skip_merges" do
-          let(:options) { { ref: "master", skip_merges: true, path: path } }
+        context 'with skip_merges' do
+          let(:options) { {ref: 'master', skip_merges: true} }
 
           it { expect(commits_by_walk).to eq(commits_by_shell) }
         end
       end
 
-      context "with path" do
-        let(:options) { { ref: "master", path: "encoding" } }
+      context 'with root path' do
+        let(:path) { '/' }
+
+        context 'with limit' do
+          let(:options) { {ref: 'master', limit: 1, path: path} }
+
+          it { expect(commits_by_walk).to eq(commits_by_shell) }
+        end
+
+        context 'with offset' do
+          let(:options) { {ref: 'master', offset: 1, path: path} }
+
+          it { expect(commits_by_walk).to eq(commits_by_shell) }
+        end
+
+        context 'with skip_merges' do
+          let(:options) { {ref: 'master', skip_merges: true, path: path} }
+
+          it { expect(commits_by_walk).to eq(commits_by_shell) }
+        end
+      end
+
+      context 'with path' do
+        let(:options) { {ref: 'master', path: 'encoding'} }
 
         it { expect(commits_by_walk).to eq(commits_by_shell) }
 
-        context "with follow" do
-          let(:options) { { ref: "master", path: "encoding", follow: true } }
+        context 'with follow' do
+          let(:options) { {ref: 'master', path: 'encoding', follow: true} }
 
           it { expect(commits_by_walk).to eq(commits_by_shell) }
         end
@@ -799,9 +801,9 @@ describe Bringit::Repository, seed_helper: true do
     end
 
     context "where provides 'after' timestamp" do
-      options = { after: Time.iso8601('2014-03-03T20:15:01+00:00') }
+      options = {after: Time.iso8601('2014-03-03T20:15:01+00:00')}
 
-      it "should returns commits on or after that timestamp" do
+      it 'should returns commits on or after that timestamp' do
         commits = repository.log(options)
 
         expect(commits.size).to be > 0
@@ -812,9 +814,9 @@ describe Bringit::Repository, seed_helper: true do
     end
 
     context "where provides 'before' timestamp" do
-      options = { before: Time.iso8601('2014-03-03T20:15:01+00:00') }
+      options = {before: Time.iso8601('2014-03-03T20:15:01+00:00')}
 
-      it "should returns commits on or before that timestamp" do
+      it 'should returns commits on or before that timestamp' do
         commits = repository.log(options)
 
         expect(commits.size).to be > 0
@@ -825,7 +827,7 @@ describe Bringit::Repository, seed_helper: true do
     end
   end
 
-  describe "#commits_between" do
+  describe '#commits_between' do
     context 'two SHAs' do
       let(:first_sha) { 'b0e52af38d7ea43cf41d8a6f2471351ac036d6c9' }
       let(:second_sha) { '0e50ec4d3c7ce42ab74dda1d422cb2cbffe1e326' }
@@ -867,7 +869,7 @@ describe Bringit::Repository, seed_helper: true do
   describe '#count_commits' do
     context 'with after timestamp' do
       it 'returns the number of commits after timestamp' do
-        options = { ref: 'master', limit: nil, after: Time.iso8601('2013-03-03T20:15:01+00:00') }
+        options = {ref: 'master', limit: nil, after: Time.iso8601('2013-03-03T20:15:01+00:00')}
 
         expect(repository.count_commits(options)).to eq(25)
       end
@@ -875,7 +877,7 @@ describe Bringit::Repository, seed_helper: true do
 
     context 'with before timestamp' do
       it 'returns the number of commits after timestamp' do
-        options = { ref: 'feature', limit: nil, before: Time.iso8601('2015-03-03T20:15:01+00:00') }
+        options = {ref: 'feature', limit: nil, before: Time.iso8601('2015-03-03T20:15:01+00:00')}
 
         expect(repository.count_commits(options)).to eq(9)
       end
@@ -883,14 +885,14 @@ describe Bringit::Repository, seed_helper: true do
 
     context 'with path' do
       it 'returns the number of commits with path ' do
-        options = { ref: 'master', limit: nil, path: "encoding" }
+        options = {ref: 'master', limit: nil, path: 'encoding'}
 
         expect(repository.count_commits(options)).to eq(2)
       end
     end
   end
 
-  describe "branch_names_contains" do
+  describe 'branch_names_contains' do
     subject { repository.branch_names_contains(SeedRepo::LastCommit::ID) }
 
     it { is_expected.to include('master') }
@@ -959,7 +961,7 @@ describe Bringit::Repository, seed_helper: true do
 
   describe '#branches with deleted branch' do
     before(:each) do
-      ref = double()
+      ref = double
       allow(ref).to receive(:name) { 'bad-branch' }
       allow(ref).to receive(:target) { raise Rugged::ReferenceError }
       allow(repository.rugged).to receive(:branches) { [ref] }
@@ -988,44 +990,44 @@ describe Bringit::Repository, seed_helper: true do
     end
   end
 
-  describe "#ls_files" do
-    let(:master_file_paths) { repository.ls_files("master") }
-    let(:not_existed_branch) { repository.ls_files("not_existed_branch") }
+  describe '#ls_files' do
+    let(:master_file_paths) { repository.ls_files('master') }
+    let(:not_existed_branch) { repository.ls_files('not_existed_branch') }
 
-    it "read every file paths of master branch" do
+    it 'read every file paths of master branch' do
       expect(master_file_paths.length).to equal(40)
     end
 
-    it "reads full file paths of master branch" do
-      expect(master_file_paths).to include("files/html/500.html")
+    it 'reads full file paths of master branch' do
+      expect(master_file_paths).to include('files/html/500.html')
     end
 
-    it "dose not read submodule directory and empty directory of master branch" do
-      expect(master_file_paths).not_to include("six")
+    it 'dose not read submodule directory and empty directory of master branch' do
+      expect(master_file_paths).not_to include('six')
     end
 
     it "does not include 'nil'" do
       expect(master_file_paths).not_to include(nil)
     end
 
-    it "returns empty array when not existed branch" do
+    it 'returns empty array when not existed branch' do
       expect(not_existed_branch.length).to equal(0)
     end
   end
 
-  describe "#copy_gitattributes" do
+  describe '#copy_gitattributes' do
     let(:attributes_path) { File.join(TEST_REPO_PATH, 'info/attributes') }
 
-    it "raises an error with invalid ref" do
-      expect { repository.copy_gitattributes("invalid") }.to raise_error(Bringit::Repository::InvalidRef)
+    it 'raises an error with invalid ref' do
+      expect { repository.copy_gitattributes('invalid') }.to raise_error(Bringit::Repository::InvalidRef)
     end
 
-    context "with no .gitattrbutes" do
+    context 'with no .gitattrbutes' do
       before(:each) do
-        repository.copy_gitattributes("master")
+        repository.copy_gitattributes('master')
       end
 
-      it "does not have an info/attributes" do
+      it 'does not have an info/attributes' do
         expect(File.exist?(attributes_path)).to be_falsey
       end
 
@@ -1034,17 +1036,17 @@ describe Bringit::Repository, seed_helper: true do
       end
     end
 
-    context "with .gitattrbutes" do
+    context 'with .gitattrbutes' do
       before(:each) do
-        repository.copy_gitattributes("gitattributes")
+        repository.copy_gitattributes('gitattributes')
       end
 
-      it "has an info/attributes" do
+      it 'has an info/attributes' do
         expect(File.exist?(attributes_path)).to be_truthy
       end
 
-      it "has the same content in info/attributes as .gitattributes" do
-        contents = File.open(attributes_path, "rb") { |f| f.read }
+      it 'has the same content in info/attributes as .gitattributes' do
+        contents = File.open(attributes_path, 'rb', &:read)
         expect(contents).to eq("*.md binary\n")
       end
 
@@ -1053,17 +1055,17 @@ describe Bringit::Repository, seed_helper: true do
       end
     end
 
-    context "with updated .gitattrbutes" do
+    context 'with updated .gitattrbutes' do
       before(:each) do
-        repository.copy_gitattributes("gitattributes")
-        repository.copy_gitattributes("gitattributes-updated")
+        repository.copy_gitattributes('gitattributes')
+        repository.copy_gitattributes('gitattributes-updated')
       end
 
-      it "has an info/attributes" do
+      it 'has an info/attributes' do
         expect(File.exist?(attributes_path)).to be_truthy
       end
 
-      it "has the updated content in info/attributes" do
+      it 'has the updated content in info/attributes' do
         contents = File.read(attributes_path)
         expect(contents).to eq("*.txt binary\n")
       end
@@ -1073,13 +1075,13 @@ describe Bringit::Repository, seed_helper: true do
       end
     end
 
-    context "with no .gitattrbutes in HEAD but with previous info/attributes" do
+    context 'with no .gitattrbutes in HEAD but with previous info/attributes' do
       before(:each) do
-        repository.copy_gitattributes("gitattributes")
-        repository.copy_gitattributes("master")
+        repository.copy_gitattributes('gitattributes')
+        repository.copy_gitattributes('master')
       end
 
-      it "does not have an info/attributes" do
+      it 'does not have an info/attributes' do
         expect(File.exist?(attributes_path)).to be_falsey
       end
 
@@ -1098,7 +1100,7 @@ describe Bringit::Repository, seed_helper: true do
       File.write(attributes_path, "*.md -diff\n")
     end
 
-    it "should return true for files which are text and do not have attributes" do
+    it 'should return true for files which are text and do not have attributes' do
       blob = Bringit::Blob.find(
         repository,
         '33bcff41c232a11727ac6d660bd4b0c2ba86d63d',
@@ -1107,7 +1109,7 @@ describe Bringit::Repository, seed_helper: true do
       expect(repository.diffable?(blob)).to be_truthy
     end
 
-    it "should return false for binary files which do not have attributes" do
+    it 'should return false for binary files which do not have attributes' do
       blob = Bringit::Blob.find(
         repository,
         '33bcff41c232a11727ac6d660bd4b0c2ba86d63d',
@@ -1116,7 +1118,7 @@ describe Bringit::Repository, seed_helper: true do
       expect(repository.diffable?(blob)).to be_falsey
     end
 
-    it "should return false for text files which have been marked as not being diffable in attributes" do
+    it 'should return false for text files which have been marked as not being diffable in attributes' do
       blob = Bringit::Blob.find(
         repository,
         '33bcff41c232a11727ac6d660bd4b0c2ba86d63d',
@@ -1186,18 +1188,18 @@ describe Bringit::Repository, seed_helper: true do
     options = {}
     options[:tree] = index.write_tree(repo)
     options[:author] = {
-      email: "test@example.com",
-      name: "Test Author",
-      time: Time.gm(2014, "mar", 3, 20, 15, 1)
+      email: 'test@example.com',
+      name: 'Test Author',
+      time: Time.gm(2014, 'mar', 3, 20, 15, 1),
     }
     options[:committer] = {
-      email: "test@example.com",
-      name: "Test Author",
-      time: Time.gm(2014, "mar", 3, 20, 15, 1)
+      email: 'test@example.com',
+      name: 'Test Author',
+      time: Time.gm(2014, 'mar', 3, 20, 15, 1),
     }
     options[:message] ||= message
     options[:parents] = repo.empty? ? [] : [repo.head.target].compact
-    options[:update_ref] = "HEAD"
+    options[:update_ref] = 'HEAD'
 
     options
   end
@@ -1205,15 +1207,15 @@ describe Bringit::Repository, seed_helper: true do
   # Writes a new commit to the repo and returns a Rugged::Commit.  Replaces the
   # contents of CHANGELOG with a single new line of text.
   def new_commit_edit_old_file(repo)
-    oid = repo.write("I replaced the changelog with this text", :blob)
+    oid = repo.write('I replaced the changelog with this text', :blob)
     index = repo.index
     index.read_tree(repo.head.target.tree)
-    index.add(path: "CHANGELOG", oid: oid, mode: 0100644)
+    index.add(path: 'CHANGELOG', oid: oid, mode: 0o100644)
 
     options = commit_options(
       repo,
       index,
-      "Edit CHANGELOG in its original location"
+      'Edit CHANGELOG in its original location'
     )
 
     sha = Rugged::Commit.create(repo, options)
@@ -1226,9 +1228,9 @@ describe Bringit::Repository, seed_helper: true do
     oid = repo.write("I'm a new changelog with different text", :blob)
     index = repo.index
     index.read_tree(repo.head.target.tree)
-    index.add(path: "encoding/CHANGELOG", oid: oid, mode: 0100644)
+    index.add(path: 'encoding/CHANGELOG', oid: oid, mode: 0o100644)
 
-    options = commit_options(repo, index, "Edit encoding/CHANGELOG")
+    options = commit_options(repo, index, 'Edit encoding/CHANGELOG')
 
     sha = Rugged::Commit.create(repo, options)
     repo.lookup(sha)
@@ -1237,15 +1239,15 @@ describe Bringit::Repository, seed_helper: true do
   # Writes a new commit to the repo and returns a Rugged::Commit.  Moves the
   # CHANGELOG file to the encoding/ directory.
   def new_commit_move_file(repo)
-    blob_oid = repo.head.target.tree.detect { |i| i[:name] == "CHANGELOG" }[:oid]
+    blob_oid = repo.head.target.tree.detect { |i| i[:name] == 'CHANGELOG' }[:oid]
     file_content = repo.lookup(blob_oid).content
     oid = repo.write(file_content, :blob)
     index = repo.index
     index.read_tree(repo.head.target.tree)
-    index.add(path: "encoding/CHANGELOG", oid: oid, mode: 0100644)
-    index.remove("CHANGELOG")
+    index.add(path: 'encoding/CHANGELOG', oid: oid, mode: 0o100644)
+    index.remove('CHANGELOG')
 
-    options = commit_options(repo, index, "Move CHANGELOG to encoding/")
+    options = commit_options(repo, index, 'Move CHANGELOG to encoding/')
 
     sha = Rugged::Commit.create(repo, options)
     repo.lookup(sha)

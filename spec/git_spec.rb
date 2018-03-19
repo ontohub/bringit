@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Bringit, lib: true do
@@ -18,7 +20,7 @@ describe Bringit, lib: true do
   let(:committer_name) { Faker::Name.name.chomp("\.") }
 
   describe 'committer_hash' do
-    it "returns a hash containing the given email and name" do
+    it 'returns a hash containing the given email and name' do
       committer_hash = Bringit.committer_hash(email: committer_email, name: committer_name)
 
       expect(committer_hash[:email]).to eq(committer_email)
@@ -27,7 +29,7 @@ describe Bringit, lib: true do
     end
 
     context 'when email is nil' do
-      it "returns nil" do
+      it 'returns nil' do
         committer_hash = Bringit.committer_hash(email: nil, name: committer_name)
 
         expect(committer_hash).to be_nil
@@ -35,7 +37,7 @@ describe Bringit, lib: true do
     end
 
     context 'when name is nil' do
-      it "returns nil" do
+      it 'returns nil' do
         committer_hash = Bringit.committer_hash(email: committer_email, name: nil)
 
         expect(committer_hash).to be_nil

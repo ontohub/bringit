@@ -9,7 +9,7 @@ module Bringit
         return [:noop, nil] unless diverged?(options, previous_head_sha)
 
         commit_sha = merge(options, previous_head_sha)
-        return [:merge_commit_created, commit_sha]
+        [:merge_commit_created, commit_sha]
       end
 
       def diverged?(options, previous_head_sha)
@@ -76,17 +76,17 @@ module Bringit
 
       def conflict_hash(blob_object, stage)
         {path: blob_object.path,
-          oid: blob_object.id,
-          dev: 0,
-          ino: 0,
-          mode: blob_object.mode.to_i(8),
-          gid: 0,
-          uid: 0,
-          file_size: 0,
-          valid: false,
-          stage: stage,
-          ctime: Time.at(0),
-          mtime: Time.at(0)}
+         oid: blob_object.id,
+         dev: 0,
+         ino: 0,
+         mode: blob_object.mode.to_i(8),
+         gid: 0,
+         uid: 0,
+         file_size: 0,
+         valid: false,
+         stage: stage,
+         ctime: Time.at(0),
+         mtime: Time.at(0)}
       end
 
       def create_user_commit(options, previous_head_sha)
@@ -100,7 +100,7 @@ module Bringit
         end
       end
 
-      def with_temp_user_reference(options, previous_head_sha)
+      def with_temp_user_reference(_options, previous_head_sha)
         refname = "#{Time.now.to_f.to_s.tr('.', '')}_#{SecureRandom.hex(20)}"
         full_refname = "refs/merges/user/#{refname}"
         reference = rugged.references.create(full_refname, previous_head_sha)
@@ -115,8 +115,8 @@ module Bringit
       end
 
       def raise_head_changed_error(conflicts, options)
-        message = <<MESSAGE
-The branch has changed since editing and cannot be merged automatically.
+        message = <<~MESSAGE
+          The branch has changed since editing and cannot be merged automatically.
 MESSAGE
         raise HeadChangedError.new(message, conflicts, options)
       end

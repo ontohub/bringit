@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'open3'
 
 module Bringit
   module Popen
-    extend self
+    module_function
 
     def self.popen(cmd, path = nil, vars = {})
       unless cmd.is_a?(Array)

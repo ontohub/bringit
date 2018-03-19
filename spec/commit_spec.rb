@@ -1,4 +1,6 @@
-require "spec_helper"
+# frozen_string_literal: true
+
+require 'spec_helper'
 
 describe Bringit::Commit, seed_helper: true do
   let(:repository) { Bringit::Repository.new(TEST_REPO_PATH) }
@@ -7,20 +9,20 @@ describe Bringit::Commit, seed_helper: true do
     repository.rugged.lookup(SeedRepo::Commit::ID)
   end
 
-  describe "Commit info" do
+  describe 'Commit info' do
     before do
       repo = Bringit::Repository.new(TEST_REPO_PATH).rugged
 
       @committer = {
         email: 'mike@smith.com',
-        name: "Mike Smith",
-        time: Time.now
+        name: 'Mike Smith',
+        time: Time.now,
       }
 
       @author = {
         email: 'john@smith.com',
-        name: "John Smith",
-        time: Time.now
+        name: 'John Smith',
+        time: Time.now,
       }
 
       @parents = [repo.head.target]
@@ -34,8 +36,8 @@ describe Bringit::Commit, seed_helper: true do
         committer: @committer,
         tree: @tree,
         parents: @parents,
-        message: "Refactoring specs",
-        update_ref: "HEAD"
+        message: 'Refactoring specs',
+        update_ref: 'HEAD'
       )
 
       @raw_commit = repo.lookup(sha)
@@ -55,44 +57,44 @@ describe Bringit::Commit, seed_helper: true do
     it { expect(@commit.different_committer?).to be_truthy }
     it { expect(@commit.parents).to eq(@bringit_parents) }
     it { expect(@commit.parent_id).to eq(@parents.first.oid) }
-    it { expect(@commit.no_commit_message).to eq("--no commit message") }
+    it { expect(@commit.no_commit_message).to eq('--no commit message') }
     it { expect(@commit.tree).to eq(@tree) }
 
     after do
       # Erase the new commit so other tests get the original repo
       repo = Bringit::Repository.new(TEST_REPO_PATH).rugged
-      repo.references.update("refs/heads/master", SeedRepo::LastCommit::ID)
+      repo.references.update('refs/heads/master', SeedRepo::LastCommit::ID)
     end
   end
 
   context 'Class methods' do
     describe :find do
-      it "should return first head commit if without params" do
+      it 'should return first head commit if without params' do
         expect(Bringit::Commit.last(repository).id).to eq(
           repository.raw.head.target.oid
         )
       end
 
-      it "should return valid commit" do
+      it 'should return valid commit' do
         expect(Bringit::Commit.find(repository, SeedRepo::Commit::ID)).to be_valid_commit
       end
 
-      it "should return valid commit for tag" do
+      it 'should return valid commit for tag' do
         expect(Bringit::Commit.find(repository, 'v1.0.0').id).to eq('6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9')
       end
 
-      it "should return nil for non-commit ids" do
-        blob = Bringit::Blob.find(repository, SeedRepo::Commit::ID, "files/ruby/popen.rb")
+      it 'should return nil for non-commit ids' do
+        blob = Bringit::Blob.find(repository, SeedRepo::Commit::ID, 'files/ruby/popen.rb')
         expect(Bringit::Commit.find(repository, blob.id)).to be_nil
       end
 
-      it "should return nil for parent of non-commit object" do
-        blob = Bringit::Blob.find(repository, SeedRepo::Commit::ID, "files/ruby/popen.rb")
+      it 'should return nil for parent of non-commit object' do
+        blob = Bringit::Blob.find(repository, SeedRepo::Commit::ID, 'files/ruby/popen.rb')
         expect(Bringit::Commit.find(repository, "#{blob.id}^")).to be_nil
       end
 
-      it "should return nil for nonexisting ids" do
-        expect(Bringit::Commit.find(repository, "+123_4532530XYZ")).to be_nil
+      it 'should return nil for nonexisting ids' do
+        expect(Bringit::Commit.find(repository, '+123_4532530XYZ')).to be_nil
       end
 
       context 'with broken repo' do
@@ -133,7 +135,7 @@ describe Bringit::Commit, seed_helper: true do
       end
     end
 
-    describe "where" do
+    describe 'where' do
       context 'path is empty string' do
         subject do
           commits = Bringit::Commit.where(
@@ -143,7 +145,7 @@ describe Bringit::Commit, seed_helper: true do
             limit: 10
           )
 
-          commits.map { |c| c.id }
+          commits.map(&:id)
         end
 
         it 'has 10 elements' do
@@ -161,7 +163,7 @@ describe Bringit::Commit, seed_helper: true do
             limit: 10
           )
 
-          commits.map { |c| c.id }
+          commits.map(&:id)
         end
 
         it 'has 10 elements' do
@@ -180,33 +182,33 @@ describe Bringit::Commit, seed_helper: true do
             offset: 1
           )
 
-          commits.map { |c| c.id }
+          commits.map(&:id)
         end
 
         it 'has 3 elements' do
           expect(subject.size).to eq(3)
         end
-        it { is_expected.to include("d14d6c0abdd253381df51a723d58691b2ee1ab08") }
-        it { is_expected.not_to include("eb49186cfa5c4338011f5f590fac11bd66c5c631") }
+        it { is_expected.to include('d14d6c0abdd253381df51a723d58691b2ee1ab08') }
+        it { is_expected.not_to include('eb49186cfa5c4338011f5f590fac11bd66c5c631') }
       end
 
       context 'ref is commit id' do
         subject do
           commits = Bringit::Commit.where(
             repo: repository,
-            ref: "874797c3a73b60d2187ed6e2fcabd289ff75171e",
+            ref: '874797c3a73b60d2187ed6e2fcabd289ff75171e',
             path: 'files',
             limit: 3,
             offset: 1
           )
 
-          commits.map { |c| c.id }
+          commits.map(&:id)
         end
 
         it 'has 3 elements' do
           expect(subject.size).to eq(3)
         end
-        it { is_expected.to include("2f63565e7aac07bcdadb654e253078b727143ec4") }
+        it { is_expected.to include('2f63565e7aac07bcdadb654e253078b727143ec4') }
         it { is_expected.not_to include(SeedRepo::Commit::ID) }
       end
 
@@ -220,13 +222,13 @@ describe Bringit::Commit, seed_helper: true do
             offset: 1
           )
 
-          commits.map { |c| c.id }
+          commits.map(&:id)
         end
 
         it 'has 3 elements' do
           expect(subject.size).to eq(3)
         end
-        it { is_expected.to include("874797c3a73b60d2187ed6e2fcabd289ff75171e") }
+        it { is_expected.to include('874797c3a73b60d2187ed6e2fcabd289ff75171e') }
         it { is_expected.not_to include(SeedRepo::Commit::ID) }
       end
     end
@@ -234,7 +236,7 @@ describe Bringit::Commit, seed_helper: true do
     describe :between do
       subject do
         commits = Bringit::Commit.between(repository, SeedRepo::Commit::PARENT_ID, SeedRepo::Commit::ID)
-        commits.map { |c| c.id }
+        commits.map(&:id)
       end
 
       it 'has 1 element' do
@@ -252,7 +254,7 @@ describe Bringit::Commit, seed_helper: true do
             max_count: 50
           )
 
-          commits.map { |c| c.id }
+          commits.map(&:id)
         end
 
         it 'has 31 elements' do
@@ -272,7 +274,7 @@ describe Bringit::Commit, seed_helper: true do
             skip: 1
           )
 
-          commits.map { |c| c.id }
+          commits.map(&:id)
         end
 
         it 'has 23 elements' do
@@ -291,7 +293,7 @@ describe Bringit::Commit, seed_helper: true do
             max_count: 7
           )
 
-          commits.map { |c| c.id }
+          commits.map(&:id)
         end
 
         it 'has 7 elements' do
@@ -321,12 +323,12 @@ describe Bringit::Commit, seed_helper: true do
 
     describe '#id' do
       subject { super().id }
-      it { is_expected.to eq(sample_commit_hash[:id])}
+      it { is_expected.to eq(sample_commit_hash[:id]) }
     end
 
     describe '#message' do
       subject { super().message }
-      it { is_expected.to eq(sample_commit_hash[:message])}
+      it { is_expected.to eq(sample_commit_hash[:message]) }
     end
   end
 
@@ -348,7 +350,7 @@ describe Bringit::Commit, seed_helper: true do
     subject { commit.to_diff }
 
     it { is_expected.not_to include "From #{SeedRepo::Commit::ID}" }
-    it { is_expected.to include 'diff --git a/files/ruby/popen.rb b/files/ruby/popen.rb'}
+    it { is_expected.to include 'diff --git a/files/ruby/popen.rb b/files/ruby/popen.rb' }
   end
 
   describe :has_zero_stats? do
@@ -359,7 +361,7 @@ describe Bringit::Commit, seed_helper: true do
     subject { commit.to_patch }
 
     it { is_expected.to include "From #{SeedRepo::Commit::ID}" }
-    it { is_expected.to include 'diff --git a/files/ruby/popen.rb b/files/ruby/popen.rb'}
+    it { is_expected.to include 'diff --git a/files/ruby/popen.rb b/files/ruby/popen.rb' }
   end
 
   describe :to_hash do
@@ -389,8 +391,8 @@ describe Bringit::Commit, seed_helper: true do
     it 'has 1 element' do
       expect(subject.size).to eq(1)
     end
-    it { is_expected.to include("master") }
-    it { is_expected.not_to include("feature") }
+    it { is_expected.to include('master') }
+    it { is_expected.not_to include('feature') }
   end
 
   describe :references do
@@ -443,15 +445,15 @@ describe Bringit::Commit, seed_helper: true do
 
   def sample_commit_hash
     {
-      author_email: "dmitriy.zaporozhets@gmail.com",
-      author_name: "Dmitriy Zaporozhets",
-      authored_date: "2012-02-27 20:51:12 +0200",
-      committed_date: "2012-02-27 20:51:12 +0200",
-      committer_email: "dmitriy.zaporozhets@gmail.com",
-      committer_name: "Dmitriy Zaporozhets",
+      author_email: 'dmitriy.zaporozhets@gmail.com',
+      author_name: 'Dmitriy Zaporozhets',
+      authored_date: '2012-02-27 20:51:12 +0200',
+      committed_date: '2012-02-27 20:51:12 +0200',
+      committer_email: 'dmitriy.zaporozhets@gmail.com',
+      committer_name: 'Dmitriy Zaporozhets',
       id: SeedRepo::Commit::ID,
-      message: "tree css fixes",
-      parent_ids: ["874797c3a73b60d2187ed6e2fcabd289ff75171e"]
+      message: 'tree css fixes',
+      parent_ids: ['874797c3a73b60d2187ed6e2fcabd289ff75171e'],
     }
   end
 end

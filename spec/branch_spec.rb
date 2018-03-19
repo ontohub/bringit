@@ -1,4 +1,6 @@
-require "spec_helper"
+# frozen_string_literal: true
+
+require 'spec_helper'
 
 describe Bringit::Branch, seed_helper: true do
   let(:repository) { Bringit::Repository.new(TEST_REPO_PATH) }
@@ -16,7 +18,7 @@ describe Bringit::Branch, seed_helper: true do
     let(:branch) { repository.branches.first }
 
     it { expect(branch.name).to eq(SeedRepo::Repo::BRANCHES.first) }
-    it { expect(branch.dereferenced_target.sha).to eq("0b4bc9a49b562e85de7cc9e834518ea6828729b9") }
+    it { expect(branch.dereferenced_target.sha).to eq('0b4bc9a49b562e85de7cc9e834518ea6828729b9') }
   end
 
   describe 'master branch' do

@@ -1,6 +1,6 @@
-# encoding: UTF-8
+# frozen_string_literal: true
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Bringit::BlobSnippet, seed_helper: true do
   describe :data do

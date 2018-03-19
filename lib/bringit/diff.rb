@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Bringit::Diff is a wrapper around native Rugged::Diff object
 module Bringit
   class Diff
@@ -137,17 +139,17 @@ module Bringit
       #    all files under ignored directories will be included in the diff,
       #    too.
       def filter_diff_options(options, default_options = {})
-        allowed_options = [:max_size, :context_lines, :interhunk_lines,
-                            :old_prefix, :new_prefix, :reverse, :force_text,
-                            :ignore_whitespace, :ignore_whitespace_change,
-                            :ignore_whitespace_eol, :ignore_submodules,
-                            :patience, :include_ignored, :include_untracked,
-                            :include_unmodified, :recurse_untracked_dirs,
-                            :disable_pathspec_match, :deltas_are_icase,
-                            :include_untracked_content, :skip_binary_check,
-                            :include_typechange, :include_typechange_trees,
-                            :ignore_filemode, :recurse_ignored_dirs, :paths,
-                            :max_files, :max_lines, :all_diffs, :no_collapse]
+        allowed_options = %i(max_sizecontext_linesinterhunk_lines
+                             old_prefix new_prefix reverse force_text
+                             ignore_whitespace ignore_whitespace_change
+                             ignore_whitespace_eol ignore_submodules
+                             patience include_ignored include_untracked
+                             include_unmodified recurse_untracked_dirs
+                             disable_pathspec_match deltas_are_icase
+                             include_untracked_content skip_binary_check
+                             include_typechange include_typechange_trees
+                             ignore_filemode recurse_ignored_dirs paths
+                             max_files max_lines all_diffs no_collapse)
 
         if default_options
           actual_defaults = default_options.dup
@@ -179,7 +181,7 @@ module Bringit
       when Rugged::Patch, Rugged::Diff::Delta
         init_from_rugged(raw_diff, collapse: collapse)
       when nil
-        raise "Nil as raw diff passed"
+        raise 'Nil as raw diff passed'
       else
         raise "Invalid raw diff type: #{raw_diff.class}"
       end

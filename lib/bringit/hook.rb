@@ -1,8 +1,10 @@
-require "bundler"
+# frozen_string_literal: true
+
+require 'bundler'
 
 module Bringit
   class Hook
-    GL_PROTOCOL = 'web'.freeze
+    GL_PROTOCOL = 'web'
     attr_reader :name, :repo_path, :path
 
     def initialize(name, repo_path)
@@ -20,9 +22,9 @@ module Bringit
 
       Bundler.with_clean_env do
         case name
-        when "pre-receive", "post-receive"
+        when 'pre-receive', 'post-receive'
           call_receive_hook(user_id, oldrev, newrev, ref)
-        when "update"
+        when 'update'
           call_update_hook(user_id, oldrev, newrev, ref)
         end
       end
@@ -31,7 +33,7 @@ module Bringit
     private
 
     def call_receive_hook(user_id, oldrev, newrev, ref)
-      changes = [oldrev, newrev, ref].join(" ")
+      changes = [oldrev, newrev, ref].join(' ')
 
       exit_status = false
       exit_message = nil
@@ -39,11 +41,11 @@ module Bringit
       vars = {
         'USER_ID' => user_id,
         'PWD' => repo_path,
-        'GL_PROTOCOL' => GL_PROTOCOL
+        'GL_PROTOCOL' => GL_PROTOCOL,
       }
 
       options = {
-        chdir: repo_path
+        chdir: repo_path,
       }
 
       Open3.popen3(vars, path, options) do |stdin, stdout, stderr, wait_thr|
@@ -74,7 +76,7 @@ module Bringit
 
     def call_update_hook(user_id, oldrev, newrev, ref)
       Dir.chdir(repo_path) do
-        stdout, stderr, status = Open3.capture3({ 'USER_ID' => user_id }, path, ref, oldrev, newrev)
+        stdout, stderr, status = Open3.capture3({'USER_ID' => user_id}, path, ref, oldrev, newrev)
         [status.success?, stderr.presence || stdout]
       end
     end

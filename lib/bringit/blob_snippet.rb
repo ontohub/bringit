@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Bringit
   class BlobSnippet
     include Linguist::BlobHelper
@@ -8,7 +10,10 @@ module Bringit
     attr_accessor :startline
 
     def initialize(ref, lines, startline, filename)
-      @ref, @lines, @startline, @filename = ref, lines, startline, filename
+      @ref = ref
+      @lines = lines
+      @startline = startline
+      @filename = filename
     end
 
     def data
