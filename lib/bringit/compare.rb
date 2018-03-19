@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Bringit
   class Compare
     attr_reader :head, :base, :straight
@@ -29,9 +31,7 @@ module Bringit
     end
 
     def diffs(options = {})
-      unless @head && @base
-        return Bringit::DiffCollection.new([])
-      end
+      return Bringit::DiffCollection.new([]) unless @head && @base
 
       paths = options.delete(:paths) || []
       options[:straight] = @straight

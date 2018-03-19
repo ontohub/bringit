@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Bringit
   class Index
     DEFAULT_MODE = 0o100644
@@ -24,7 +26,7 @@ module Bringit
 
       file_entry = get(options[:file_path])
       if file_entry
-        raise Bringit::Repository::InvalidBlobName.new("Filename already exists")
+        raise Bringit::Repository::InvalidBlobName, 'Filename already exists'
       end
 
       add_blob(options)
@@ -35,11 +37,11 @@ module Bringit
 
       file_entry = get(options[:file_path])
       if file_entry
-        raise Bringit::Repository::InvalidBlobName.new("Directory already exists as a file")
+        raise Bringit::Repository::InvalidBlobName, 'Directory already exists as a file'
       end
 
       if dir_exists?(options[:file_path])
-        raise Bringit::Repository::InvalidBlobName.new("Directory already exists")
+        raise Bringit::Repository::InvalidBlobName, 'Directory already exists'
       end
 
       options = options.dup
@@ -54,7 +56,7 @@ module Bringit
 
       file_entry = get(options[:file_path])
       unless file_entry
-        raise Bringit::Repository::InvalidBlobName.new("File doesn't exist")
+        raise Bringit::Repository::InvalidBlobName, "File doesn't exist"
       end
 
       add_blob(options, mode: file_entry[:mode])
@@ -65,11 +67,11 @@ module Bringit
 
       file_entry = get(options[:previous_path])
       unless file_entry
-        raise Bringit::Repository::InvalidBlobName.new("File doesn't exist")
+        raise Bringit::Repository::InvalidBlobName, "File doesn't exist"
       end
 
       if get(options[:file_path])
-        raise IndexError, "A file with this name already exists"
+        raise IndexError, 'A file with this name already exists'
       end
 
       raw_index.remove(options[:previous_path])
@@ -82,7 +84,7 @@ module Bringit
 
       file_entry = get(options[:file_path])
       unless file_entry
-        raise Bringit::Repository::InvalidBlobName.new("File doesn't exist")
+        raise Bringit::Repository::InvalidBlobName, "File doesn't exist"
       end
 
       raw_index.remove(options[:file_path])
@@ -101,7 +103,7 @@ module Bringit
       pathname = Bringit::PathHelper.normalize_path(path.dup)
 
       if pathname.each_filename.include?('..')
-        raise Bringit::Repository::InvalidBlobName.new('Invalid path')
+        raise Bringit::Repository::InvalidBlobName, 'Invalid path'
       end
 
       pathname.to_s
@@ -122,7 +124,7 @@ module Bringit
 
       raw_index.add(path: options[:file_path], oid: oid, mode: mode || DEFAULT_MODE)
     rescue Rugged::IndexError => e
-      raise Bringit::Repository::InvalidBlobName.new(e.message)
+      raise Bringit::Repository::InvalidBlobName, e.message
     end
   end
 end

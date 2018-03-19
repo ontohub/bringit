@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module Bringit
   class DiffCollection
     include Enumerable
 
-    DEFAULT_LIMITS = { max_files: 100, max_lines: 5000 }.freeze
+    DEFAULT_LIMITS = {max_files: 100, max_lines: 5000}.freeze
 
     def initialize(iterator, options = {})
       @iterator = iterator
@@ -19,7 +21,7 @@ module Bringit
       @line_count = 0
       @byte_count = 0
       @overflow = false
-      @array = Array.new
+      @array = []
     end
 
     def each(&block)
@@ -34,7 +36,7 @@ module Bringit
     end
 
     def empty?
-      !@iterator.any?
+      @iterator.none?
     end
 
     def overflow?
@@ -106,9 +108,7 @@ module Bringit
 
         diff = Bringit::Diff.new(raw, collapse: collapse)
 
-        if collapse && over_safe_limits?(i)
-          diff.prune_collapsed_diff!
-        end
+        diff.prune_collapsed_diff! if collapse && over_safe_limits?(i)
 
         @line_count += diff.line_count
         @byte_count += diff.diff.bytesize

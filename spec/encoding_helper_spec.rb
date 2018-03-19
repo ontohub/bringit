@@ -1,4 +1,6 @@
-require "spec_helper"
+# frozen_string_literal: true
+
+require 'spec_helper'
 
 describe Bringit::EncodingHelper do
   let(:ext_class) { Class.new { extend Bringit::EncodingHelper } }
@@ -9,12 +11,12 @@ describe Bringit::EncodingHelper do
       [
         'leaves ascii only string as is',
         'ascii only string',
-        'ascii only string'
+        'ascii only string',
       ],
       [
         'leaves valid utf8 string as is',
         'multibyte string №∑∉',
-        'multibyte string №∑∉'
+        'multibyte string №∑∉',
       ],
       [
         'removes invalid bytes from ASCII-8bit encoded multibyte string. This can occur when a git diff match line truncates in the middle of a multibyte character. This occurs after the second word in this example. The test string is as short as we can get while still triggering the error condition when not looking at `detect[:confidence]`.',
@@ -35,19 +37,19 @@ describe Bringit::EncodingHelper do
   describe '#encode_utf8' do
     [
       [
-        "encodes valid utf8 encoded string to utf8",
-        "λ, λ, λ".encode("UTF-8"),
-        "λ, λ, λ".encode("UTF-8"),
+        'encodes valid utf8 encoded string to utf8',
+        'λ, λ, λ'.encode('UTF-8'),
+        'λ, λ, λ'.encode('UTF-8'),
       ],
       [
-        "encodes valid ASCII-8BIT encoded string to utf8",
-        "ascii only".encode("ASCII-8BIT"),
-        "ascii only".encode("UTF-8"),
+        'encodes valid ASCII-8BIT encoded string to utf8',
+        'ascii only'.encode('ASCII-8BIT'),
+        'ascii only'.encode('UTF-8'),
       ],
       [
-        "encodes valid ISO-8859-1 encoded string to utf8",
-        "Rüby ist eine Programmiersprache. Wir verlängern den text damit ICU die Sprache erkennen kann.".encode("ISO-8859-1", "UTF-8"),
-        "Rüby ist eine Programmiersprache. Wir verlängern den text damit ICU die Sprache erkennen kann.".encode("UTF-8"),
+        'encodes valid ISO-8859-1 encoded string to utf8',
+        'Rüby ist eine Programmiersprache. Wir verlängern den text damit ICU die Sprache erkennen kann.'.encode('ISO-8859-1', 'UTF-8'),
+        'Rüby ist eine Programmiersprache. Wir verlängern den text damit ICU die Sprache erkennen kann.'.encode('UTF-8'),
       ],
     ].each do |description, test_string, xpect|
       it description do
@@ -63,12 +65,12 @@ describe Bringit::EncodingHelper do
       [
         'leaves ascii only string as is',
         'ascii only string',
-        'ascii only string'
+        'ascii only string',
       ],
       [
         'leaves valid utf8 string as is',
         'multibyte string №∑∉',
-        'multibyte string №∑∉'
+        'multibyte string №∑∉',
       ],
       [
         'removes invalid bytes from ASCII-8bit encoded multibyte string.',

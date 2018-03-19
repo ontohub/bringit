@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "committing/merge"
+require_relative 'committing/merge'
 
 module Bringit
   # Methods for committing. Use all these methods only mutexed with the git
@@ -247,7 +247,6 @@ module Bringit
 
     protected
 
-
     # Converts the options from a single change commit to a multi change
     # commit.
     def convert_options(options, action)
@@ -282,10 +281,6 @@ module Bringit
 
     # This method does the actual committing. Use this mutexed with the git
     # repository as the key.
-    # rubocop:disable Metrics/AbcSize
-    # rubocop:disable Metrics/CyclomaticComplexity
-    # rubocop:disable Metrics/PerceivedComplexity
-    # rubocop:disable Metrics/MethodLength
     def commit_with(options, previous_head_sha)
       # rubocop:enable Metrics/AbcSize
       # rubocop:enable Metrics/CyclomaticComplexity
@@ -317,7 +312,7 @@ module Bringit
       [parents, last_commit]
     end
 
-    def create_commit(index, tree, options, parents)
+    def create_commit(_index, tree, options, parents)
       opts = {}
       opts[:tree] = tree
       opts[:author] = options[:author]

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Bringit::Commit is a wrapper around native Rugged::Commit object
 module Bringit
   class Commit
@@ -6,11 +8,11 @@ module Bringit
     attr_reader :repository
     attr_accessor :raw_commit, :head, :refs
 
-    SERIALIZE_KEYS = [
-      :id, :message, :parent_ids,
-      :authored_date, :author_name, :author_email,
-      :committed_date, :committer_name, :committer_email
-    ].freeze
+    SERIALIZE_KEYS = %i(
+      id message parent_ids
+      authored_date author_name author_email
+      committed_date committer_name committer_email
+    ).freeze
 
     attr_accessor *SERIALIZE_KEYS # rubocop:disable Lint/AmbiguousOperator
 
@@ -19,9 +21,9 @@ module Bringit
     def ==(other)
       return false unless other.is_a?(Bringit::Commit)
 
-      methods = [:message, :parent_ids, :authored_date, :author_name,
-                  :author_email, :committed_date, :committer_name,
-                  :committer_email]
+      methods = %i(messageparent_idsauthored_dateauthor_name
+                   author_email committed_date committer_name
+                   committer_email)
 
       methods.all? do |method|
         send(method) == other.send(method)
@@ -54,7 +56,7 @@ module Bringit
       #
       #   Commit.find(repo, 'master')
       #
-      def find(repo, commit_id = "HEAD")
+      def find(repo, commit_id = 'HEAD')
         return decorate(commit_id, repo) if commit_id.is_a?(Rugged::Commit)
 
         obj = if commit_id.is_a?(String)
@@ -128,9 +130,9 @@ module Bringit
         actual_options = Bringit::Diff.filter_diff_options(options)
 
         diff = if rugged_commit.parents.empty?
-                  rugged_commit.diff(actual_options.merge(reverse: true))
-                else
-                  rugged_commit.parents[0].diff(rugged_commit, actual_options)
+                 rugged_commit.diff(actual_options.merge(reverse: true))
+               else
+                 rugged_commit.parents[0].diff(rugged_commit, actual_options)
                 end
 
         diff.find_similar!(break_rewrites: break_rewrites)
@@ -139,7 +141,7 @@ module Bringit
     end
 
     def initialize(raw_commit, repository = nil, head = nil)
-      raise "Nil as raw commit passed" unless raw_commit
+      raise 'Nil as raw commit passed' unless raw_commit
 
       if raw_commit.is_a?(Hash)
         init_from_hash(raw_commit)
@@ -195,12 +197,12 @@ module Bringit
 
     def has_zero_stats?
       stats.total.zero?
-    rescue
+    rescue StandardError
       true
     end
 
     def no_commit_message
-      "--no commit message"
+      '--no commit message'
     end
 
     def to_hash
@@ -226,12 +228,10 @@ module Bringit
     end
 
     def to_patch(options = {})
-      begin
-        raw_commit.to_mbox(options)
-      rescue Rugged::InvalidError => ex
-        if ex.message =~ /Commit \w+ is a merge commit/
-          'Patch format is not currently supported for merge commits.'
-        end
+      raw_commit.to_mbox(options)
+    rescue Rugged::InvalidError => ex
+      if ex.message.match?(/Commit \w+ is a merge commit/)
+        'Patch format is not currently supported for merge commits.'
       end
     end
 
@@ -247,17 +247,15 @@ module Bringit
     # Get a collection of Bringit::Ref (its subclasses) objects
     def references
       refs.map do |ref|
-        if ref.name.match(%r{\Arefs/heads/})
+        if ref.name.match?(%r{\Arefs/heads/})
           Bringit::Branch.new(repository, ref.name, ref.target)
-        elsif ref.name.match(%r{\Arefs/tags/})
+        elsif ref.name.match?(%r{\Arefs/tags/})
           message = nil
 
           if ref.target.is_a?(Rugged::Tag::Annotation)
             tag_message = ref.target.message
 
-            if tag_message.respond_to?(:chomp)
-              message = tag_message.chomp
-            end
+            message = tag_message.chomp if tag_message.respond_to?(:chomp)
           end
 
           Bringit::Tag.new(self, ref.name, ref.target, message)
@@ -274,7 +272,7 @@ module Bringit
     #
     def ref_names
       repository.refs_hash[id].map do |ref|
-        ref.name.sub(%r{^refs/(heads|remotes|tags)/}, "")
+        ref.name.sub(%r{^refs/(heads|remotes|tags)/}, '')
       end
     end
 

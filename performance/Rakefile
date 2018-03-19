@@ -1,11 +1,13 @@
-BRINGIT_GIT_ROOT = File.expand_path('../..', __FILE__)
+# frozen_string_literal: true
+
+BRINGIT_GIT_ROOT = File.expand_path('..', __dir__)
 PERFORMANCE_TEST_REPO_SOURCE = 'https://gitlab.com/gitlab-org/git-memory-test.git'
 PERFORMANCE_TEST_REPO_PATH = File.join(BRINGIT_GIT_ROOT, 'support/git-memory-test.git')
 
 desc "Clone the test repo from #{PERFORMANCE_TEST_REPO_SOURCE}"
 task :clone do
   unless File.exist?(PERFORMANCE_TEST_REPO_PATH)
-    system(*%W(git clone --bare #{PERFORMANCE_TEST_REPO_SOURCE} -- #{PERFORMANCE_TEST_REPO_PATH}))
+    system('git', 'clone', '--bare', PERFORMANCE_TEST_REPO_SOURCE.to_s, '--', PERFORMANCE_TEST_REPO_PATH.to_s)
   end
 end
 
@@ -20,7 +22,7 @@ Dir['test/*.rb'].each do |test_file|
   desc "Performance test: #{test_name}"
   task test_name => :clone do
     puts "Running performance test: #{test_name}"
-    system(*%W(time bundle exec ruby -Ilib #{test_file} #{PERFORMANCE_TEST_REPO_PATH}))
+    system('time', 'bundle', 'exec', 'ruby', '-Ilib', test_file.to_s, PERFORMANCE_TEST_REPO_PATH.to_s)
   end
   tests << test_name
 end

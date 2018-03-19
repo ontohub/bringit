@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'bringit'
 require 'memory_benchmark'
 

@@ -1,11 +1,13 @@
-require "spec_helper"
+# frozen_string_literal: true
+
+require 'spec_helper'
 
 describe Bringit::Diff, seed_helper: true do
   let(:repository) { Bringit::Repository.new(TEST_REPO_PATH) }
 
   before do
     @raw_diff_hash = {
-      diff: <<EOT.gsub(/^ {8}/, "").sub(/\n$/, ""),
+      diff: <<EOT.gsub(/^ {8}/, '').sub(/\n$/, ''),
         --- a/.gitmodules
         +++ b/.gitmodules
         @@ -4,3 +4,6 @@
@@ -17,18 +19,18 @@ describe Bringit::Diff, seed_helper: true do
         +	url = https://gitlab.com/gitlab-org/gitlab-grack.git
 
 EOT
-      new_path: ".gitmodules",
-      old_path: ".gitmodules",
+      new_path: '.gitmodules',
+      old_path: '.gitmodules',
       a_mode: '100644',
       b_mode: '100644',
       new_file: false,
       renamed_file: false,
       deleted_file: false,
-      too_large: false
+      too_large: false,
     }
 
-    @rugged_diff = repository.rugged.diff("5937ac0a7beb003549fc5fd26fc247adbce4a52e^", "5937ac0a7beb003549fc5fd26fc247adbce4a52e", paths:
-                                          [".gitmodules"]).patches.first
+    @rugged_diff = repository.rugged.diff('5937ac0a7beb003549fc5fd26fc247adbce4a52e^', '5937ac0a7beb003549fc5fd26fc247adbce4a52e', paths:
+                                          ['.gitmodules']).patches.first
   end
 
   describe '.new' do
@@ -70,8 +72,8 @@ EOT
 
       context 'using a diff that is too large' do
         it 'prunes the diff' do
-          stub_const("Bringit::Diff::DIFF_SIZE_LIMIT", 2)
-          stub_const("Bringit::Diff::DIFF_COLLAPSE_LIMIT", 1)
+          stub_const('Bringit::Diff::DIFF_SIZE_LIMIT', 2)
+          stub_const('Bringit::Diff::DIFF_COLLAPSE_LIMIT', 1)
 
           diff = described_class.new(@rugged_diff)
 
@@ -112,7 +114,7 @@ EOT
   end
 
   describe 'straight diffs' do
-    let(:options) { { straight: true } }
+    let(:options) { {straight: true} }
     let(:diffs) { described_class.between(repository, 'feature', 'master', options) }
 
     it 'has the correct size' do
@@ -166,32 +168,32 @@ EOT
   end
 
   describe '.filter_diff_options' do
-    let(:options) { { max_size: 100, invalid_opt: true } }
+    let(:options) { {max_size: 100, invalid_opt: true} }
 
-    context "without default options" do
+    context 'without default options' do
       let(:filtered_options) { described_class.filter_diff_options(options) }
 
-      it "should filter invalid options" do
+      it 'should filter invalid options' do
         expect(filtered_options).not_to have_key(:invalid_opt)
       end
     end
 
-    context "with default options" do
+    context 'with default options' do
       let(:filtered_options) do
-        default_options = { max_size: 5, bad_opt: 1, ignore_whitespace: true }
+        default_options = {max_size: 5, bad_opt: 1, ignore_whitespace: true}
         described_class.filter_diff_options(options, default_options)
       end
 
-      it "should filter invalid options" do
+      it 'should filter invalid options' do
         expect(filtered_options).not_to have_key(:invalid_opt)
         expect(filtered_options).not_to have_key(:bad_opt)
       end
 
-      it "should merge with default options" do
+      it 'should merge with default options' do
         expect(filtered_options).to have_key(:ignore_whitespace)
       end
 
-      it "should override default options" do
+      it 'should override default options' do
         expect(filtered_options).to have_key(:max_size)
         expect(filtered_options[:max_size]).to eq(100)
       end

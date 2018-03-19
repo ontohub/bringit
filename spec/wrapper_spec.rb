@@ -431,10 +431,8 @@ RSpec.describe(Bringit::Wrapper) do
 
         it 'has the correct number of branches' do
           expect do
-            begin
-              subject.create_branch("#{name}.", branch)
-            rescue Bringit::InvalidRefName
-            end
+            subject.create_branch("#{name}.", branch)
+          rescue Bringit::InvalidRefName
           end.not_to(change { subject.branches.size })
         end
       end
@@ -594,10 +592,8 @@ RSpec.describe(Bringit::Wrapper) do
 
         it 'has the correct number of tags' do
           expect do
-            begin
-              subject.create_tag("#{name}.", branch)
-            rescue Bringit::InvalidRefName
-            end
+            subject.create_tag("#{name}.", branch)
+          rescue Bringit::InvalidRefName
           end.not_to(change { subject.tags.size })
         end
       end
@@ -633,7 +629,7 @@ RSpec.describe(Bringit::Wrapper) do
           FactoryBot.create(:git_commit_info)[:author]
         end
         before do
-          subject.create_tag(name, branch, {message: message, tagger: tagger})
+          subject.create_tag(name, branch, message: message, tagger: tagger)
         end
 
         it_behaves_like 'a valid tag' do
@@ -717,7 +713,7 @@ RSpec.describe(Bringit::Wrapper) do
 
   context 'diff' do
     let(:num_setup_commits) { 6 }
-    let!(:file_range) { (0 .. num_setup_commits - 1) }
+    let!(:file_range) { (0..num_setup_commits - 1) }
     let!(:old_files) { file_range.map { generate(:filepath) } }
     let!(:old_contents) { file_range.map { generate(:content) } }
     let!(:setup_commits) do
@@ -763,7 +759,7 @@ RSpec.describe(Bringit::Wrapper) do
     end
 
     context 'with nil revisions' do
-      it "is empty if both revisions are nil" do
+      it 'is empty if both revisions are nil' do
         expect(subject.diff(nil, nil)).to be_empty
       end
 
@@ -810,7 +806,7 @@ RSpec.describe(Bringit::Wrapper) do
       context 'with paths' do
         context 'from root' do
           let(:diffs) do
-            subject.diff(nil, setup_commits.last, {}, *(old_files[0..3]))
+            subject.diff(nil, setup_commits.last, {}, *old_files[0..3])
           end
 
           it 'is of the correct class' do
@@ -831,7 +827,7 @@ RSpec.describe(Bringit::Wrapper) do
         context 'from a commit' do
           let(:diffs) do
             subject.diff(setup_commits.first, setup_commits.last, {},
-                         *(old_files[0..3]))
+                         *old_files[0..3])
           end
 
           it 'is of the correct class' do
@@ -891,7 +887,7 @@ RSpec.describe(Bringit::Wrapper) do
 
   context 'log' do
     let(:num_setup_commits) { 6 }
-    let!(:file_range) { (0 .. num_setup_commits - 1) }
+    let!(:file_range) { (0..num_setup_commits - 1) }
     let!(:old_files) { file_range.map { generate(:filepath) } }
     let!(:old_contents) { file_range.map { generate(:content) } }
     let!(:setup_commits) do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 if RUBY_ENGINE == 'ruby' # not 'rbx'
   require 'simplecov'
   SimpleCov.start
@@ -9,7 +11,7 @@ require 'bringit'
 require 'pry'
 require 'fuubar'
 
-Dir[File.expand_path('../support/**/*.rb', __FILE__)].each { |f| require f }
+Dir[File.expand_path('support/**/*.rb', __dir__)].each { |f| require f }
 
 RSpec.configure do |config|
   config.run_all_when_everything_filtered = true

@@ -1,4 +1,6 @@
-require "base64"
+# frozen_string_literal: true
+
+require 'base64'
 require 'spec_helper'
 
 describe Bringit::Index, seed_helper: true do
@@ -13,7 +15,7 @@ describe Bringit::Index, seed_helper: true do
     let(:options) do
       {
         content: 'Lorem ipsum...',
-        file_path: 'documents/story.txt'
+        file_path: 'documents/story.txt',
       }
     end
 
@@ -70,7 +72,7 @@ describe Bringit::Index, seed_helper: true do
   describe '#create_dir' do
     let(:options) do
       {
-        file_path: 'newdir'
+        file_path: 'newdir',
       }
     end
 
@@ -109,7 +111,7 @@ describe Bringit::Index, seed_helper: true do
     let(:options) do
       {
         content: 'Lorem ipsum...',
-        file_path: 'README.md'
+        file_path: 'README.md',
       }
     end
 
@@ -139,7 +141,7 @@ describe Bringit::Index, seed_helper: true do
 
         entry = index.get(options[:file_path])
 
-        expect(entry[:mode]).to eq(0100755)
+        expect(entry[:mode]).to eq(0o100755)
       end
     end
   end
@@ -149,7 +151,7 @@ describe Bringit::Index, seed_helper: true do
       {
         content: 'Lorem ipsum...',
         previous_path: 'README.md',
-        file_path: 'NEWREADME.md'
+        file_path: 'NEWREADME.md',
       }
     end
 
@@ -186,7 +188,7 @@ describe Bringit::Index, seed_helper: true do
 
         entry = index.get(options[:file_path])
 
-        expect(entry[:mode]).to eq(0100755)
+        expect(entry[:mode]).to eq(0o100755)
       end
     end
   end
@@ -194,7 +196,7 @@ describe Bringit::Index, seed_helper: true do
   describe '#delete' do
     let(:options) do
       {
-        file_path: 'README.md'
+        file_path: 'README.md',
       }
     end
 

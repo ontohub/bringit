@@ -1,4 +1,6 @@
-require "spec_helper"
+# frozen_string_literal: true
+
+require 'spec_helper'
 
 describe Bringit::Compare, seed_helper: true do
   let(:repository) { Bringit::Repository.new(TEST_REPO_PATH) }
@@ -67,7 +69,7 @@ describe Bringit::Compare, seed_helper: true do
     end
   end
 
-  describe :same  do
+  describe :same do
     subject do
       compare.same
     end

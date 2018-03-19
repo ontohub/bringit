@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Bringit
   class Blame
     include Bringit::EncodingHelper
@@ -26,21 +28,25 @@ module Bringit
     def load_blame
       cmd = %W(git --git-dir=#{@repo.path} blame -p #{@sha} -- #{@path})
       # Read in binary mode to ensure ASCII-8BIT
-      raw_output = IO.popen(cmd, 'rb') {|io| io.read }
+      raw_output = IO.popen(cmd, 'rb', &:read)
       output = encode_utf8(raw_output)
       process_raw_blame output
     end
 
     def process_raw_blame(output)
-      lines, final = [], []
-      info, commits = {}, {}
+      lines = []
+      final = []
+      info = {}
+      commits = {}
 
       # process the output
       output.split("\n").each do |line|
         if line[0, 1] == "\t"
           lines << line[1, line.size]
         elsif m = /^(\w{40}) (\d+) (\d+)/.match(line)
-          commit_id, old_lineno, lineno = m[1], m[2].to_i, m[3].to_i
+          commit_id = m[1]
+          old_lineno = m[2].to_i
+          lineno = m[3].to_i
           commits[commit_id] = nil unless commits.key?(commit_id)
           info[lineno] = [commit_id, old_lineno]
         end

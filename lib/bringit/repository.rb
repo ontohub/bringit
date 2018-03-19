@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 # Bringit::Repository is a wrapper around native Rugged::Repository object
 require 'tempfile'
 require 'forwardable'
-require "rubygems/package"
+require 'rubygems/package'
 
 module Bringit
   class Repository
@@ -26,7 +28,7 @@ module Bringit
     # /path/to/my-repo.git
     def initialize(path)
       @path = path
-      @name = path.split("/").last
+      @name = path.split('/').last
       @attributes = Bringit::Attributes.new(path)
     end
 
@@ -47,7 +49,7 @@ module Bringit
     def rugged
       @rugged ||= Rugged::Repository.new(path)
     rescue Rugged::RepositoryError, Rugged::OSError
-      raise NoRepository.new('no repository for such path')
+      raise NoRepository, 'no repository for such path'
     end
 
     # Returns an Array of branch names
@@ -59,11 +61,9 @@ module Bringit
     # Returns an Array of Branches
     def branches
       rugged.branches.map do |rugged_ref|
-        begin
-          Bringit::Branch.new(self, rugged_ref.name, rugged_ref.target)
-        rescue Rugged::ReferenceError
-          # Omit invalid branch
-        end
+        Bringit::Branch.new(self, rugged_ref.name, rugged_ref.target)
+      rescue Rugged::ReferenceError
+        # Omit invalid branch
       end.compact.sort_by(&:name)
     end
 
@@ -94,32 +94,28 @@ module Bringit
     # Returns the number of valid branches
     def branch_count
       rugged.branches.count do |ref|
-        begin
-          ref.name && ref.target # ensures the branch is valid
+        ref.name && ref.target # ensures the branch is valid
 
-          true
-        rescue Rugged::ReferenceError
-          false
-        end
+        true
+      rescue Rugged::ReferenceError
+        false
       end
     end
 
     # Returns an Array of tag names
     def tag_names
-      rugged.tags.map { |t| t.name }
+      rugged.tags.map(&:name)
     end
 
     # Returns an Array of Tags
     def tags
-      rugged.references.each("refs/tags/*").map do |ref|
+      rugged.references.each('refs/tags/*').map do |ref|
         message = nil
 
         if ref.target.is_a?(Rugged::Tag::Annotation)
           tag_message = ref.target.message
 
-          if tag_message.respond_to?(:chomp)
-            message = tag_message.chomp
-          end
+          message = tag_message.chomp if tag_message.respond_to?(:chomp)
         end
 
         Bringit::Tag.new(self, ref.name, ref.target, message)
@@ -154,7 +150,7 @@ module Bringit
 
     # Deprecated. Will be removed in 5.2
     def heads
-      rugged.references.each("refs/heads/*").map do |head|
+      rugged.references.each('refs/heads/*').map do |head|
         Bringit::Ref.new(self, head.name, head.target)
       end.sort_by(&:name)
     end
@@ -199,11 +195,11 @@ module Bringit
     end
 
     def archive_prefix(ref, sha)
-      project_name = self.name.chomp('.git')
+      project_name = name.chomp('.git')
       "#{project_name}-#{ref.tr('/', '-')}-#{sha}"
     end
 
-    def archive_metadata(ref, storage_path, format = "tar.gz")
+    def archive_metadata(ref, storage_path, format = 'tar.gz')
       ref ||= root_ref
       commit = Bringit::Commit.find(self, ref)
       return {} if commit.nil?
@@ -218,21 +214,21 @@ module Bringit
       }
     end
 
-    def archive_file_path(name, storage_path, format = "tar.gz")
+    def archive_file_path(name, storage_path, format = 'tar.gz')
       # Build file path
       return nil unless name
 
       extension =
         case format
-        when "tar.bz2", "tbz", "tbz2", "tb2", "bz2"
-          "tar.bz2"
-        when "tar"
-          "tar"
-        when "zip"
-          "zip"
+        when 'tar.bz2', 'tbz', 'tbz2', 'tb2', 'bz2'
+          'tar.bz2'
+        when 'tar'
+          'tar'
+        when 'zip'
+          'zip'
         else
           # everything else should fall back to tar.gz
-          "tar.gz"
+          'tar.gz'
         end
 
       file_name = "#{name}.#{extension}"
@@ -326,7 +322,7 @@ module Bringit
         show: sha,
         sort: Rugged::SORT_TOPO,
         limit: options[:limit],
-        offset: options[:offset]
+        offset: options[:offset],
       }
       commits = Rugged::Walker.walk(rugged, walk_options).to_a
       if options[:only_commit_sha]
@@ -346,7 +342,7 @@ module Bringit
       offset_in_ruby = use_follow_flag && options[:offset].present?
       limit += offset if offset_in_ruby
 
-      cmd = %W[git --git-dir=#{path} log]
+      cmd = %W(git --git-dir=#{path} log)
       cmd << "--max-count=#{limit}" if limit > 0
       cmd << '--format=%H'
       cmd << "--skip=#{offset}" unless offset_in_ruby
@@ -356,10 +352,10 @@ module Bringit
       cmd << "--before=#{options[:before].iso8601}" if options[:before]
       cmd << sha
       if options[:path].present?
-        cmd += %W[-- #{options[:path].sub(%r{\A/*}, './')}]
+        cmd += %W(-- #{options[:path].sub(%r{\A/*}, './')})
       end
 
-      raw_output = IO.popen(cmd) { |io| io.read }
+      raw_output = IO.popen(cmd, &:read)
       lines = offset_in_ruby ? raw_output.lines.drop(offset) : raw_output.lines
 
       if options[:only_commit_sha]
@@ -370,13 +366,13 @@ module Bringit
     end
 
     def count_commits(options)
-      cmd = %W[git --git-dir=#{path} rev-list]
+      cmd = %W(git --git-dir=#{path} rev-list)
       cmd << "--after=#{options[:after].iso8601}" if options[:after]
       cmd << "--before=#{options[:before].iso8601}" if options[:before]
-      cmd += %W[--count #{options[:ref]}]
-      cmd += %W[-- #{options[:path]}] if options[:path].present?
+      cmd += %W(--count #{options[:ref]})
+      cmd += %W(-- #{options[:path]}) if options[:path].present?
 
-      raw_output = IO.popen(cmd) { |io| io.read }
+      raw_output = IO.popen(cmd, &:read)
 
       raw_output.to_i
     end
@@ -449,13 +445,13 @@ module Bringit
     def find_commits(options = {})
       actual_options = options.dup
 
-      allowed_options = [:ref, :max_count, :skip, :contains, :order]
+      allowed_options = %i(ref max_count skip contains order)
 
       actual_options.keep_if do |key|
         allowed_options.include?(key)
       end
 
-      default_options = { skip: 0 }
+      default_options = {skip: 0}
       actual_options = default_options.merge(actual_options)
 
       walker = Rugged::Walker.new(rugged)
@@ -467,7 +463,7 @@ module Bringit
           walker.push(branch.target_id)
         end
       else
-        rugged.references.each("refs/heads/*") do |ref|
+        rugged.references.each('refs/heads/*') do |ref|
           walker.push(ref.target_id)
         end
       end
@@ -500,7 +496,7 @@ module Bringit
     #   repo.branch_names_contains('master')
     #
     def branch_names_contains(commit)
-      branches_contains(commit).map { |c| c.name }
+      branches_contains(commit).map(&:name)
     end
 
     # Returns branch collection that contains the special commit(SHA1 or name)
@@ -567,7 +563,7 @@ module Bringit
       return {} unless commit
 
       begin
-        content = blob_content(commit, ".gitmodules")
+        content = blob_content(commit, '.gitmodules')
       rescue InvalidBlobName
         return {}
       end
@@ -761,12 +757,12 @@ module Bringit
     #  :target_directory ::
     #    A path to an alternative workdir directory in which the checkout
     #    should be performed.
-    def checkout(ref, options = {}, start_point = "HEAD")
+    def checkout(ref, options = {}, start_point = 'HEAD')
       if options[:b]
         rugged.branches.create(ref, start_point)
         options.delete(:b)
       end
-      default_options = { strategy: [:recreate_missing, :safe] }
+      default_options = {strategy: %i(recreate_missing safe)}
       rugged.checkout(ref, default_options.merge(options))
     end
 
@@ -780,12 +776,12 @@ module Bringit
     # Examples:
     #   create_branch("feature")
     #   create_branch("other-feature", "master")
-    def create_branch(ref, start_point = "HEAD")
+    def create_branch(ref, start_point = 'HEAD')
       rugged_ref = rugged.branches.create(ref, start_point)
       Bringit::Branch.new(self, rugged_ref.name, rugged_ref.target)
     rescue Rugged::ReferenceError => e
-      raise InvalidRef.new("Branch #{ref} already exists") if e.to_s =~ /'refs\/heads\/#{ref}'/
-      raise InvalidRef.new("Invalid reference #{start_point}")
+      raise InvalidRef, "Branch #{ref} already exists" if e.to_s =~ /'refs\/heads\/#{ref}'/
+      raise InvalidRef, "Invalid reference #{start_point}"
     end
 
     # Return an array of this repository's remote names
@@ -829,8 +825,8 @@ module Bringit
       our_commit = rugged.branches[target_name].target
       their_commit = rugged.branches[source_name].target
 
-      raise "Invalid merge target" if our_commit.nil?
-      raise "Invalid merge source" if their_commit.nil?
+      raise 'Invalid merge target' if our_commit.nil?
+      raise 'Invalid merge source' if their_commit.nil?
 
       merge_index = rugged.merge_commits(our_commit, their_commit)
       return false if merge_index.conflicts?
@@ -847,7 +843,7 @@ module Bringit
       walker = Rugged::Walker.new(rugged)
       walker.sorting(Rugged::SORT_DATE | Rugged::SORT_REVERSE)
 
-      rugged.references.each("refs/heads/*") do |ref|
+      rugged.references.each('refs/heads/*') do |ref|
         walker.push(ref.target_id)
       end
 
@@ -861,9 +857,9 @@ module Bringit
     end
 
     AUTOCRLF_VALUES = {
-      "true" => true,
-      "false" => false,
-      "input" => :input
+      'true' => true,
+      'false' => false,
+      'input' => :input,
     }.freeze
 
     def autocrlf
@@ -897,8 +893,8 @@ module Bringit
 
       raw_output = IO.popen(cmd, &:read).split("\n").map do |f|
         stuff, path = f.split("\t")
-        _mode, type, _sha = stuff.split(" ")
-        path if type == "blob"
+        _mode, type, _sha = stuff.split(' ')
+        path if type == 'blob'
         # Contain only blob type
       end
 
@@ -909,7 +905,7 @@ module Bringit
       begin
         commit = lookup(ref)
       rescue Rugged::ReferenceError
-        raise InvalidRef.new("Ref #{ref} is invalid")
+        raise InvalidRef, "Ref #{ref} is invalid"
       end
 
       # Create the paths
@@ -930,7 +926,7 @@ module Bringit
 
       # Write the contents of the .gitattributes file to info/attributes
       # Use binary mode to prevent Rails from converting ASCII-8BIT to UTF-8
-      File.open(info_attributes_path, "wb") do |file|
+      File.open(info_attributes_path, 'wb') do |file|
         file.write(gitattributes_content)
       end
     end
@@ -954,15 +950,13 @@ module Bringit
     def blob_content(commit, blob_name)
       blob_entry = tree_entry(commit, blob_name)
 
-      unless blob_entry
-        raise InvalidBlobName.new("Invalid blob name: #{blob_name}")
-      end
+      raise InvalidBlobName, "Invalid blob name: #{blob_name}" unless blob_entry
 
       case blob_entry[:type]
       when :commit
         blob_entry[:oid]
       when :tree
-        raise InvalidBlobName.new("#{blob_name} is a tree, not a blob")
+        raise InvalidBlobName, "#{blob_name} is a tree, not a blob"
       when :blob
         rugged.lookup(blob_entry[:oid]).content
       end
@@ -973,9 +967,9 @@ module Bringit
     def parse_gitmodules(commit, content)
       results = {}
 
-      current = ""
+      current = ''
       content.split("\n").each do |txt|
-        if txt =~ /^\s*\[/
+        if txt.match?(/^\s*\[/)
           current = txt.match(/(?<=").*(?=")/)[0]
           results[current] = {}
         else
@@ -985,9 +979,9 @@ module Bringit
           target = match_data[2].chomp
           results[current][match_data[1]] = target
 
-          if match_data[1] == "path"
+          if match_data[1] == 'path'
             begin
-              results[current]["id"] = blob_content(commit, target)
+              results[current]['id'] = blob_content(commit, target)
             rescue InvalidBlobName
               results.delete(current)
             end
@@ -1115,22 +1109,20 @@ module Bringit
         # When 'git archive' and the compression process are finished, we are
         # done.
         Process.waitpid(git_archive_pid)
-        raise "#{git_archive_cmd.join(' ')} failed" unless $?.success?
+        raise "#{git_archive_cmd.join(' ')} failed" unless $CHILD_STATUS.success?
         Process.waitpid(compress_pid)
-        raise "#{compress_cmd.join(' ')} failed" unless $?.success?
+        raise "#{compress_cmd.join(' ')} failed" unless $CHILD_STATUS.success?
       end
     end
 
     def nice(cmd)
       nice_cmd = %w(nice -n 20)
-      unless unsupported_platform?
-        nice_cmd += %w(ionice -c 2 -n 7)
-      end
+      nice_cmd += %w(ionice -c 2 -n 7) unless unsupported_platform?
       nice_cmd + cmd
     end
 
     def unsupported_platform?
-      %w[darwin freebsd solaris].map { |platform| RUBY_PLATFORM.include?(platform) }.any?
+      %w(darwin freebsd solaris).map { |platform| RUBY_PLATFORM.include?(platform) }.any?
     end
 
     # Returns true if the index entry has the special file mode that denotes
@@ -1190,9 +1182,9 @@ module Bringit
       # Loop through consecutive blocks of lines with indexes
       lines_with_index.each_cons(2 * SEARCH_CONTEXT_LINES + 1) do |line_block|
         # Get the 'middle' line and index from the block
-        line, _ = line_block[SEARCH_CONTEXT_LINES]
+        line, = line_block[SEARCH_CONTEXT_LINES]
 
-        next unless line && line.match(/#{Regexp.escape(query)}/i)
+        next unless line&.match(/#{Regexp.escape(query)}/i)
 
         # Yay, 'line' contains a match!
         # Get an array with just the context lines (no indexes)

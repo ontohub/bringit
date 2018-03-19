@@ -100,7 +100,7 @@ RSpec.describe(Bringit::Committing) do
                                  filepath: filepath2,
                                  content: content2,
                                  branch: branch)
-            commit_info[:file].merge!(previous_path: filepath1)
+            commit_info[:file][:previous_path] = filepath1
             subject.rename_and_update_file(commit_info, sha1)
           end
 
@@ -140,7 +140,7 @@ RSpec.describe(Bringit::Committing) do
                                  filepath: filepath2,
                                  branch: branch)
             commit_info[:file].delete(:content)
-            commit_info[:file].merge!(previous_path: filepath1)
+            commit_info[:file][:previous_path] = filepath1
             subject.rename_file(commit_info, sha1)
           end
 
@@ -208,7 +208,7 @@ RSpec.describe(Bringit::Committing) do
 
         context 'making multiple changes at once' do
           let(:num_setup_commits) { 6 }
-          let!(:file_range) { (0 .. num_setup_commits - 1) }
+          let!(:file_range) { (0..num_setup_commits - 1) }
           let!(:old_files) { file_range.map { generate(:filepath) } }
           let!(:old_contents) { file_range.map { generate(:content) } }
           let!(:setup_commits) do
@@ -247,7 +247,7 @@ RSpec.describe(Bringit::Committing) do
                action: :remove},
 
               {path: new_files[5],
-               action: :mkdir}
+               action: :mkdir},
             ]
             subject.commit_multichange(info)
           end
@@ -321,17 +321,17 @@ RSpec.describe(Bringit::Committing) do
     let(:existing_file_added) { generate(:filepath) }
     let(:existing_file_removed) { generate(:filepath) }
     let(:existing_content) do
-      <<CONTENT
-line 1
-line 2
-line 3
-line 4
-line 5
-line 6
-line 7
-line 8
-line 9
-line 10
+      <<~CONTENT
+        line 1
+        line 2
+        line 3
+        line 4
+        line 5
+        line 6
+        line 7
+        line 8
+        line 9
+        line 10
 CONTENT
     end
     let(:commit_before1) do
@@ -463,23 +463,19 @@ CONTENT
       end
 
       it 'raises an error with the correct conflicts' do
-        begin
-          new_commit
-        rescue Bringit::Committing::HeadChangedError => e
-          expect(e.conflicts).
-            to match([{ancestor: expected_conflict_ancestor,
-                       ours: expected_conflict_ours,
-                       theirs: expected_conflict_theirs,
-                       merge_info: expected_conflict_merge_info}])
-        end
+        new_commit
+      rescue Bringit::Committing::HeadChangedError => e
+        expect(e.conflicts).
+          to match([{ancestor: expected_conflict_ancestor,
+                     ours: expected_conflict_ours,
+                     theirs: expected_conflict_theirs,
+                     merge_info: expected_conflict_merge_info}])
       end
 
       context 'trying to commit' do
         before do
-          begin
-            new_commit
-          rescue Bringit::Committing::HeadChangedError
-          end
+          new_commit
+        rescue Bringit::Committing::HeadChangedError
         end
 
         it 'keeps the HEAD of the branch' do

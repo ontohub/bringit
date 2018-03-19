@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Bringit
   class Tree
     include Bringit::EncodingHelper
@@ -17,14 +19,14 @@ module Bringit
         root_tree = commit.tree
 
         tree = if path
-                  id = find_id_by_path(repository, root_tree.oid, path)
-                  if id
-                    repository.lookup(id)
-                  else
-                    []
-                  end
-                else
-                  root_tree
+                 id = find_id_by_path(repository, root_tree.oid, path)
+                 if id
+                   repository.lookup(id)
+                 else
+                   []
+                 end
+               else
+                 root_tree
                 end
 
         tree.map do |entry|
@@ -35,7 +37,7 @@ module Bringit
             type: entry[:type],
             mode: entry[:filemode],
             path: path ? File.join(path, entry[:name]) : entry[:name],
-            commit_id: sha,
+            commit_id: sha
           )
         end
       end
@@ -73,7 +75,7 @@ module Bringit
 
     def initialize(options)
       %w(id root_id name path type mode commit_id).each do |key|
-        self.send("#{key}=", options[key.to_sym])
+        send("#{key}=", options[key.to_sym])
       end
     end
 

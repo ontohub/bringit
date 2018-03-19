@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Bringit::DiffCollection, seed_helper: true do
@@ -298,14 +300,14 @@ describe Bringit::DiffCollection, seed_helper: true do
 
     describe '#real_size' do
       subject { super().real_size }
-      it { is_expected.to eq('0')}
+      it { is_expected.to eq('0') }
     end
   end
 
   describe :each do
     context 'when diff are too large' do
       let(:collection) do
-        Bringit::DiffCollection.new([{ diff: 'a' * 204800 }])
+        Bringit::DiffCollection.new([{diff: 'a' * 204800}])
       end
 
       it 'yields Diff instances even when they are too large' do
@@ -325,7 +327,7 @@ describe Bringit::DiffCollection, seed_helper: true do
     end
 
     context 'when diff is quite large will collapse by default' do
-      let(:iterator) { [{ diff: 'a' * 20480 }] }
+      let(:iterator) { [{diff: 'a' * 20480}] }
 
       context 'when no collapse is set' do
         let(:no_collapse) { true }
@@ -368,7 +370,7 @@ describe Bringit::DiffCollection, seed_helper: true do
           let(:iterator) { [fake_diff(1, 1)] * 4 }
 
           before(:each) do
-            stub_const('Bringit::DiffCollection::DEFAULT_LIMITS', { max_files: 2, max_lines: max_lines })
+            stub_const('Bringit::DiffCollection::DEFAULT_LIMITS', max_files: 2, max_lines: max_lines)
           end
 
           it 'prunes diffs by default even little ones' do
@@ -388,12 +390,12 @@ describe Bringit::DiffCollection, seed_helper: true do
               fake_diff(1, 45),
               fake_diff(1, 45),
               fake_diff(1, 20480),
-              fake_diff(1, 1)
+              fake_diff(1, 1),
             ]
           end
 
           before(:each) do
-            stub_const('Bringit::DiffCollection::DEFAULT_LIMITS', { max_files: max_files, max_lines: 80 })
+            stub_const('Bringit::DiffCollection::DEFAULT_LIMITS', max_files: max_files, max_lines: 80)
           end
 
           it 'prunes diffs by default even little ones' do
@@ -413,12 +415,12 @@ describe Bringit::DiffCollection, seed_helper: true do
               fake_diff(1, 45),
               fake_diff(1, 45),
               fake_diff(1, 20480),
-              fake_diff(1, 1)
+              fake_diff(1, 1),
             ]
           end
 
           before(:each) do
-            stub_const('Bringit::DiffCollection::DEFAULT_LIMITS', { max_files: max_files, max_lines: 80 })
+            stub_const('Bringit::DiffCollection::DEFAULT_LIMITS', max_files: max_files, max_lines: 80)
           end
 
           it 'prunes diffs by default even little ones' do
@@ -455,6 +457,6 @@ describe Bringit::DiffCollection, seed_helper: true do
   end
 
   def fake_diff(line_length, line_count)
-    { 'diff' => "#{'a' * line_length}\n" * line_count }
+    {'diff' => "#{'a' * line_length}\n" * line_count}
   end
 end

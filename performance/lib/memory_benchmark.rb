@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 def memory_benchmark
   print_rss
   10.times do
@@ -7,5 +9,5 @@ def memory_benchmark
 end
 
 def print_rss
-  printf "%s RSS: %9s", $PROGRAM_NAME, IO.popen(%W(ps -o rss= -p #{Process.pid})).read
+  printf '%s RSS: %9s', $PROGRAM_NAME, IO.popen(%W(ps -o rss= -p #{Process.pid})).read
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Bringit::Attributes, seed_helper: true do
@@ -10,40 +12,40 @@ describe Bringit::Attributes, seed_helper: true do
   describe '#attributes' do
     context 'using a path with attributes' do
       it 'returns the attributes as a Hash' do
-        expect(subject.attributes('test.txt')).to eq({ 'text' => true })
+        expect(subject.attributes('test.txt')).to eq('text' => true)
       end
 
       it 'returns a Hash containing multiple attributes' do
         expect(subject.attributes('test.sh')).
-          to eq({ 'eol' => 'lf', 'bringit-language' => 'shell' })
+          to eq('eol' => 'lf', 'bringit-language' => 'shell')
       end
 
       it 'returns a Hash containing attributes for a file with multiple extensions' do
         expect(subject.attributes('test.haml.html')).
-          to eq({ 'bringit-language' => 'haml' })
+          to eq('bringit-language' => 'haml')
       end
 
       it 'returns a Hash containing attributes for a file in a directory' do
-        expect(subject.attributes('foo/bar.txt')).to eq({ 'foo' => true })
+        expect(subject.attributes('foo/bar.txt')).to eq('foo' => true)
       end
 
       it 'returns a Hash containing attributes with query string parameters' do
         expect(subject.attributes('foo.cgi')).
-          to eq({ 'key' => 'value?p1=v1&p2=v2' })
+          to eq('key' => 'value?p1=v1&p2=v2')
       end
 
       it 'returns a Hash containing the attributes for an absolute path' do
-        expect(subject.attributes('/test.txt')).to eq({ 'text' => true })
+        expect(subject.attributes('/test.txt')).to eq('text' => true)
       end
 
       it 'returns a Hash containing the attributes when a pattern is defined using an absolute path' do
         # When a path is given without a leading slash it should still match
         # patterns defined with a leading slash.
         expect(subject.attributes('foo.png')).
-          to eq({ 'bringit-language' => 'png' })
+          to eq('bringit-language' => 'png')
 
         expect(subject.attributes('/foo.png')).
-          to eq({ 'bringit-language' => 'png' })
+          to eq('bringit-language' => 'png')
       end
 
       it 'returns an empty Hash for a defined path without attributes' do
@@ -75,7 +77,7 @@ describe Bringit::Attributes, seed_helper: true do
 
     it 'parses an entry that uses a tab to separate the pattern and attributes' do
       expect(subject.patterns[File.join(path, '*.md')]).
-        to eq({ 'bringit-language' => 'markdown' })
+        to eq('bringit-language' => 'markdown')
     end
 
     it 'stores patterns in reverse order' do
@@ -101,27 +103,27 @@ describe Bringit::Attributes, seed_helper: true do
 
   describe '#parse_attributes' do
     it 'parses a boolean attribute' do
-      expect(subject.parse_attributes('text')).to eq({ 'text' => true })
+      expect(subject.parse_attributes('text')).to eq('text' => true)
     end
 
     it 'parses a negated boolean attribute' do
-      expect(subject.parse_attributes('-text')).to eq({ 'text' => false })
+      expect(subject.parse_attributes('-text')).to eq('text' => false)
     end
 
     it 'parses a key-value pair' do
-      expect(subject.parse_attributes('foo=bar')).to eq({ 'foo' => 'bar' })
+      expect(subject.parse_attributes('foo=bar')).to eq('foo' => 'bar')
     end
 
     it 'parses multiple attributes' do
       input = 'boolean key=value -negated'
 
       expect(subject.parse_attributes(input)).
-        to eq({ 'boolean' => true, 'key' => 'value', 'negated' => false })
+        to eq('boolean' => true, 'key' => 'value', 'negated' => false)
     end
 
     it 'parses attributes with query string parameters' do
       expect(subject.parse_attributes('foo=bar?baz=1')).
-        to eq({ 'foo' => 'bar?baz=1' })
+        to eq('foo' => 'bar?baz=1')
     end
   end
 
