@@ -31,7 +31,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'faker', '~> 1.8.5'
   s.add_development_dependency 'fuubar', '~> 2.3.0'
   s.add_development_dependency 'pry', '~> 0.11.0'
-  s.add_development_dependency 'pry-byebug', '~> 3.5.0'
+  s.add_development_dependency 'pry-byebug', '~> 3.6.0'
   s.add_development_dependency 'pry-rescue', '~> 1.4.4'
   s.add_development_dependency 'pry-stack_explorer', '~> 0.4.9.2'
   s.add_development_dependency 'rake', '~> 12.0'
