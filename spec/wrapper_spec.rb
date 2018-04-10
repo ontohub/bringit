@@ -457,7 +457,7 @@ RSpec.describe(Bringit::Wrapper) do
       end
 
       context 'bad revision' do
-        let(:revision) { '0' * 40 }
+        let(:revision) { '1' * 40 }
         it 'fails' do
           expect { subject.create_branch(name, revision) }.
             to raise_error(Rugged::OdbError,
@@ -619,7 +619,7 @@ RSpec.describe(Bringit::Wrapper) do
       end
 
       context 'bad revision' do
-        let(:revision) { '0' * 40 }
+        let(:revision) { '1' * 40 }
         it 'fails' do
           expect { subject.create_tag(name, revision) }.
             to raise_error(Rugged::OdbError,

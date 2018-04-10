@@ -5,7 +5,7 @@ PATH
       activesupport (>= 4.0)
       charlock_holmes (~> 0.7.3)
       github-linguist (>= 5.1, < 6.1)
-      rugged (~> 0.26.0)
+      rugged (>= 0.26, < 0.28)
 
 GEM
   remote: https://rubygems.org/
@@ -97,7 +97,7 @@ GEM
       ruby-progressbar (~> 1.7)
       unicode-display_width (~> 1.0, >= 1.0.1)
     ruby-progressbar (1.9.0)
-    rugged (0.26.0)
+    rugged (0.27.0)
     simplecov (0.16.1)
       docile (~> 1.1)
       json (>= 1.8, < 3)
