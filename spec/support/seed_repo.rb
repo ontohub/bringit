@@ -93,6 +93,7 @@ module SeedRepo
       gitattributes-updated
       master
       merge-test
+      rd-add-file-larger-than-1-mb
     ]
     TAGS = %w[v1.0.0 v1.1.0 v1.2.0 v1.2.1]
   end
