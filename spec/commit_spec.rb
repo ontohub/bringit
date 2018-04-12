@@ -255,8 +255,8 @@ describe Bringit::Commit, seed_helper: true do
           commits.map { |c| c.id }
         end
 
-        it 'has 31 elements' do
-          expect(subject.size).to eq(33)
+        it 'has 34 elements' do
+          expect(subject.size).to eq(34)
         end
         it { is_expected.to include(SeedRepo::Commit::ID) }
         it { is_expected.to include(SeedRepo::Commit::PARENT_ID) }
