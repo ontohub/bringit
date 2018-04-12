@@ -125,7 +125,7 @@ describe Bringit::Repository, seed_helper: true do
   describe '#size' do
     subject { repository.size }
 
-    it { is_expected.to be < 2 }
+    it { is_expected.to be < 4 }
   end
 
   describe '#has_commits?' do
