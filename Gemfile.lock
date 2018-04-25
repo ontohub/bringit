@@ -4,7 +4,7 @@ PATH
     bringit (1.0.0)
       activesupport (>= 4.0)
       charlock_holmes (~> 0.7.3)
-      github-linguist (>= 5.1, < 6.1)
+      github-linguist (>= 5.1, < 6.2)
       rugged (>= 0.26, < 0.28)
 
 GEM
@@ -44,8 +44,8 @@ GEM
     fuubar (2.3.1)
       rspec-core (~> 3.0)
       ruby-progressbar (~> 1.4)
-    github-linguist (6.0.1)
-      charlock_holmes (~> 0.7.5)
+    github-linguist (6.1.0)
+      charlock_holmes (~> 0.7.6)
       escape_utils (~> 1.2.0)
       mime-types (>= 1.19)
       rugged (>= 0.25.1)
