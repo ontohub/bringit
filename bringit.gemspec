@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'bundler-audit', '~> 0.6.0'
   s.add_development_dependency 'codecov', '~> 0.1.10'
   s.add_development_dependency 'factory_bot', '~> 4.8.2'
-  s.add_development_dependency 'faker', '~> 1.8.5'
+  s.add_development_dependency 'faker', '~> 1.9.2'
   s.add_development_dependency 'fuubar', '~> 2.3.0'
   s.add_development_dependency 'pry', '~> 0.11.0'
   s.add_development_dependency 'pry-byebug', '~> 3.6.0'
