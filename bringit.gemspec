@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.homepage    =
     'https://github.com/ontohub/bringit'
 
-  s.add_dependency('github-linguist', '>= 5.1', '< 6.2')
+  s.add_dependency('github-linguist', '>= 5.1', '< 7.9')
   s.add_dependency('activesupport', '>= 4.0')
   s.add_dependency('rugged', '>= 0.26', '< 0.28')
   s.add_dependency('charlock_holmes', '~> 0.7.3')
