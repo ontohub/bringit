@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'appraisal'
   s.add_development_dependency 'bundler', '~> 1.14'
   s.add_development_dependency 'bundler-audit', '~> 0.6.0'
-  s.add_development_dependency 'codecov', '~> 0.1.10'
+  s.add_development_dependency 'codecov', '~> 0.2.0'
   s.add_development_dependency 'factory_bot', '~> 4.8.2'
   s.add_development_dependency 'faker', '~> 1.8.5'
   s.add_development_dependency 'fuubar', '~> 2.3.0'
